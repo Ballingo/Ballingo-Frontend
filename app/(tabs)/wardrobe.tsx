@@ -1,11 +1,11 @@
-import { ImageBackground, View } from "react-native";
+import { ImageBackground, View, Text } from "react-native";
 import MoneyCounter from "@/components/money-counter/MoneyCounter";
 import Pet from "@/components/pet/Pet";
 import ProfileIcon from "@/components/profile-icon/ProfileIcon";
 import HungerBar from "@/components/hunger-bar/HungerBar";
 import FoodBar from "@/components/food-bar/FoodBar";
 
-export default function Index() {
+export default function Wardrobe() {
   return (
     <ImageBackground
       source={require("../../assets/backgrounds/notebook-bg.png")}
@@ -22,12 +22,11 @@ export default function Index() {
         flex: 1,
         justifyContent: 'center',
       }}>
-        <Pet />
-        <HungerBar hungerLevel={100} />
+        <Text>Wardrobe</Text>
       </View>
 
-      {/* Barra de alimentos debajo de la mascota */}
-      <FoodBar />
+
+      {/* Navbar al final */}
     </ImageBackground>
   );
 }
