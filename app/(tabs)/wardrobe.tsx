@@ -1,11 +1,22 @@
 import { ImageBackground, View, Text } from "react-native";
 import MoneyCounter from "@/components/money-counter/MoneyCounter";
-import Pet from "@/components/pet/Pet";
 import ProfileIcon from "@/components/profile-icon/ProfileIcon";
-import HungerBar from "@/components/hunger-bar/HungerBar";
-import FoodBar from "@/components/food-bar/FoodBar";
+import { useEffect } from "react";
+import { getAllClothes } from "../../api/ballingo_api";
 
 export default function Wardrobe() {
+  useEffect(() => {
+    console.log("Wardrobe screen mounted");
+
+    async function loadAllClothes() {
+      const res = await getAllClothes();
+      console.log(res);
+    }
+
+    loadAllClothes();
+
+  }, []);
+
   return (
     <ImageBackground
       source={require("../../assets/backgrounds/notebook-bg.png")}
