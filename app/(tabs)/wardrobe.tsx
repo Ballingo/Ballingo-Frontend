@@ -2,7 +2,7 @@ import { ImageBackground, View, Text } from "react-native";
 import MoneyCounter from "@/components/money-counter/MoneyCounter";
 import ProfileIcon from "@/components/profile-icon/ProfileIcon";
 import { useEffect } from "react";
-import { getAllClothes } from "../../api/ballingo_api";
+import { getAllClothes } from "../../api/cothes_api";
 
 export default function Wardrobe() {
   useEffect(() => {

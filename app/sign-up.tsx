@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-//import { createUser } from "../api/ballingo_api";
+import { createUser } from "../api/user_api";
 
 export default function RegisterScreen() {
     const router = useRouter();
@@ -13,10 +13,10 @@ export default function RegisterScreen() {
         if (username && email && password) {
             alert(`Usuario ${username} registrado con éxito`);
 
-            /*const newUser = {username, email, password};
+            const newUser = {username, email, password};
 
             const res = await createUser(newUser);
-            console.log(res);*/
+            console.log(res);
 
             router.replace('/(tabs)');  // Redirige a la pantalla principal
         } else {

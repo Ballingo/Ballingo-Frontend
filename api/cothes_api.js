@@ -9,7 +9,3 @@ const api = axios.create(
 export const getAllClothes = () => {
     return res = api.get('clothes/');
 };
-
-export const createUser = (data) => {
-    return res = api.post('user/signup', data);
-};

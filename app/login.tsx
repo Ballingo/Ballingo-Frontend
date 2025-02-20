@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import { loginUser } from "../api/user_api";
 
 export default function LoginScreen() {
     const router = useRouter();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         if (username && password) {
             alert(`Bienvenido de nuevo, ${username}`);
+
+            const credentials = {username, password};
+            const res = await loginUser(credentials);
+            console.log(res);
+
             router.replace('/(tabs)');  // Lleva al usuario a la página principal con el Navbar
         } else {
             alert('Por favor, ingresa tu usuario y contraseña.');
