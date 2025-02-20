@@ -1,11 +1,28 @@
 import { ImageBackground, View, Text } from "react-native";
 import MoneyCounter from "@/components/money-counter/MoneyCounter";
-import Pet from "@/components/pet/Pet";
 import ProfileIcon from "@/components/profile-icon/ProfileIcon";
-import HungerBar from "@/components/hunger-bar/HungerBar";
-import FoodBar from "@/components/food-bar/FoodBar";
+import Inventory from "@/components/inventory/Inventory";
+import Pet from "@/components/pet/Pet";
+import { useState } from "react";
+
+interface InventoryItem {
+  id: string;
+  category: string;
+  image: any;
+}
+
+const mockFood: InventoryItem[] = [
+  { id: '1', category: 'de', image: require('../../assets/inventory/food/ja/food1.png') },
+  { id: '2', category: 'ja', image: require('../../assets/inventory/food/ja/food1.png') },
+  { id: '3', category: 'es', image: require('../../assets/inventory/food/ja/food1.png') },
+  { id: '4', category: 'en', image: require('../../assets/inventory/food/ja/food1.png') },
+  { id: '5', category: 'ar', image: require('../../assets/inventory/food/ja/food1.png') },
+];
 
 export default function Trade() {
+
+  const [food] = useState<InventoryItem[]>(mockFood);
+
   return (
     <ImageBackground
       source={require("../../assets/backgrounds/notebook-bg.png")}
@@ -19,10 +36,25 @@ export default function Trade() {
       {/* Contenedor de mascota y barra de hambre */}
       <View style={{
         alignItems: 'center',
-        flex: 1,
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
+        marginTop: 100,
       }}>
-        <Text>Trade</Text>
+        <Pet 
+          containerStyle={{
+            alignItems: 'center',
+            marginBottom: 20,
+          }}
+          imageStyle={{
+            width: 200,
+            height: 200,
+          }}
+        />
+
+        <Inventory 
+          categories={['es', 'en', 'de', 'ja', 'ar']}
+          items={food}
+        />
+
       </View>
 
 

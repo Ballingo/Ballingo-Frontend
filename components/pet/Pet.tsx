@@ -1,20 +1,25 @@
 import React, { useEffect } from 'react';
-import { View, Image } from 'react-native';
+import { View, ImageStyle, ViewStyle } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 import styles from './PetStyles';
 
-const Pet: React.FC = () => {
+// Separar las props de estilo para View y Image
+interface PetProps {
+  containerStyle?: ViewStyle;
+  imageStyle?: ImageStyle;
+}
+
+const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle }) => {
   const rotation = useSharedValue(0);
 
   useEffect(() => {
-    // Animación en bucle de 10 grados a la derecha y a la izquierda
     rotation.value = withRepeat(
       withSequence(
-        withTiming(5, { duration: 2500 }), // Gira 10 grados a la derecha
-        withTiming(-5, { duration: 2500 }) // Gira 10 grados a la izquierda
+        withTiming(5, { duration: 2500 }),
+        withTiming(-5, { duration: 2500 })
       ),
-      -1, // Repetir infinitamente
-      true // Alternar la dirección
+      -1,
+      true
     );
   }, []);
 
@@ -23,10 +28,10 @@ const Pet: React.FC = () => {
   }));
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, containerStyle]}>
       <Animated.Image
         source={require('./assets/moringo.png')}
-        style={[styles.image, animatedStyle]}
+        style={[styles.image, animatedStyle, imageStyle]}
       />
     </View>
   );
