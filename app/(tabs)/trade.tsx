@@ -19,9 +19,18 @@ const mockFood: InventoryItem[] = [
   { id: '5', category: 'ar', image: require('../../assets/inventory/food/ja/food1.png') },
 ];
 
+const mockAllFood: InventoryItem[] = [
+  { id: '6', category: 'de', image: require('../../assets/inventory/food/ja/food2.png') },
+  { id: '7', category: 'ja', image: require('../../assets/inventory/food/ja/food2.png') },
+  { id: '8', category: 'es', image: require('../../assets/inventory/food/ja/food2.png') },
+  { id: '9', category: 'en', image: require('../../assets/inventory/food/ja/food2.png') },
+  { id: '10', category: 'ar', image: require('../../assets/inventory/food/ja/food2.png') },
+];
+
 export default function Trade() {
 
   const [food] = useState<InventoryItem[]>(mockFood);
+  const [allFood] = useState<InventoryItem[]>(mockAllFood);
 
   return (
     <ImageBackground
@@ -53,6 +62,8 @@ export default function Trade() {
         <Inventory 
           categories={['es', 'en', 'de', 'ja', 'ar']}
           items={food}
+          allItems = {allFood}
+          isClothes={false}
         />
 
       </View>

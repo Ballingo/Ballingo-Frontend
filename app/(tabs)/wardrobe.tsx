@@ -85,6 +85,7 @@ export default function Wardrobe() {
         <Inventory 
           categories={['hats', 'shirts', 'shoes', 'accesories']}
           items={clothes}
+          isClothes={true}
         />
       </View>
 
