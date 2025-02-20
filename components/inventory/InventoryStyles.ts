@@ -77,41 +77,160 @@ export default StyleSheet.create({
     alignItems: 'center',
     position: 'relative',
   },
-  modalImage: {
-    width: 100,
-    height: 100,
-    marginBottom: 10,
-  },
+
   closeButton: {
     position: 'absolute',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    top: 10,
-    right: 10,
+    paddingVertical: 4,
+    paddingHorizontal: 7,
+    top: 7,
+    right: 7,
     borderRadius: 20,
     backgroundColor: '#ff4d4d',
   },
   closeButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
   },
   buttonContainer: {
-    flexDirection: 'column',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     alignItems: 'center',
     width: '100%',
     marginTop: 10,
   },
   modalButton: {
+    flexDirection: 'row',
     padding: 10,
     borderRadius: 5,
     backgroundColor: '#007AFF',
     marginVertical: 5,
     alignItems: 'center',
+    width: '40%',
   },
   buttonText: {
     color: 'white',
     fontWeight: 'bold',
   },
+
+  tradeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 10,
+  },
+  
+  imageBox: {
+    borderWidth: 2,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    padding: 10,
+    backgroundColor: 'white',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  
+  modalImage: {
+    width: 100,
+    height: 100,
+    resizeMode: 'contain',
+  },
+
+  modalImage2: {
+    width: 65,
+    height: 65,
+    resizeMode: 'contain',
+  },
+
+  
+  arrowIcon: {
+    marginHorizontal: 10,
+  },
+  
+  iconStyle: {
+    marginRight: 8,
+  },
+
+  
+  tradeItem: {
+    width: '90%',        // Ancho del 90%
+    alignSelf: 'center', // Centra el ítem dentro del contenedor padre
+    padding: 10,
+    marginVertical: 5,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    elevation: 3,
+  },
+
+  tradeText: {
+    fontSize: 14,
+    color: '#333',
+  },
+  tradeTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+
+  tradeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 20,
+    marginLeft: 10,
+  },
+
+  tradeContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start', // Alinea los elementos a la izquierda
+    flex: 1, // Permite que los ítems ocupen el espacio restante
+    marginLeft: 10,
+  },
+  
+  tradeImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 10,
+    resizeMode: 'contain',
+  },
+
+tradeRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between', // Distribuye los elementos a lo largo de la fila
+  width: '100%',
+},
+
+
+backButton: {
+  flexDirection: 'row',   
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: '60%',       
+  paddingVertical: 10, 
+  borderRadius: 10,
+  backgroundColor: '#007AFF', 
+  alignSelf: 'center', 
+  marginTop: 10, 
+  marginBottom: 10,
+},
+
+
+
+
+
+
+
+  
 
 });
