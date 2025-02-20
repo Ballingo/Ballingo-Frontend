@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 export default function RegisterScreen() {
     const router = useRouter();
     const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const handleRegister = () => {
@@ -25,6 +26,12 @@ export default function RegisterScreen() {
                 placeholder="Nombre de usuario"
                 value={username}
                 onChangeText={setUsername}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Correo electrónico"
+                value={email}
+                onChangeText={setEmail}
             />
             <TextInput
                 style={styles.input}
