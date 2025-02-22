@@ -2,6 +2,7 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
+    width: 250,
     borderRadius: 10,
     overflow: "hidden",
     margin: 10,
@@ -21,6 +22,7 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "white",
     marginVertical: 5,
+    textAlign: "center",
   },
   price: {
     fontSize: 16,

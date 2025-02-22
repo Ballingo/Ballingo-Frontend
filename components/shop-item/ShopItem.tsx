@@ -13,7 +13,7 @@ const rarityColors: Record<string, string> = {
 interface ShopItemProps {
   title: string;
   image: string;
-  price: number;
+  price: string;
   rarity: keyof typeof rarityColors;
   onPress: () => void;
 }
@@ -33,7 +33,7 @@ const ShopItem: React.FC<ShopItemProps> = ({
       <View style={styles.content}>
         <Image source={{ uri: image }} style={styles.image} />
         <Text style={styles.title}>{title}</Text>
-        <Text style={styles.price}>{price} V-Bucks</Text>
+        <Text style={styles.price}>{price} </Text>
       </View>
     </TouchableOpacity>
   );
