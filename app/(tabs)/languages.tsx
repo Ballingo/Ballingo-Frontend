@@ -54,7 +54,7 @@ export default function Languages() {
   return (
     <ImageBackground
       source={require("../../assets/backgrounds/purple.png")}
-      style={{ flex: 1 }}
+      style={{ flex: 1, width: "100%", height: "100%" }}
       resizeMode="cover"
     >
       <MoneyCounter value={100} color="BE0AFF" />

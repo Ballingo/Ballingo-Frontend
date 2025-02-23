@@ -70,7 +70,7 @@ export default function Shop() {
   return (
     <ImageBackground
       source={require("../../assets/backgrounds/blue.png")}
-      style={{ flex: 1 }}
+      style={{ flex: 1, width: "100%", height: "100%" }}
       resizeMode="cover"
     >
       <MoneyCounter value={100} color="147DF5" />

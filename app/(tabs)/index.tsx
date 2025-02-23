@@ -9,7 +9,7 @@ export default function Index() {
   return (
     <ImageBackground
       source={require("../../assets/backgrounds/green.png")}
-      style={{ flex: 1 }}
+      style={{ flex: 1, width: "100%", height: "100%" }}
       resizeMode="cover"
     >
       {/* Contador de dinero y perfil */}

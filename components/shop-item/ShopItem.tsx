@@ -10,6 +10,14 @@ const rarityColors: Record<string, string> = {
   legendary: "#E67E22",
 };
 
+const rarityBorderColors: Record<string, string> = {
+  common: "#707070",
+  uncommon: "#27AE60",
+  rare: "#2980B9",
+  epic: "#8E44AD",
+  legendary: "#D35400",
+};
+
 interface ShopItemProps {
   title: string;
   image: any;
@@ -28,7 +36,13 @@ const ShopItem: React.FC<ShopItemProps> = ({
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={[styles.container, { backgroundColor: rarityColors[rarity] }]}
+      style={[
+        styles.container,
+        {
+          backgroundColor: rarityColors[rarity],
+          borderColor: rarityBorderColors[rarity],
+        },
+      ]}
     >
       <View style={styles.content}>
         <Image source={image} style={styles.image} />

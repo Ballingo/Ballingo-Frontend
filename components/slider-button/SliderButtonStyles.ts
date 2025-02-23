@@ -23,7 +23,6 @@ export const styles = StyleSheet.create({
     labelContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
-        paddingHorizontal: 10,
     },
     labelWrapper: {
         flex: 1,
