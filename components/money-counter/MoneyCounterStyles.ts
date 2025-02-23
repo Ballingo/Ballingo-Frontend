@@ -5,15 +5,17 @@ const styles = StyleSheet.create({
     position: 'absolute',
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
     justifyContent: 'flex-end',
     paddingInline: 10,
     flexWrap: 'wrap',
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: '#ccc',
     borderRadius: 20,
     alignSelf: 'flex-end',
     margin: 20,
+  },
+  moneyBackground: {
+    backgroundColor: 'rgba(240, 240, 240, 0.75)'
   },
   moneyIcon: {
     width: 32,

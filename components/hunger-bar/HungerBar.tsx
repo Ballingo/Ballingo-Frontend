@@ -5,11 +5,12 @@ import styles from "./HungerBarStyles";
 
 interface HungerBarProps {
   hungerLevel: number;
+  width: number;
 }
 
-const HungerBar: React.FC<HungerBarProps> = ({ hungerLevel }) => {
+const HungerBar: React.FC<HungerBarProps> = ({ hungerLevel, width }) => {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { width: `${width}%` }]}>
       <Image
         source={require("./assets/chicken.png")}
         style={[styles.icon, { left: `${hungerLevel}%` }]}

@@ -23,7 +23,8 @@ export default function LoginScreen() {
       const res = await loginUser(credentials);
       console.log(res);
 
-      router.replace("/(tabs)"); // Lleva al usuario a la página principal con el Navbar
+      router.replace("/(tabs)");
+      localStorage.setItem("username", username);
     } else {
       alert("Por favor, ingresa tu usuario y contraseña.");
     }

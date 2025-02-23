@@ -19,10 +19,11 @@ const icons = {
 const TabIcon = ({
   focused,
   icon,
+  index,
 }: {
   focused: boolean;
   icon: ImageSourcePropType;
-  title: string;
+  index: number;
 }) => {
   const animation = useRef(new Animated.Value(0)).current;
 
@@ -56,7 +57,6 @@ const TabIcon = ({
     <View style={[styles.iconContainer, focused && styles.activeIconContainer]}>
       <Animated.Image
         source={icon}
-        resizeMode="contain"
         style={[styles.icon, { transform: [{ translateY: animation }] }]}
       />
     </View>
@@ -64,70 +64,31 @@ const TabIcon = ({
 };
 
 const TabsLayout = () => {
+  const tabData = [
+    { name: "shop", icon: icons.shop },
+    { name: "wardrobe", icon: icons.wardrobe },
+    { name: "index", icon: icons.home },
+    { name: "languages", icon: icons.languages },
+    { name: "trade", icon: icons.trade },
+  ];
+
   return (
     <Tabs
-      screenOptions={{
-        tabBarShowLabel: false,
-        tabBarStyle: styles.navbar,
-      }}
+      screenOptions={{ tabBarShowLabel: false, tabBarStyle: styles.navbar }}
     >
-      <Tabs.Screen
-        name="shop"
-        options={{
-          title: "Shop",
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} icon={icons.shop} title="Shop" />
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="wardrobe"
-        options={{
-          title: "Wardrobe",
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} icon={icons.wardrobe} title="Wardrobe" />
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Home",
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} icon={icons.home} title="Home" />
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="languages"
-        options={{
-          title: "Languages",
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <TabIcon
-              focused={focused}
-              icon={icons.languages}
-              title="Languages"
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="trade"
-        options={{
-          title: "Trade",
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} icon={icons.trade} title="Trade" />
-          ),
-        }}
-      />
+      {tabData.map((tab, i) => (
+        <Tabs.Screen
+          key={tab.name}
+          name={tab.name}
+          options={{
+            title: tab.name.charAt(0).toUpperCase() + tab.name.slice(1),
+            headerShown: false,
+            tabBarIcon: ({ focused }) => (
+              <TabIcon focused={focused} icon={tab.icon} index={i} />
+            ),
+          }}
+        />
+      ))}
     </Tabs>
   );
 };
@@ -141,17 +102,17 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     width: "100%",
-    height: 80,
     borderTopWidth: 2,
     borderTopColor: "#aaa",
+    height: 80,
+    flex: 1,
   },
   iconContainer: {
-    flex: 1,
-    alignItems: "center",
+    height: 78,
+    paddingInline: 15,
     justifyContent: "center",
-    height: "100%",
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
+    borderLeftWidth: 2,
+    borderRightWidth: 2,
     borderColor: "#ccc",
   },
   activeIconContainer: {
@@ -160,7 +121,6 @@ const styles = StyleSheet.create({
   icon: {
     width: 50,
     height: 50,
-    resizeMode: "contain",
   },
 });
 

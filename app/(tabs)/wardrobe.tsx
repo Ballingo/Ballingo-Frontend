@@ -142,12 +142,12 @@ export default function Wardrobe() {
 
   return (
     <ImageBackground
-      source={require("../../assets/backgrounds/notebook-bg.png")}
+      source={require("../../assets/backgrounds/orange.png")}
       style={{ flex: 1 }}
       resizeMode="cover"
     >
       {/* Contador de dinero y perfil */}
-      <MoneyCounter value={100} />
+      <MoneyCounter value={100} color="FF8700" />
       <ProfileIcon size={50} style={{ zIndex: 10 }} />
 
       {/* Contenedor de mascota y barra de hambre */}

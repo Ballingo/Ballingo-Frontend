@@ -73,12 +73,12 @@ export default function Trade() {
 
   return (
     <ImageBackground
-      source={require("../../assets/backgrounds/notebook-bg.png")}
+      source={require("../../assets/backgrounds/red.png")}
       style={{ flex: 1 }}
       resizeMode="cover"
     >
       {/* Contador de dinero y perfil */}
-      <MoneyCounter value={100} />
+      <MoneyCounter value={100} color="FF0000" />
       <ProfileIcon size={50} style={{ zIndex: 10 }} />
 
       {/* Contenedor de mascota y barra de hambre */}

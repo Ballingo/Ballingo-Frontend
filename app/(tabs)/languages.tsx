@@ -53,11 +53,11 @@ export default function Languages() {
 
   return (
     <ImageBackground
-      source={require("../../assets/backgrounds/notebook-bg.png")}
+      source={require("../../assets/backgrounds/purple.png")}
       style={{ flex: 1 }}
       resizeMode="cover"
     >
-      <MoneyCounter value={100} />
+      <MoneyCounter value={100} color="BE0AFF" />
       <ProfileIcon size={50} style={{ zIndex: 10 }} />
 
       <View style={styles.container}>

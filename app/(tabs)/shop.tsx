@@ -24,7 +24,7 @@ const shopItems = [
     id: "3",
     title: "Big Coin Bag",
     image: require("../../assets/shop/coins.png"),
-    price: "5.99 $",
+    price: "9.99 $",
     rarity: "rare",
   },
   {
@@ -38,7 +38,7 @@ const shopItems = [
     id: "5",
     title: "Some Coins I Guess...",
     image: require("../../assets/shop/coins.png"),
-    price: "5.99 $",
+    price: "2.99 $",
     rarity: "common",
   },
 ];
@@ -46,14 +46,14 @@ const shopItems = [
 const clothesItems = [
   {
     id: "1",
-    title: "Camiseta Cool",
+    title: "Cool Shirt",
     image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
     price: "1000 coins",
     rarity: "uncommon",
   },
   {
     id: "2",
-    title: "Sombrero Aventurero",
+    title: "Adventurer Hat",
     image: require("../../assets/inventory/wardrobe/hats/hat1.png"),
     price: "800 coins",
     rarity: "rare",
@@ -69,11 +69,11 @@ export default function Shop() {
 
   return (
     <ImageBackground
-      source={require("../../assets/backgrounds/notebook-bg.png")}
+      source={require("../../assets/backgrounds/blue.png")}
       style={{ flex: 1 }}
       resizeMode="cover"
     >
-      <MoneyCounter value={100} />
+      <MoneyCounter value={100} color="147DF5" />
       <ProfileIcon size={50} style={{ zIndex: 10 }} />
 
       <View style={{ flex: 1, marginTop: 100 }}>
