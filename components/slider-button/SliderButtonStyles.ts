@@ -12,7 +12,6 @@ export const styles = StyleSheet.create({
         backgroundColor: "#ddd",
         position: "relative",
         justifyContent: "center",
-        paddingHorizontal: 5,
     },
     slider: {
         width: 90,
@@ -20,9 +19,6 @@ export const styles = StyleSheet.create({
         borderRadius: 20,
         backgroundColor: "#fff",
         position: "absolute",
-        top: 5,
-        left: 5,
-        elevation: 3,
     },
     labelContainer: {
         flexDirection: "row",

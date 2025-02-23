@@ -17,11 +17,13 @@ export default function Index() {
       <ProfileIcon size={50} style={{ zIndex: 10 }} />
 
       {/* Contenedor de mascota y barra de hambre */}
-      <View style={{
-        alignItems: 'center',
-        flex: 1,
-        justifyContent: 'center',
-      }}>
+      <View
+        style={{
+          alignItems: "center",
+          flex: 1,
+          justifyContent: "center",
+        }}
+      >
         <Pet />
         <HungerBar hungerLevel={100} />
       </View>

@@ -1,5 +1,15 @@
 import React, { useState, useRef } from "react";
-import { Button, Image, ImageBackground, Text, View, ScrollView, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
+import {
+  Button,
+  Image,
+  ImageBackground,
+  Text,
+  View,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+} from "react-native";
 import MoneyCounter from "@/components/money-counter/MoneyCounter";
 import ProfileIcon from "@/components/profile-icon/ProfileIcon";
 
@@ -10,11 +20,23 @@ export default function Languages() {
   const scrollViewRef = useRef<ScrollView>(null);
 
   const languages = [
-    { name: "English", flag: "en", image: require("../../assets/flags/en.svg") },
-    { name: "Spanish", flag: "es", image: require("../../assets/flags/es.svg") },
+    {
+      name: "English",
+      flag: "en",
+      image: require("../../assets/flags/en.svg"),
+    },
+    {
+      name: "Spanish",
+      flag: "es",
+      image: require("../../assets/flags/es.svg"),
+    },
     { name: "Arabic", flag: "ar", image: require("../../assets/flags/ar.svg") },
     { name: "German", flag: "de", image: require("../../assets/flags/de.svg") },
-    { name: "Japanese", flag: "ja", image: require("../../assets/flags/ja.svg") },
+    {
+      name: "Japanese",
+      flag: "ja",
+      image: require("../../assets/flags/ja.svg"),
+    },
   ];
 
   const handleSelectLanguage = (language: string) => {
@@ -66,7 +88,10 @@ export default function Languages() {
           <Text style={styles.selectedText}>Selected: {selectedLanguage}</Text>
         )}
 
-        <Button title="Confirm Selection" onPress={() => alert(`You selected ${selectedLanguage}`)} />
+        <Button
+          title="Confirm Selection"
+          onPress={() => alert(`You selected ${selectedLanguage}`)}
+        />
       </View>
     </ImageBackground>
   );
@@ -86,7 +111,7 @@ const styles = StyleSheet.create({
   },
   carouselContainer: {
     marginBottom: 20,
-    width: '100%',
+    width: "100%",
   },
   carousel: {
     alignItems: "center",

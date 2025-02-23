@@ -7,7 +7,6 @@ import Pet from "@/components/pet/Pet";
 import Inventory from "@/components/inventory/Inventory";
 import { useState } from "react";
 
-
 interface InventoryItem {
   id: string;
   category: string;
@@ -15,32 +14,119 @@ interface InventoryItem {
 }
 
 const mockClothes: InventoryItem[] = [
-  { id: '1', category: 'hats', image: require('../../assets/inventory/wardrobe/shirts/shirt1.png') },
-  { id: '2', category: 'shirts', image: require('../../assets/inventory/wardrobe/shirts/shirt1.png') },
-  { id: '3', category: 'accesories', image: require('../../assets/inventory/wardrobe/shirts/shirt1.png') },
-  { id: '4', category: 'hats', image: require('../../assets/inventory/wardrobe/shirts/shirt1.png') },
-  { id: '5', category: 'shirts', image: require('../../assets/inventory/wardrobe/shirts/shirt1.png') },
-  { id: '6', category: 'shirts', image: require('../../assets/inventory/wardrobe/shirts/shirt1.png') },
-  { id: '7', category: 'shirts', image: require('../../assets/inventory/wardrobe/shirts/shirt1.png') },
-  { id: '8', category: 'shirts', image: require('../../assets/inventory/wardrobe/shirts/shirt1.png') },
-  { id: '9', category: 'shirts', image: require('../../assets/inventory/wardrobe/shirts/shirt1.png') },
-  { id: '10', category: 'shirts', image: require('../../assets/inventory/wardrobe/shirts/shirt1.png') },
-  { id: '11', category: 'shirts', image: require('../../assets/inventory/wardrobe/shirts/shirt1.png') },
-  { id: '12', category: 'shirts', image: require('../../assets/inventory/wardrobe/shirts/shirt1.png') },
-  { id: '13', category: 'shirts', image: require('../../assets/inventory/wardrobe/shirts/shirt1.png') },
-  { id: '14', category: 'shirts', image: require('../../assets/inventory/wardrobe/shirts/shirt1.png') },
-  { id: '15', category: 'shirts', image: require('../../assets/inventory/wardrobe/shirts/shirt1.png') },
-  { id: '16', category: 'shirts', image: require('../../assets/inventory/wardrobe/shirts/shirt1.png') },
-  { id: '17', category: 'shirts', image: require('../../assets/inventory/wardrobe/shirts/shirt1.png') },
-  { id: '18', category: 'shirts', image: require('../../assets/inventory/wardrobe/shirts/shirt1.png') },
-  { id: '19', category: 'shirts', image: require('../../assets/inventory/wardrobe/shirts/shirt1.png') },
-  { id: '20', category: 'shirts', image: require('../../assets/inventory/wardrobe/shirts/shirt1.png') },
-  { id: '21', category: 'shirts', image: require('../../assets/inventory/wardrobe/shirts/shirt1.png') },
-  { id: '22', category: 'shirts', image: require('../../assets/inventory/wardrobe/shirts/shirt1.png') },
+  {
+    id: "1",
+    category: "hats",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+  },
+  {
+    id: "2",
+    category: "shirts",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+  },
+  {
+    id: "3",
+    category: "accesories",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+  },
+  {
+    id: "4",
+    category: "hats",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+  },
+  {
+    id: "5",
+    category: "shirts",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+  },
+  {
+    id: "6",
+    category: "shirts",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+  },
+  {
+    id: "7",
+    category: "shirts",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+  },
+  {
+    id: "8",
+    category: "shirts",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+  },
+  {
+    id: "9",
+    category: "shirts",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+  },
+  {
+    id: "10",
+    category: "shirts",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+  },
+  {
+    id: "11",
+    category: "shirts",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+  },
+  {
+    id: "12",
+    category: "shirts",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+  },
+  {
+    id: "13",
+    category: "shirts",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+  },
+  {
+    id: "14",
+    category: "shirts",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+  },
+  {
+    id: "15",
+    category: "shirts",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+  },
+  {
+    id: "16",
+    category: "shirts",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+  },
+  {
+    id: "17",
+    category: "shirts",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+  },
+  {
+    id: "18",
+    category: "shirts",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+  },
+  {
+    id: "19",
+    category: "shirts",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+  },
+  {
+    id: "20",
+    category: "shirts",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+  },
+  {
+    id: "21",
+    category: "shirts",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+  },
+  {
+    id: "22",
+    category: "shirts",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+  },
 ];
 
 export default function Wardrobe() {
-
   const [clothes] = useState<InventoryItem[]>(mockClothes);
 
   useEffect(() => {
@@ -52,7 +138,6 @@ export default function Wardrobe() {
     }
 
     loadAllClothes();
-
   }, []);
 
   return (
@@ -66,14 +151,16 @@ export default function Wardrobe() {
       <ProfileIcon size={50} style={{ zIndex: 10 }} />
 
       {/* Contenedor de mascota y barra de hambre */}
-      <View style={{
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        marginTop: 100,
-      }}>
-        <Pet 
+      <View
+        style={{
+          alignItems: "center",
+          justifyContent: "flex-start",
+          marginTop: 100,
+        }}
+      >
+        <Pet
           containerStyle={{
-            alignItems: 'center',
+            alignItems: "center",
             marginBottom: 20,
           }}
           imageStyle={{
@@ -82,8 +169,8 @@ export default function Wardrobe() {
           }}
         />
 
-        <Inventory 
-          categories={['hats', 'shirts', 'shoes', 'accesories']}
+        <Inventory
+          categories={["hats", "shirts", "shoes", "accesories"]}
           items={clothes}
           isClothes={true}
         />

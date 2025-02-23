@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, FlatList } from 'react-native';
-import styles from './InventoryStyles';
+import React, { useState } from "react";
+import { View, Text, Image, TouchableOpacity, FlatList } from "react-native";
+import styles from "./InventoryStyles";
 
 interface InventoryItem {
   id: string;
@@ -14,24 +14,38 @@ interface InventoryProps {
   isClothes?: boolean;
 }
 
-const Inventory: React.FC<InventoryProps> = ({ categories, items, isClothes = false }) => {
-  const [selectedCategory, setSelectedCategory] = useState<string>(categories[0]);
+const Inventory: React.FC<InventoryProps> = ({
+  categories,
+  items,
+  isClothes = false,
+}) => {
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    categories[0]
+  );
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
   const filteredItems = [
-    ...(isClothes ? [{ id: '0', category: 'all', image: require('./assets/not-allowed.png') }] : []),
-    ...items.filter(item => item.category === selectedCategory)
+    ...(isClothes
+      ? [
+          {
+            id: "0",
+            category: "all",
+            image: require("./assets/not-allowed.png"),
+          },
+        ]
+      : []),
+    ...items.filter((item) => item.category === selectedCategory),
   ];
 
   const handleSelectItem = (id: string) => {
-    setSelectedItemId(prevId => (prevId === id ? null : id));
+    setSelectedItemId((prevId) => (prevId === id ? null : id));
   };
 
   const renderItem = ({ item }: { item: InventoryItem }) => (
     <TouchableOpacity
       style={[
         styles.itemContainer,
-        selectedItemId === item.id && styles.selectedItem
+        selectedItemId === item.id && styles.selectedItem,
       ]}
       onPress={() => handleSelectItem(item.id)}
     >
@@ -43,12 +57,12 @@ const Inventory: React.FC<InventoryProps> = ({ categories, items, isClothes = fa
     <View style={styles.container}>
       {/* Navbar de Categorías */}
       <View style={styles.navbar}>
-        {categories.map(category => (
+        {categories.map((category) => (
           <TouchableOpacity
             key={category}
             style={[
               styles.navButton,
-              selectedCategory === category && styles.activeNavButton
+              selectedCategory === category && styles.activeNavButton,
             ]}
             onPress={() => setSelectedCategory(category)}
           >

@@ -8,7 +8,11 @@ interface SliderButtonProps {
   onToggle: (isLeft: boolean) => void;
 }
 
-const SliderButton: React.FC<SliderButtonProps> = ({ leftLabel, rightLabel, onToggle }) => {
+const SliderButton: React.FC<SliderButtonProps> = ({
+  leftLabel,
+  rightLabel,
+  onToggle,
+}) => {
   const [isLeft, setIsLeft] = useState(true);
   const animatedValue = useRef(new Animated.Value(0)).current;
 
@@ -31,16 +35,34 @@ const SliderButton: React.FC<SliderButtonProps> = ({ leftLabel, rightLabel, onTo
   return (
     <View style={styles.container}>
       <View style={styles.switchContainer}>
-        <Animated.View style={[styles.slider, { transform: [{ translateX }] }]} />
+        <Animated.View
+          style={[styles.slider, { transform: [{ translateX }] }]}
+        />
         <View style={styles.labelContainer}>
-          <TouchableOpacity onPress={() => !isLeft && toggleSwitch()} style={styles.labelWrapper}>
-            <Text style={[styles.label, isLeft ? styles.activeLabel : styles.inactiveLabel]}>
+          <TouchableOpacity
+            onPress={() => !isLeft && toggleSwitch()}
+            style={styles.labelWrapper}
+          >
+            <Text
+              style={[
+                styles.label,
+                isLeft ? styles.activeLabel : styles.inactiveLabel,
+              ]}
+            >
               {leftLabel}
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => isLeft && toggleSwitch()} style={styles.labelWrapper}>
-            <Text style={[styles.label, !isLeft ? styles.activeLabel : styles.inactiveLabel]}>
+          <TouchableOpacity
+            onPress={() => isLeft && toggleSwitch()}
+            style={styles.labelWrapper}
+          >
+            <Text
+              style={[
+                styles.label,
+                !isLeft ? styles.activeLabel : styles.inactiveLabel,
+              ]}
+            >
               {rightLabel}
             </Text>
           </TouchableOpacity>

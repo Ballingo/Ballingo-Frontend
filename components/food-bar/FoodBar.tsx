@@ -1,18 +1,23 @@
-import React, { useRef, useState } from 'react';
-import { View, Image, ScrollView, TouchableOpacity, Text } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring, withSequence } from 'react-native-reanimated';
-import { GestureDetector, Gesture } from 'react-native-gesture-handler';
-import styles from './FoodBarStyles';
-import { AntDesign } from '@expo/vector-icons';
+import React, { useRef, useState } from "react";
+import { View, Image, ScrollView, TouchableOpacity, Text } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withSequence,
+} from "react-native-reanimated";
+import { GestureDetector, Gesture } from "react-native-gesture-handler";
+import styles from "./FoodBarStyles";
+import { AntDesign } from "@expo/vector-icons";
 
 const initialFoods = [
-  { id: 1, image: require('./assets/food1.png'), quantity: 3 },
-  { id: 2, image: require('./assets/food2.png'), quantity: 5 },
-  { id: 3, image: require('./assets/food3.png'), quantity: 2 },
-  { id: 4, image: require('./assets/food4.png'), quantity: 4 },
-  { id: 5, image: require('./assets/food5.png'), quantity: 1 },
-  { id: 6, image: require('./assets/food6.png'), quantity: 6 },
-  { id: 7, image: require('./assets/food7.png'), quantity: 2 },
+  { id: 1, image: require("./assets/food1.png"), quantity: 3 },
+  { id: 2, image: require("./assets/food2.png"), quantity: 5 },
+  { id: 3, image: require("./assets/food3.png"), quantity: 2 },
+  { id: 4, image: require("./assets/food4.png"), quantity: 4 },
+  { id: 5, image: require("./assets/food5.png"), quantity: 1 },
+  { id: 6, image: require("./assets/food6.png"), quantity: 6 },
+  { id: 7, image: require("./assets/food7.png"), quantity: 2 },
 ];
 
 const FoodBar: React.FC = () => {
@@ -66,7 +71,11 @@ const FoodBar: React.FC = () => {
   );
 };
 
-const DraggableFood: React.FC<{ image: any; quantity: number; onReduceQuantity: () => void }> = ({ image, quantity, onReduceQuantity }) => {
+const DraggableFood: React.FC<{
+  image: any;
+  quantity: number;
+  onReduceQuantity: () => void;
+}> = ({ image, quantity, onReduceQuantity }) => {
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
   const scale = useSharedValue(1);
@@ -90,10 +99,7 @@ const DraggableFood: React.FC<{ image: any; quantity: number; onReduceQuantity: 
   }));
 
   const handlePress = () => {
-    scale.value = withSequence(
-      withSpring(0.8),
-      withSpring(1)
-    );
+    scale.value = withSequence(withSpring(0.8), withSpring(1));
     onReduceQuantity();
   };
 

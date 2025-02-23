@@ -1,8 +1,12 @@
 import { Tabs } from "expo-router";
-import { ImageSourcePropType, Text, View, Animated, StyleSheet } from "react-native";
+import {
+  ImageSourcePropType,
+  Text,
+  View,
+  Animated,
+  StyleSheet,
+} from "react-native";
 import React, { useRef, useEffect } from "react";
-
-
 
 const icons = {
   shop: require("../../assets/icons/shop.png"),
@@ -11,7 +15,6 @@ const icons = {
   languages: require("../../assets/icons/languages.png"),
   trade: require("../../assets/icons/trade.png"),
 };
-
 
 const TabIcon = ({
   focused,
@@ -60,7 +63,6 @@ const TabIcon = ({
   );
 };
 
-
 const TabsLayout = () => {
   return (
     <Tabs
@@ -69,7 +71,6 @@ const TabsLayout = () => {
         tabBarStyle: styles.navbar,
       }}
     >
-
       <Tabs.Screen
         name="shop"
         options={{
@@ -80,7 +81,7 @@ const TabsLayout = () => {
           ),
         }}
       />
-      
+
       <Tabs.Screen
         name="wardrobe"
         options={{
@@ -130,7 +131,6 @@ const TabsLayout = () => {
     </Tabs>
   );
 };
-
 
 const styles = StyleSheet.create({
   navbar: {

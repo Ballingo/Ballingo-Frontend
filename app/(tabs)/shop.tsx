@@ -8,69 +8,57 @@ import { useState } from "react";
 const shopItems = [
   {
     id: "1",
-    title: "Espada Mística",
-    image: "../../assets/shop/coins.png",
+    title: "Ultimate Coin Treasure",
+    image: require("../../assets/shop/coins.png"),
+    price: "20.99 $",
+    rarity: "legendary",
+  },
+  {
+    id: "2",
+    title: "Mega Coin Chest",
+    image: require("../../assets/shop/coins.png"),
     price: "15.99 $",
     rarity: "epic",
   },
   {
-    id: "2",
-    title: "Poción de Vida",
-    image: "../../assets/shop/coins.png",
-    price: "5.99 $",
-    rarity: "common",
-  },
-  {
     id: "3",
-    title: "Arco del Dragón",
-    image: "../../assets/shop/coins.png",
-    price: "20.99 $",
-    rarity: "legendary",
+    title: "Big Coin Bag",
+    image: require("../../assets/shop/coins.png"),
+    price: "5.99 $",
+    rarity: "rare",
   },
   {
     id: "4",
-    title: "Poción de Vida",
-    image: "../../assets/shop/coins.png",
+    title: "Normal Coin Bag",
+    image: require("../../assets/shop/coins.png"),
     price: "5.99 $",
-    rarity: "common",
+    rarity: "uncommon",
   },
   {
     id: "5",
-    title: "Poción de Vida",
-    image: "../../assets/shop/coins.png",
+    title: "Some Coins I Guess...",
+    image: require("../../assets/shop/coins.png"),
     price: "5.99 $",
     rarity: "common",
-  },
-  {
-    id: "6",
-    title: "Poción de Vida",
-    image: "../../assets/shop/coins.png",
-    price: "5.99 $",
-    rarity: "common",
-  },
-  {
-    id: "7",
-    title: "Arco del Dragón",
-    image: "../../assets/shop/coins.png",
-    price: "20.99 $",
-    rarity: "legendary",
   },
 ];
 
 const clothesItems = [
-  { id: "1",
+  {
+    id: "1",
     title: "Camiseta Cool",
-    image: "../../assets/shop/coins.png",
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
     price: "1000 coins",
-    rarity: "uncommon" 
+    rarity: "uncommon",
   },
-  { id: "2",
+  {
+    id: "2",
     title: "Sombrero Aventurero",
-    image: "../../assets/shop/coins.png",
+    image: require("../../assets/inventory/wardrobe/hats/hat1.png"),
     price: "800 coins",
-    rarity: "rare" 
+    rarity: "rare",
   },
-]
+];
 
 export default function Shop() {
   const [isObjects, setIsObjects] = useState(true);
@@ -82,15 +70,18 @@ export default function Shop() {
   return (
     <ImageBackground
       source={require("../../assets/backgrounds/notebook-bg.png")}
-      style={{ flex: 1, padding: 20 }}
+      style={{ flex: 1 }}
       resizeMode="cover"
     >
-      <MoneyCounter value={10000} />
+      <MoneyCounter value={100} />
       <ProfileIcon size={50} style={{ zIndex: 10 }} />
 
-      <SliderButton leftLabel={"Objects"} rightLabel={"Clothes"} onToggle={handleToggle} />
-
-      <View style={{ flex: 1, justifyContent: "center" }}>
+      <View style={{ flex: 1, marginTop: 100 }}>
+        <SliderButton
+          leftLabel={"Coins"}
+          rightLabel={"Clothes"}
+          onToggle={handleToggle}
+        />
         <FlatList
           data={isObjects ? shopItems : clothesItems}
           keyExtractor={(item) => item.id}

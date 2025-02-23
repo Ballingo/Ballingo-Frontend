@@ -1,7 +1,13 @@
-import React, { useEffect } from 'react';
-import { View, ImageStyle, ViewStyle } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
-import styles from './PetStyles';
+import React, { useEffect } from "react";
+import { View, ImageStyle, ViewStyle } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
+import styles from "./PetStyles";
 
 // Separar las props de estilo para View y Image
 interface PetProps {
@@ -30,7 +36,7 @@ const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle }) => {
   return (
     <View style={[styles.container, containerStyle]}>
       <Animated.Image
-        source={require('./assets/moringo.png')}
+        source={require("./assets/moringo.png")}
         style={[styles.image, animatedStyle, imageStyle]}
       />
     </View>
