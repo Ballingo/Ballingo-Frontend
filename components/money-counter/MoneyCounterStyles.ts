@@ -13,6 +13,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignSelf: 'flex-end',
     margin: 20,
+    zIndex: 20,
+    pointerEvents: 'auto',
   },
   moneyBackground: {
     backgroundColor: 'rgba(240, 240, 240, 0.75)'
