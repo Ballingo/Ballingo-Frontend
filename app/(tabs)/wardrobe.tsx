@@ -129,7 +129,7 @@ const mockClothes: InventoryItem[] = [
 export default function Wardrobe() {
   const [clothes] = useState<InventoryItem[]>(mockClothes);
 
-  useEffect(() => {
+  /*useEffect(() => {
     console.log("Wardrobe screen mounted");
 
     async function loadAllClothes() {
@@ -138,7 +138,7 @@ export default function Wardrobe() {
     }
 
     loadAllClothes();
-  }, []);
+  }, []);*/
 
   return (
     <ImageBackground
