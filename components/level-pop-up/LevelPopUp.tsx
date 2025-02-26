@@ -1,6 +1,6 @@
-// components/LevelPopup.tsx
 import React from "react";
 import { Modal, View, Text, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
 import styles from "./LevelPopUpStyles";
 
 interface LevelPopupProps {
@@ -11,6 +11,14 @@ interface LevelPopupProps {
 }
 
 const LevelPopup: React.FC<LevelPopupProps> = ({ visible, onClose, level, unlocked }) => {
+  const router = useRouter();
+
+  const handlePlay = () => {
+    onClose();
+    //router.push(`/quiz?level=${level}`); // Navega a la pantalla del cuestionario con el nivel
+    router.push(`/quiz?level=${level}`);
+  };
+
   return (
     <Modal transparent visible={visible} animationType="fade">
       <View style={styles.modalBackground}>
@@ -28,7 +36,7 @@ const LevelPopup: React.FC<LevelPopupProps> = ({ visible, onClose, level, unlock
                 <Text style={styles.closeButtonText}>Cerrar</Text>
               </TouchableOpacity>
             )}
-            <TouchableOpacity style={styles.playButton} onPress={onClose}>
+            <TouchableOpacity style={styles.playButton} onPress={handlePlay}>
               <Text style={styles.playButtonText}>Jugar</Text>
             </TouchableOpacity>
           </View>
