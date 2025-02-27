@@ -1,13 +1,29 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Button, ImageBackground } from "react-native";
 import { useRouter } from "expo-router";
 import Pet from "@/components/pet/Pet";
 import HungerBar from "@/components/hunger-bar/HungerBar";
 import MoneyCounter from "@/components/money-counter/MoneyCounter";
+import { getUserById } from "../api/user_api";
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const username = localStorage.getItem("username");
+  const id = localStorage.getItem("id");
+  const token = localStorage.getItem("Token");
+  const [username, setUsername] = useState("");
+
+  useEffect(() => {
+    const getUserData = async () => {
+      const { data, status } = await getUserById(id, token);
+
+      if (status === 200){
+        setUsername(data.username);
+      }
+
+    };
+
+    getUserData();
+  }, []);
 
   return (
     <ImageBackground

@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { loginUser } from "../api/user_api";
+import { loginUser, handleErrorUserLogin } from "../api/user_api";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -17,15 +17,22 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (username && password) {
-      alert(`Bienvenido de nuevo, ${username}`);
 
       const credentials = { username, password };
-      const res = await loginUser(credentials);
-      console.log(res);
+      const { data, status } = await loginUser(credentials);
 
-      router.replace("/(tabs)");
-      localStorage.setItem("username", username);
-    } else {
+      if (status === 200){
+        alert(`Bienvenido de nuevo, ${username}`);
+
+        router.replace("/(tabs)");
+        localStorage.setItem("Token", data.token);
+        localStorage.setItem("id", data.user_id);
+      }
+
+      handleErrorUserLogin(data);
+
+    }
+    else {
       alert("Por favor, ingresa tu usuario y contraseña.");
     }
   };

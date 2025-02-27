@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { createUser } from "../api/user_api";
+import { createUser, handleErrorUserSignUp } from "../api/user_api";
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -18,15 +18,22 @@ export default function RegisterScreen() {
 
   const handleRegister = async () => {
     if (username && email && password) {
-      alert(`Usuario ${username} registrado con éxito`);
-
       const newUser = { username, email, password };
 
-      const res = await createUser(newUser);
-      console.log(res);
+      const {data, status} = await createUser(newUser);
 
-      router.replace("/(tabs)"); // Redirige a la pantalla principal
-    } else {
+      if (status === 201) {
+        alert(`Usuario ${username} registrado con éxito`);
+
+        router.replace("/(tabs)"); // Redirige a la pantalla principal
+        localStorage.setItem("Token", data.token);
+        localStorage.setItem("id", data.user_id);
+      }
+
+      handleErrorUserSignUp(data);
+
+    }
+    else {
       alert("Por favor, complete todos los campos.");
     }
   };
