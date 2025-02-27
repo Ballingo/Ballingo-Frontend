@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { createUser, handleErrorUserSignUp } from "../api/user_api";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -25,9 +26,9 @@ export default function RegisterScreen() {
       if (status === 201) {
         alert(`Usuario ${username} registrado con éxito`);
 
-        router.replace("/(tabs)"); // Redirige a la pantalla principal
-        localStorage.setItem("Token", data.token);
-        localStorage.setItem("id", data.user_id);
+        router.replace("/(tabs)");
+        await AsyncStorage.setItem("Token", data.token);
+        await AsyncStorage.setItem("id", data.user_id);
       }
 
       handleErrorUserSignUp(data);

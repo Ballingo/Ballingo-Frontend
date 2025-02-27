@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { loginUser, handleErrorUserLogin } from "../api/user_api";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -25,8 +26,8 @@ export default function LoginScreen() {
         alert(`Bienvenido de nuevo, ${username}`);
 
         router.replace("/(tabs)");
-        localStorage.setItem("Token", data.token);
-        localStorage.setItem("id", data.user_id);
+        await AsyncStorage.setItem("Token", data.token);
+        await AsyncStorage.setItem("id", data.user_id);
       }
 
       handleErrorUserLogin(data);
