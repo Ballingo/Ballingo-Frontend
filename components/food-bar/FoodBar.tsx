@@ -21,9 +21,9 @@ const FoodBar: React.FC<FoodBarProps> = ({ foodList }) => {
   const [foods, setFoods] = useState(foodList);
 
   useEffect(() => {
-    setFoods(foodList);
+    setFoods(foodList.filter((food) => food.quantity > 0));
   }, [foodList]);
-
+  
   
   const scrollLeft = () => {
     scrollRef.current?.scrollTo({ x: 0, animated: true });
@@ -84,6 +84,7 @@ const DraggableFood: React.FC<{
   quantity: number;
   onReduceQuantity: () => void;
 }> = ({ image, quantity, onReduceQuantity }) => {
+  if (quantity <= 0) return null;
   console.log("🔹 Cargando imagen:", image);
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);

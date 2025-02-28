@@ -6,6 +6,7 @@ import ProfileIcon from "@/components/profile-icon/ProfileIcon";
 import Inventory from "@/components/inventory/Inventory";
 import Pet from "@/components/pet/Pet";
 import { getFoodListByPlayer } from "@/api/foodList_api";
+import { getAllFood } from "@/api/food_api";
 import { FoodImageMap } from "@/utils/imageMap";
 
 interface InventoryItem {
@@ -15,36 +16,8 @@ interface InventoryItem {
 }
 
 export default function Trade() {
-  const [food, setFood] = useState<InventoryItem[]>([]);
-
-  const mockAllFood: InventoryItem[] = [
-    {
-      id: "6",
-      category: "de",
-      image: require("../../assets/inventory/food/ja/sushi.png"),
-    },
-    {
-      id: "7",
-      category: "ja",
-      image: require("../../assets/inventory/food/ja/sushi.png"),
-    },
-    {
-      id: "8",
-      category: "es",
-      image: require("../../assets/inventory/food/ja/sushi.png"),
-    },
-    {
-      id: "9",
-      category: "en",
-      image: require("../../assets/inventory/food/ja/sushi.png"),
-    },
-    {
-      id: "10",
-      category: "ar",
-      image: require("../../assets/inventory/food/ja/sushi.png"),
-    },
-  ];
-
+  const [userFood, setUserFood] = useState<InventoryItem[]>([]);
+  const [allFood, setAllFood] = useState<InventoryItem[]>([]);
   const [playerId, setPlayerId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -57,7 +30,8 @@ export default function Trade() {
           setPlayerId(parsedPlayerId);
           console.log("✅ Player ID obtenido:", parsedPlayerId);
 
-          fetchFoodList(parsedPlayerId);
+          fetchUserFoodList(parsedPlayerId);
+          fetchAllFoodList();
         } else {
           console.error("❌ No se encontró playerId en AsyncStorage");
         }
@@ -69,7 +43,7 @@ export default function Trade() {
     fetchPlayerIdAndFood();
   }, []);
 
-  const fetchFoodList = async (id: number) => {
+  const fetchUserFoodList = async (id: number) => {
     try {
       console.log("🔹 Llamando API con playerId:", id);
       const response = await getFoodListByPlayer(id);
@@ -77,13 +51,39 @@ export default function Trade() {
       if (response.status === 200) {
         console.log("✅ Lista de comida obtenida:", response.data.food_items);
         
-        const formattedFood = response.data.food_items.map((item: any) => ({
+        const formattedFood = response.data.food_items
+          .filter((item: any) => item.quantity > 0) // Filtrar comidas con cantidad > 0
+          .map((item: any) => ({
+            id: item.id.toString(),
+            category: item.food.language,
+            image: FoodImageMap[item.food.image_path], // Función para obtener la imagen
+          }));
+  
+        setUserFood(formattedFood);
+      } else {
+        console.error("❌ Error obteniendo la lista de comida:", response.data);
+      }
+    } catch (error) {
+      console.error("❌ Error en la llamada a la API:", error);
+    }
+  };
+  
+
+
+  const fetchAllFoodList = async () => {
+    try {
+      const response = await getAllFood();
+  
+      if (response.status === 200) {
+        console.log("✅ Lista de toda la comida de la DB:", response.data.food_items);
+        
+        const formattedFood = response.data.map((item: any) => ({
           id: item.id.toString(),
-          category: item.food.language,
-          image: FoodImageMap[item.food.image_path], // Función para obtener la imagen
+          category: item.language,
+          image: FoodImageMap[item.image_path], // Función para obtener la imagen
         }));
   
-        setFood(formattedFood);
+        setAllFood(formattedFood);
       } else {
         console.error("❌ Error obteniendo la lista de comida:", response.data);
       }
@@ -92,12 +92,13 @@ export default function Trade() {
     }
   };
 
+
   // Nuevo useEffect para imprimir la lista de comida una vez que se actualice food
   useEffect(() => {
-    if (food.length > 0) {
-      console.log("📦 Lista de comida seteada en el estado:", food);
+    if (userFood.length > 0) {
+      console.log("📦 Lista de comida seteada en el estado:", userFood);
     }
-  }, [food]);
+  }, [userFood]);
 
   return (
     <ImageBackground
@@ -128,11 +129,11 @@ export default function Trade() {
           }}
         />
 
-        {food.length > 0 ? (
+        {userFood.length > 0 ? (
           <Inventory
             categories={["es", "en", "de", "ja", "ar"]}
-            items={food}
-            allItems={mockAllFood}
+            items={userFood}
+            allItems={allFood}
             isClothes={false}
           />
         ) : (
