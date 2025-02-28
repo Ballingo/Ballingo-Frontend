@@ -1,5 +1,6 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { View, Image, ScrollView, TouchableOpacity, Text } from "react-native";
+import { reduceFoodQuantity } from "@/api/foodList_api";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -9,21 +10,21 @@ import Animated, {
 import { GestureDetector, Gesture } from "react-native-gesture-handler";
 import styles from "./FoodBarStyles";
 import { AntDesign } from "@expo/vector-icons";
+import imageMap from "@/utils/imageMap";
 
-const initialFoods = [
-  { id: 1, image: require("./assets/food1.png"), quantity: 3 },
-  { id: 2, image: require("./assets/food2.png"), quantity: 5 },
-  { id: 3, image: require("./assets/food3.png"), quantity: 2 },
-  { id: 4, image: require("./assets/food4.png"), quantity: 4 },
-  { id: 5, image: require("./assets/food5.png"), quantity: 1 },
-  { id: 6, image: require("./assets/food6.png"), quantity: 6 },
-  { id: 7, image: require("./assets/food7.png"), quantity: 2 },
-];
+interface FoodBarProps {
+  foodList: { id: number; food: { image_path: string }; quantity: number }[];
+}
 
-const FoodBar: React.FC = () => {
+const FoodBar: React.FC<FoodBarProps> = ({ foodList }) => {
   const scrollRef = useRef<ScrollView>(null);
-  const [foods, setFoods] = useState(initialFoods);
+  const [foods, setFoods] = useState(foodList);
 
+  useEffect(() => {
+    setFoods(foodList);
+  }, [foodList]);
+
+  
   const scrollLeft = () => {
     scrollRef.current?.scrollTo({ x: 0, animated: true });
   };
@@ -32,15 +33,22 @@ const FoodBar: React.FC = () => {
     scrollRef.current?.scrollToEnd({ animated: true });
   };
 
-  const handleReduceQuantity = (id: number) => {
-    setFoods((prevFoods) =>
-      prevFoods
-        .map((food) =>
-          food.id === id ? { ...food, quantity: food.quantity - 1 } : food
-        )
-        .filter((food) => food.quantity > 0)
-    );
+  const handleReduceQuantity = async (foodItemId: number) => {
+    const response = await reduceFoodQuantity(foodItemId);
+  
+    if (response.status === 200) {
+      setFoods((prevFoods) =>
+        prevFoods
+          .map((food) =>
+            food.id === foodItemId ? { ...food, quantity: response.data.new_quantity } : food
+          )
+          .filter((food) => food.quantity > 0)
+      );
+    } else {
+      console.error("❌ Error reduciendo cantidad:", response.data);
+    }
   };
+  
 
   return (
     <View style={styles.container}>
@@ -57,7 +65,7 @@ const FoodBar: React.FC = () => {
         {foods.map((food) => (
           <DraggableFood
             key={food.id}
-            image={food.image}
+            image={imageMap[food.food.image_path]}
             quantity={food.quantity}
             onReduceQuantity={() => handleReduceQuantity(food.id)}
           />
@@ -76,6 +84,7 @@ const DraggableFood: React.FC<{
   quantity: number;
   onReduceQuantity: () => void;
 }> = ({ image, quantity, onReduceQuantity }) => {
+  console.log("🔹 Cargando imagen:", image);
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
   const scale = useSharedValue(1);
