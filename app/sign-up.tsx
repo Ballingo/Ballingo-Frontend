@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { createUser, handleErrorUserSignUp } from "../api/user_api";
+import { getPlayerByUserId } from "../api/player_api";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function RegisterScreen() {
@@ -19,25 +20,34 @@ export default function RegisterScreen() {
 
   const handleRegister = async () => {
     if (username && email && password) {
-      const newUser = { username, email, password };
+        const newUser = { username, email, password };
 
-      const {data, status} = await createUser(newUser);
+        const { data, status } = await createUser(newUser);
 
-      if (status === 201) {
-        alert(`Usuario ${username} registrado con éxito`);
+        if (status === 201) { 
+          alert(`Usuario ${username} registrado con éxito`);
 
-        router.replace("/(tabs)");
-        await AsyncStorage.setItem("Token", data.token);
-        await AsyncStorage.setItem("id", data.user_id);
-      }
+          await AsyncStorage.setItem("Token", data.token);
+          await AsyncStorage.setItem("UserId", data.user_id);
 
-      handleErrorUserSignUp(data);
+          const response = await getPlayerByUserId(data.user_id);
 
+          if (response.status === 200) {
+              await AsyncStorage.setItem("PlayeriId", response.data.id);
+              console.log("✅ Player data:", response.data); 
+          } else {
+              console.error("❌ Error obteniendo el jugador:", response.data);
+          }
+
+          router.replace("/(tabs)");
+        } else {
+            handleErrorUserSignUp(data);
+        }
+    } else {
+        alert("Por favor, complete todos los campos.");
     }
-    else {
-      alert("Por favor, complete todos los campos.");
-    }
-  };
+};
+
 
   return (
     <View style={styles.container}>

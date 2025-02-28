@@ -10,6 +10,7 @@ import {
 import { useRouter } from "expo-router";
 import { loginUser, handleErrorUserLogin } from "../api/user_api";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getPlayerByUserId } from "../api/player_api";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -27,7 +28,16 @@ export default function LoginScreen() {
 
         router.replace("/(tabs)");
         await AsyncStorage.setItem("Token", data.token);
-        await AsyncStorage.setItem("id", data.user_id);
+        await AsyncStorage.setItem("UserId", data.user_id);
+
+        const response = await getPlayerByUserId(data.user_id);
+
+        if (response.status === 200) {
+            await AsyncStorage.setItem("PlayerId", response.data.id);
+            console.log("✅ Player data:", response.data); 
+        } else {
+            console.error("❌ Error obteniendo el jugador:", response.data);
+        }
       }
 
       handleErrorUserLogin(data);
