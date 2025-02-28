@@ -54,7 +54,7 @@ const clothesItems = [
   {
     id: "2",
     title: "Adventurer Hat",
-    image: require("../../assets/inventory/wardrobe/hats/hat1.png"),
+    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
     price: "800 coins",
     rarity: "rare",
   },
