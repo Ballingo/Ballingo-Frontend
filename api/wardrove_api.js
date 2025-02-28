@@ -22,3 +22,5 @@ export const createWardrove = async (playerId, clothesIds) => {
         return {data: error.data, status: error.status};
     }
 };
+
+
