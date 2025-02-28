@@ -6,7 +6,7 @@ import styles from "./QuizScreenStyles";
 
 // Lista de imágenes de comida disponibles
 const foodImages = [
-  require("../../assets/inventory/food/es/es_food1.png"),
+  require("../../assets/inventory/food/ja/sushi.png"),
   require("../../assets/inventory/food/es/squid_rings.png"),
 ];
 

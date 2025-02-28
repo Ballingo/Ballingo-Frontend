@@ -10,7 +10,7 @@ import Animated, {
 import { GestureDetector, Gesture } from "react-native-gesture-handler";
 import styles from "./FoodBarStyles";
 import { AntDesign } from "@expo/vector-icons";
-import imageMap from "@/utils/imageMap";
+import { FoodImageMap } from "@/utils/imageMap";
 
 interface FoodBarProps {
   foodList: { id: number; food: { image_path: string }; quantity: number }[];
@@ -65,7 +65,7 @@ const FoodBar: React.FC<FoodBarProps> = ({ foodList }) => {
         {foods.map((food) => (
           <DraggableFood
             key={food.id}
-            image={imageMap[food.food.image_path]}
+            image={FoodImageMap[food.food.image_path]}
             quantity={food.quantity}
             onReduceQuantity={() => handleReduceQuantity(food.id)}
           />

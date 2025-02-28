@@ -5,15 +5,18 @@ import Pet from "@/components/pet/Pet";
 import HungerBar from "@/components/hunger-bar/HungerBar";
 import MoneyCounter from "@/components/money-counter/MoneyCounter";
 import { getUserById } from "../api/user_api";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const id = localStorage.getItem("id");
-  const token = localStorage.getItem("Token");
   const [username, setUsername] = useState("");
 
   useEffect(() => {
+
     const getUserData = async () => {
+      const id = await AsyncStorage.getItem("UserId");
+      const token = await AsyncStorage.getItem("Token");
+
       const { data, status } = await getUserById(id, token);
 
       if (status === 200){

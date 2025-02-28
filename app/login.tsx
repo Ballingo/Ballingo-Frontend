@@ -33,10 +33,11 @@ export default function LoginScreen() {
         const response = await getPlayerByUserId(data.user_id);
 
         if (response.status === 200) {
-            await AsyncStorage.setItem("PlayerId", response.data.id);
-            console.log("✅ Player data:", response.data); 
-        } else {
-            console.error("❌ Error obteniendo el jugador:", response.data);
+          await AsyncStorage.setItem("PlayerId", response.data.id);
+          console.log("✅ Player data:", response.data); 
+        }
+        else {
+          console.error("❌ Error obteniendo el jugador:", response.data);
         }
       }
 

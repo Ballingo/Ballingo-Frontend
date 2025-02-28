@@ -6,7 +6,7 @@ import ProfileIcon from "@/components/profile-icon/ProfileIcon";
 import Inventory from "@/components/inventory/Inventory";
 import Pet from "@/components/pet/Pet";
 import { getFoodListByPlayer } from "@/api/foodList_api";
-import imageMap from "@/utils/imageMap";
+import { FoodImageMap } from "@/utils/imageMap";
 
 interface InventoryItem {
   id: string;
@@ -21,27 +21,27 @@ export default function Trade() {
     {
       id: "6",
       category: "de",
-      image: require("../../assets/inventory/food/ja/food2.png"),
+      image: require("../../assets/inventory/food/ja/sushi.png"),
     },
     {
       id: "7",
       category: "ja",
-      image: require("../../assets/inventory/food/ja/food2.png"),
+      image: require("../../assets/inventory/food/ja/sushi.png"),
     },
     {
       id: "8",
       category: "es",
-      image: require("../../assets/inventory/food/ja/food2.png"),
+      image: require("../../assets/inventory/food/ja/sushi.png"),
     },
     {
       id: "9",
       category: "en",
-      image: require("../../assets/inventory/food/ja/food2.png"),
+      image: require("../../assets/inventory/food/ja/sushi.png"),
     },
     {
       id: "10",
       category: "ar",
-      image: require("../../assets/inventory/food/ja/food2.png"),
+      image: require("../../assets/inventory/food/ja/sushi.png"),
     },
   ];
 
@@ -80,7 +80,7 @@ export default function Trade() {
         const formattedFood = response.data.food_items.map((item: any) => ({
           id: item.id.toString(),
           category: item.food.language,
-          image: imageMap[item.food.image_path], // Función para obtener la imagen
+          image: FoodImageMap[item.food.image_path], // Función para obtener la imagen
         }));
   
         setFood(formattedFood);
