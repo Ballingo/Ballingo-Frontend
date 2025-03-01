@@ -73,7 +73,7 @@ export default function Shop() {
       style={{ flex: 1, width: "100%", height: "100%" }}
       resizeMode="cover"
     >
-      <MoneyCounter value={100} color="147DF5" />
+      <MoneyCounter color="147DF5" />
       <ProfileIcon size={50} style={{ zIndex: 10 }} />
 
       <View style={{ flex: 1, marginTop: 100 }}>

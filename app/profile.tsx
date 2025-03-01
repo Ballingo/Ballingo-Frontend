@@ -35,7 +35,7 @@ export default function ProfileScreen() {
       resizeMode="cover"
     >
       <View style={styles.container}>
-        <MoneyCounter value={100} color="0AEFFF" />
+        <MoneyCounter color="0AEFFF" />
         <View style={styles.header}>
           <Pet
             imageStyle={{

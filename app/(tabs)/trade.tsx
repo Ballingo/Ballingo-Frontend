@@ -107,7 +107,7 @@ export default function Trade() {
       resizeMode="cover"
     >
       {/* Contador de dinero y perfil */}
-      <MoneyCounter value={100} color="FF0000" />
+      <MoneyCounter color="FF0000" />
       <ProfileIcon size={50} style={{ zIndex: 10 }} />
 
       {/* Contenedor de mascota e inventario */}

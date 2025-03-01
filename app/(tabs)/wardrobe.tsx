@@ -6,6 +6,7 @@ import { getWardrobeByPlayer } from "@/api/inventory_api";
 import { ClothesImageMap } from "@/utils/imageMap";
 import Pet from "@/components/pet/Pet";
 import Inventory from "@/components/inventory/Inventory";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface InventoryItem {
   id: string;
@@ -15,13 +16,12 @@ interface InventoryItem {
 
 export default function Wardrobe() {
   const [clothes, setClothes] = useState<InventoryItem[]>([]);
-  const playerId = 3;
 
   const mockClothes: InventoryItem[] = [
     {
       id: "1",
-      category: "hats",
-      image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
+      category: "hat",
+      image: ClothesImageMap["detective_hat"],
     },
     {
       id: "2",
@@ -133,6 +133,8 @@ export default function Wardrobe() {
   useEffect(() => {
     async function loadWardrobe() {
       console.log("🔹 Cargando wardrobe del jugador...");
+
+      const playerId = await AsyncStorage.getItem("PlayerId");
       const response = await getWardrobeByPlayer(playerId);
   
       if (response.status === 200) {
@@ -141,14 +143,12 @@ export default function Wardrobe() {
         // Mapea los datos de la API al formato que necesita `Inventory`
         const formattedClothes = response.data.items.map((item: any) => {
           console.log("📌 Procesando item:", item); // Agregar log de cada ítem
-  
           return {
             id: item.id.toString(),
             category: item.type, // Usa el tipo de ropa como categoría
             image: ClothesImageMap[item.image_path], // Manejo de imágenes
           };
         });
-  
         setClothes(formattedClothes);
       } else {
         console.error("❌ Error al cargar wardrobe:", response.data);
@@ -157,14 +157,12 @@ export default function Wardrobe() {
   
     loadWardrobe();
   }, []);
-  
 
-  // ✅ Nuevo useEffect para imprimir `clothes` cuando se actualice
   useEffect(() => {
     if (clothes.length > 0) {
       console.log("📦 Wardrobe seteado en el estado:", clothes);
     }
-  }, [clothes]); // Se ejecuta solo cuando `clothes` cambia
+  }, [clothes]);
 
   return (
     <ImageBackground
@@ -173,7 +171,7 @@ export default function Wardrobe() {
       resizeMode="cover"
     >
       {/* Contador de dinero y perfil */}
-      <MoneyCounter value={100} color="FF8700" />
+      <MoneyCounter color="FF8700" />
       <ProfileIcon size={50} style={{ zIndex: 10 }} />
 
       {/* Contenedor de mascota y barra de hambre */}
@@ -196,8 +194,8 @@ export default function Wardrobe() {
         />
 
         <Inventory
-          categories={["hats", "shirts", "shoes", "accesories"]}
-          items={clothes}
+          categories={["hat", "shirts", "shoes", "accesories"]}
+          items={mockClothes}
           isClothes={true}
         />
       </View>

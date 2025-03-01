@@ -57,7 +57,7 @@ export default function Index() {
       resizeMode="cover"
     >
       {/* Contador de dinero y perfil */}
-      <MoneyCounter value={100} color="0AFF99" />
+      <MoneyCounter color="0AFF99" />
       <ProfileIcon size={50} style={{ zIndex: 10 }} />
 
       {/* Contenedor de mascota y barra de hambre */}
