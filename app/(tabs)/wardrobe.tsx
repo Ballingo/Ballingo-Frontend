@@ -17,146 +17,42 @@ interface InventoryItem {
 export default function Wardrobe() {
   const [clothes, setClothes] = useState<InventoryItem[]>([]);
 
-  const mockClothes: InventoryItem[] = [
-    {
-      id: "1",
-      category: "hat",
-      image: ClothesImageMap["detective_hat"],
-    },
-    {
-      id: "2",
-      category: "shirts",
-      image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    },
-    {
-      id: "3",
-      category: "accesories",
-      image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    },
-    {
-      id: "4",
-      category: "hats",
-      image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    },
-    {
-      id: "5",
-      category: "shirts",
-      image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    },
-    {
-      id: "6",
-      category: "shirts",
-      image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    },
-    {
-      id: "7",
-      category: "shirts",
-      image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    },
-    {
-      id: "8",
-      category: "shirts",
-      image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    },
-    {
-      id: "9",
-      category: "shirts",
-      image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    },
-    {
-      id: "10",
-      category: "shirts",
-      image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    },
-    {
-      id: "11",
-      category: "shirts",
-      image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    },
-    {
-      id: "12",
-      category: "shirts",
-      image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    },
-    {
-      id: "13",
-      category: "shirts",
-      image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    },
-    {
-      id: "14",
-      category: "shirts",
-      image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    },
-    {
-      id: "15",
-      category: "shirts",
-      image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    },
-    {
-      id: "16",
-      category: "shirts",
-      image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    },
-    {
-      id: "17",
-      category: "shirts",
-      image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    },
-    {
-      id: "18",
-      category: "shirts",
-      image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    },
-    {
-      id: "19",
-      category: "shirts",
-      image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    },
-    {
-      id: "20",
-      category: "shirts",
-      image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    },
-    {
-      id: "21",
-      category: "shirts",
-      image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    },
-    {
-      id: "22",
-      category: "shirts",
-      image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    },
-  ];
-
   useEffect(() => {
     async function loadWardrobe() {
-      console.log("🔹 Cargando wardrobe del jugador...");
-
-      const playerId = await AsyncStorage.getItem("PlayerId");
-      const response = await getWardrobeByPlayer(playerId);
+      try {
+        const storedPlayerId = await AsyncStorage.getItem("PlayerId");
   
-      if (response.status === 200) {
-        console.log("✅ Wardrobe cargado:", response.data);
+        if (!storedPlayerId) {
+          console.error("❌ No se encontró playerId en AsyncStorage");
+          return;
+        }
   
-        // Mapea los datos de la API al formato que necesita `Inventory`
-        const formattedClothes = response.data.items.map((item: any) => {
-          console.log("📌 Procesando item:", item); // Agregar log de cada ítem
-          return {
-            id: item.id.toString(),
-            category: item.type, // Usa el tipo de ropa como categoría
-            image: ClothesImageMap[item.image_path], // Manejo de imágenes
-          };
-        });
-        setClothes(formattedClothes);
-      } else {
-        console.error("❌ Error al cargar wardrobe:", response.data);
+        const parsedPlayerId = parseInt(storedPlayerId, 10);
+        const response = await getWardrobeByPlayer(parsedPlayerId);
+  
+        if (response.status === 200 && Array.isArray(response.data.items)) {
+  
+          const formattedClothes = response.data.items.map((item: any) => {
+  
+            return {
+              id: item.id.toString(),
+              category: item.type || "unknown",
+              image: ClothesImageMap[item.image_path],
+            };
+          });
+  
+          setClothes(formattedClothes);
+        } else {
+          console.error("❌ Error al cargar wardrobe o datos incorrectos:", response.data);
+        }
+      } catch (error) {
+        console.error("❌ Error en loadWardrobe:", error);
       }
     }
   
     loadWardrobe();
   }, []);
+  
 
   useEffect(() => {
     if (clothes.length > 0) {
@@ -193,11 +89,15 @@ export default function Wardrobe() {
           }}
         />
 
+      {clothes.length > 0 ? (
         <Inventory
           categories={["hat", "shirts", "shoes", "accesories"]}
-          items={mockClothes}
+          items={clothes}
           isClothes={true}
         />
+      ) : (
+        <Text>Cargando ropa...</Text>
+      )}
       </View>
     </ImageBackground>
   );
