@@ -225,9 +225,41 @@ backButton: {
   marginBottom: 10,
 },
 
+expandedTrade: {
+  paddingVertical: 20, // Aumenta el espacio interno al expandirse
+  backgroundColor: "#fff", // 🔹 Mantener el color blanco del fondo
+  borderRadius: 10, // Bordes redondeados
+  marginBottom: 10, // Espaciado entre elementos
+  elevation: 3, // Mantener sombra al expandir
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.2,
+  shadowRadius: 4,
+},
 
 
+acceptButton: {
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+  backgroundColor: "#28a745",
+  paddingVertical: 12,
+  paddingHorizontal: 20,
+  borderRadius: 8, 
+  marginTop: 15,
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.3,
+  shadowRadius: 4,
+  elevation: 5,
+},
 
+acceptButtonText: {
+  color: "white",
+  fontSize: 16,
+  fontWeight: "bold",
+  marginLeft: 10,
+},
 
 
 
