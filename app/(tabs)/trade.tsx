@@ -45,28 +45,31 @@ export default function Trade() {
 
   const fetchUserFoodList = async (id: number) => {
     try {
-      console.log("🔹 Llamando API con playerId:", id);
-      const response = await getFoodListByPlayer(id);
-  
-      if (response.status === 200) {
-        console.log("✅ Lista de comida obtenida:", response.data.food_items);
-        
-        const formattedFood = response.data.food_items
-          .filter((item: any) => item.quantity > 0) // Filtrar comidas con cantidad > 0
-          .map((item: any) => ({
-            id: item.id.toString(),
-            category: item.food.language,
-            image: FoodImageMap[item.food.image_path], // Función para obtener la imagen
-          }));
-  
-        setUserFood(formattedFood);
-      } else {
-        console.error("❌ Error obteniendo la lista de comida:", response.data);
-      }
+        console.log("🔹 Llamando API con playerId:", id);
+        const response = await getFoodListByPlayer(id);
+
+        if (response.status === 200) {
+            console.log("✅ Lista de comida obtenida:", response.data);
+
+            const formattedFood = response.data.food_items
+                .filter((item: any) => item.quantity > 0) // Filtrar comidas con cantidad > 0
+                .map((item: any) => ({
+                    id: item.food.id.toString(),
+                    category: item.food.language,
+                    image: FoodImageMap[item.food.image_path], // Función para obtener la imagen
+                }));
+
+            console.log("📦 Comida formateada para userFood:", formattedFood);
+
+            setUserFood(formattedFood);
+        } else {
+            console.error("❌ Error obteniendo la lista de comida:", response.data);
+        }
     } catch (error) {
-      console.error("❌ Error en la llamada a la API:", error);
+        console.error("❌ Error en la llamada a la API:", error);
     }
-  };
+  };  
+
   
 
 

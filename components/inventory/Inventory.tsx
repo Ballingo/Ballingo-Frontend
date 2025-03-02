@@ -9,6 +9,9 @@ import {
 } from "react-native";
 import styles from "./InventoryStyles";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { createTrade } from "@/api/trade_api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 interface InventoryItem {
   id: string;
@@ -32,6 +35,9 @@ interface InventoryProps {
   isClothes?: boolean;
 }
 
+
+
+
 const Inventory: React.FC<InventoryProps> = ({
   categories,
   items,
@@ -50,7 +56,10 @@ const Inventory: React.FC<InventoryProps> = ({
   );
   const [isTrading, setIsTrading] = useState<boolean>(false);
   const [showTrades, setShowTrades] = useState<boolean>(false);
+  
 
+
+  
   // Ejemplo de trades activos
   const activeTrades: TradeItem[] = [
     {
@@ -168,6 +177,8 @@ const Inventory: React.FC<InventoryProps> = ({
     setTradeStep("select");
   };
 
+
+
   // Mostrar trades activos
   const handleShowTrades = () => {
     setShowTrades(true);
@@ -175,10 +186,53 @@ const Inventory: React.FC<InventoryProps> = ({
   };
 
   // Confirmar Trade
-  const handleConfirmTrade = () => {
-    alert("Trade confirmado exitosamente.");
-    handleCloseModal();
+  // Confirmar Trade y enviarlo a la API
+    const handleConfirmTrade = async () => {
+      if (!previousItem || !selectedItem) {
+          alert("❌ Debes seleccionar dos ítems para intercambiar.");
+          return;
+      }
+
+      try {
+          console.log("📌 Confirmar Trade:", previousItem, selectedItem);
+          // Obtener el ID del jugador desde AsyncStorage
+          const storedPlayerId = await AsyncStorage.getItem("PlayerId");
+          if (!storedPlayerId) {
+              alert("❌ No se encontró el ID del jugador.");
+              return;
+          }
+
+          const playerId = parseInt(storedPlayerId, 10);
+          const inFoodId = parseInt(previousItem.id, 10);  // Convertir a número
+          const outFoodId = parseInt(selectedItem.id, 10); // Convertir a número
+
+          // Estructura del JSON enviado
+          const tradeData = {
+              player: playerId,
+              isActive: true,  // Se asume que el Trade está activo por defecto
+              in_food: inFoodId,
+              out_food: outFoodId
+          };
+
+          console.log("📌 Enviando Trade:", tradeData);
+
+          // Crear el trade en el backend
+          const response = await createTrade(tradeData);
+
+          if (response.status === 201) {
+              alert("✅ Trade creado con éxito.");
+              handleCloseModal();
+          } else {
+              console.error("❌ Error creando trade:", response.data);
+              alert("❌ Hubo un error al crear el trade.");
+          }
+      } catch (error) {
+          console.error("❌ Error en la solicitud:", error);
+          alert("❌ Error de conexión.");
+      }
   };
+
+
 
   // Renderizar ítem
   const renderItem = ({ item }: { item: InventoryItem }) => (
@@ -336,43 +390,24 @@ const Inventory: React.FC<InventoryProps> = ({
                   )}
 
                   {tradeStep === "confirm" && previousItem && (
-                    <>
-                      <View style={styles.tradeContainer}>
-                        <View style={styles.imageBox}>
-                          <Image
-                            source={previousItem.image}
-                            style={styles.modalImage2}
-                          />
-                        </View>
+                      <>
+                          <View style={styles.tradeContainer}>
+                              <View style={styles.imageBox}>
+                                  <Image source={previousItem.image} style={styles.modalImage2} />
+                              </View>
 
-                        <Ionicons
-                          name="arrow-forward"
-                          size={30}
-                          color="#333"
-                          style={styles.arrowIcon}
-                        />
+                              <Ionicons name="arrow-forward" size={30} color="#333" style={styles.arrowIcon} />
 
-                        <View style={styles.imageBox}>
-                          <Image
-                            source={selectedItem.image}
-                            style={styles.modalImage2}
-                          />
-                        </View>
-                      </View>
+                              <View style={styles.imageBox}>
+                                  <Image source={selectedItem.image} style={styles.modalImage2} />
+                              </View>
+                          </View>
 
-                      <TouchableOpacity
-                        style={styles.modalButton}
-                        onPress={handleConfirmTrade}
-                      >
-                        <Ionicons
-                          name="checkmark-circle-outline"
-                          size={20}
-                          color="#fff"
-                          style={styles.iconStyle}
-                        />
-                        <Text style={styles.buttonText}>Confirmar</Text>
-                      </TouchableOpacity>
-                    </>
+                          <TouchableOpacity style={styles.modalButton} onPress={handleConfirmTrade}>
+                              <Ionicons name="checkmark-circle-outline" size={20} color="#fff" style={styles.iconStyle} />
+                              <Text style={styles.buttonText}>Confirmar Trade</Text>
+                          </TouchableOpacity>
+                      </>
                   )}
                 </>
               )}
