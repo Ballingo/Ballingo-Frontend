@@ -1,9 +1,20 @@
-import { ImageBackground, View, FlatList } from "react-native";
+import { ImageBackground, View, FlatList, Text } from "react-native";
 import MoneyCounter from "@/components/money-counter/MoneyCounter";
 import ProfileIcon from "@/components/profile-icon/ProfileIcon";
 import ShopItem from "@/components/shop-item/ShopItem";
 import SliderButton from "@/components/slider-button/SliderButton";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getAllMoneyPacks, getAllClothesPacks } from "@/api/shop_api";
+
+interface Products {
+  id: string;
+  price: string;
+  name: string;
+  description: string;
+  image: any;
+  category: string;
+  rarity: string;
+}
 
 const shopItems = [
   {
@@ -62,10 +73,44 @@ const clothesItems = [
 
 export default function Shop() {
   const [isObjects, setIsObjects] = useState(true);
+  const [moneyItems, setMoneyItems] = useState<Products[]>([]);
+  const [gameItems, setGameItems] = useState<Products[]>([]);
 
   const handleToggle = (isLeft: boolean) => {
     setIsObjects(isLeft);
   };
+
+  useEffect(() => {
+    const fetchMoneyItems = async () => {
+      const {data, status} = await getAllMoneyPacks();
+      console.log("Money packs", data);
+
+      if (status === 200) {
+        setMoneyItems(data);
+      }
+      else{
+        console.error(`${status} - ${data}`);
+      }
+
+    };
+
+    const fetchGameItems = async () => {
+      const {data, status} = await getAllClothesPacks();
+      console.log("Clothes packs", data);
+
+      if (status === 200) {
+        setGameItems(data);
+      }
+      else{
+        console.error(`${status} - ${data}`);
+      }
+
+    };
+
+    fetchMoneyItems();
+    fetchGameItems();
+
+  }, []);
 
   return (
     <ImageBackground
@@ -82,20 +127,25 @@ export default function Shop() {
           rightLabel={"Clothes"}
           onToggle={handleToggle}
         />
-        <FlatList
-          data={isObjects ? shopItems : clothesItems}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <ShopItem
-              title={item.title}
-              image={item.image}
-              price={item.price}
-              rarity={item.rarity as any}
-              onPress={() => alert(`Compraste ${item.title}`)}
-            />
-          )}
-          contentContainerStyle={{ alignItems: "center", paddingBottom: 100 }}
-        />
+        {moneyItems.length > 0 && gameItems.length > 0 ? (
+          <FlatList
+            data={isObjects ? moneyItems : gameItems}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <ShopItem
+                title={item.name}
+                image={item.image}
+                price={ isObjects ? item.price + "€" : item.price + " coins"}
+                description={item.description}
+                rarity={"legendary"}
+                onPress={() => alert(`Compraste ${item.name}`)}
+              />
+            )}
+            contentContainerStyle={{ alignItems: "center", paddingBottom: 100 }}
+          />
+        ) : (
+          <Text>Loading products...</Text>
+        )}
       </View>
     </ImageBackground>
   );

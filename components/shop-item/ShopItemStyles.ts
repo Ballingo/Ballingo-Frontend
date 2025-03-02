@@ -25,8 +25,14 @@ export const styles = StyleSheet.create({
     marginVertical: 5,
     textAlign: "center",
   },
-  price: {
+  description: {
     fontSize: 16,
+    color: "white",
+    marginVertical: 5,
+    textAlign: "center",
+  },
+  price: {
+    fontSize: 14,
     color: "yellow",
     fontWeight: "bold",
   },

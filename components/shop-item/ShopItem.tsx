@@ -22,6 +22,7 @@ interface ShopItemProps {
   title: string;
   image: any;
   price: string;
+  description: string;
   rarity: keyof typeof rarityColors;
   onPress: () => void;
 }
@@ -30,6 +31,7 @@ const ShopItem: React.FC<ShopItemProps> = ({
   title,
   image,
   price,
+  description,
   rarity,
   onPress,
 }) => {
@@ -47,6 +49,7 @@ const ShopItem: React.FC<ShopItemProps> = ({
       <View style={styles.content}>
         <Image source={image} style={styles.image} />
         <Text style={styles.title}>{title}</Text>
+        <Text style={styles.description}>{description}</Text>
         <Text style={styles.price}>{price} </Text>
       </View>
     </TouchableOpacity>
