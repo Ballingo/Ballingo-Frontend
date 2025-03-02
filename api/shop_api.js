@@ -17,10 +17,28 @@ export const getAllShopItems = async () => {
     }
 };
 
+export const getShopItemById = async (itemId) => {
+    try{
+        const res = await api.get(`shop-items/${itemId}`);
+        return { data: res.data, status: res.status };
+    }
+    catch(err){
+        const error = err.response;
+        return { data: error.data, status: error.status };
+    }
+};
+
 export const getAllMoneyPacks = async () => {
     try{
         const res = await api.get('realPack');
-        return { data: res.data, status: res.status };
+
+        const rarityOrder = ["legendary", "epic", "rare", "uncommon", "common"];
+
+        const sortedData = res.data.sort((a, b) => {
+            return rarityOrder.indexOf(a.rarity) - rarityOrder.indexOf(b.rarity);
+        });
+
+        return { data: sortedData, status: res.status };
     }
     catch(err){
         const error = err.response;
@@ -31,7 +49,14 @@ export const getAllMoneyPacks = async () => {
 export const getAllClothesPacks = async () => {
     try{
         const res = await api.get('gamePack');
-        return { data: res.data, status: res.status };
+
+        const rarityOrder = ["legendary", "epic", "rare", "uncommon", "common"];
+
+        const sortedData = res.data.sort((a, b) => {
+            return rarityOrder.indexOf(a.rarity) - rarityOrder.indexOf(b.rarity);
+        });
+
+        return { data: sortedData, status: res.status };
     }
     catch(err){
         const error = err.response;
