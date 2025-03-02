@@ -58,6 +58,8 @@ const Inventory: React.FC<InventoryProps> = ({
   );
   const [isTrading, setIsTrading] = useState<boolean>(false);
   const [showTrades, setShowTrades] = useState<boolean>(false);
+
+  const [selectedTrade, setSelectedTrade] = useState<string | null>(null);
   
 
 
@@ -203,26 +205,47 @@ const Inventory: React.FC<InventoryProps> = ({
   };
 
 
-  const renderTrade = ({ item }: { item: TradeItem }) => (
-    <View style={styles.tradeItem}>
-      <View style={styles.tradeRow}>
-        {/* Imagen de perfil a la izquierda */}
-        <Image source={item.userProfile} style={styles.profileImage} />
-
-        {/* Contenido del trade a la derecha */}
-        <View style={styles.tradeContent}>
-          <Image source={item.offeredImage} style={styles.tradeImage} />
-          <Ionicons
-            name="arrow-forward"
-            size={30}
-            color="#555"
-            style={styles.arrowIcon}
-          />
-          <Image source={item.requestedImage} style={styles.tradeImage} />
+  const renderTrade = ({ item }: { item: TradeItem }) => {
+    const isSelected = selectedTrade === item.id;
+  
+    return (
+      <TouchableOpacity
+        onPress={() => setSelectedTrade(isSelected ? null : item.id)} // Alternar selección
+        style={[
+          styles.tradeItem,
+          isSelected && styles.expandedTrade, // Aplica estilo de expansión
+        ]}
+      >
+        <View style={styles.tradeRow}>
+          {/* Imagen de perfil a la izquierda */}
+          <Image source={item.userProfile} style={styles.profileImage} />
+  
+          {/* Contenido del trade */}
+          <View style={styles.tradeContent}>
+            <Image source={item.offeredImage} style={styles.tradeImage} />
+            <Ionicons
+              name="arrow-forward"
+              size={30}
+              color="#555"
+              style={styles.arrowIcon}
+            />
+            <Image source={item.requestedImage} style={styles.tradeImage} />
+          </View>
         </View>
-      </View>
-    </View>
-  );
+  
+        {/* Mostrar el botón solo si está expandido */}
+        {isSelected && (
+          <TouchableOpacity
+            style={styles.acceptButton}
+            /*onPress={() => handleAcceptTrade(item.id)}*/
+          >
+            <Text style={styles.acceptButtonText}>Aceptar</Text>
+          </TouchableOpacity>
+        )}
+      </TouchableOpacity>
+    );
+  };
+  
 
   return (
     <View style={styles.container}>
