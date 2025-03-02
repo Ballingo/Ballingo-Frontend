@@ -27,4 +27,6 @@ export const ClothesImageMap: { [key: string]: any } = {
   "instructor_hat": require("@/assets/inventory/wardrobe/hats/instructor_hat.png"),
   "winter_hat": require("@/assets/inventory/wardrobe/hats/winter_hat.png"),
 };
+
+export const GameObjectImageMap: { [key: string]: any } = {};
   
