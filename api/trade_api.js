@@ -27,3 +27,14 @@ export const getActiveTrades = async () => {
         return { data: error?.data, status: error?.status };
     }
 };
+
+export const acceptTrade = async (tradeId, playerId) => {
+    try {
+        const res = await api.post(`trade/${tradeId}/accept/`, { player_id: playerId });
+
+        return { data: res.data, status: res.status };
+    } catch (err) {
+        const error = err.response;
+        return { data: error?.data, status: error?.status };
+    }
+};

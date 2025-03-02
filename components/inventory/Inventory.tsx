@@ -13,6 +13,7 @@ import { createTrade } from "@/api/trade_api";
 import { getActiveTrades } from "@/api/trade_api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FoodImageMap } from "@/utils/imageMap";
+import { acceptTrade } from "@/api/trade_api";
 
 
 interface InventoryItem {
@@ -61,8 +62,6 @@ const Inventory: React.FC<InventoryProps> = ({
 
   const [selectedTrade, setSelectedTrade] = useState<string | null>(null);
   
-
-
   
   // Ejemplo de trades activos
   const [activeTrades, setActiveTrades] = useState<TradeItem[]>([]);
@@ -205,6 +204,37 @@ const Inventory: React.FC<InventoryProps> = ({
   };
 
 
+  const handleAcceptTrade = async (tradeId: string) => {
+    try {
+      console.log(`📌 Aceptando trade con ID: ${tradeId}`);
+  
+      // Obtener el ID del jugador desde AsyncStorage
+      const storedPlayerId = await AsyncStorage.getItem("PlayerId");
+      if (!storedPlayerId) {
+        alert("❌ No se encontró el ID del jugador.");
+        return;
+      }
+  
+      const playerId = parseInt(storedPlayerId, 10);
+  
+      // Llamada a la API para aceptar el trade
+      const response = await acceptTrade(tradeId, playerId);
+  
+      if (response.status === 200) {
+        alert("✅ Trade aceptado con éxito.");
+        await fetchActiveTrades(); // Recargar trades después de aceptar uno
+      } else {
+        console.error("❌ Error aceptando trade:", response.data);
+        alert(`❌ Hubo un error al aceptar el trade: ${response.data.error}`);
+      }
+    } catch (error) {
+      console.error("❌ Error en la solicitud de aceptación:", error);
+      alert("❌ Error de conexión.");
+    }
+  };
+
+
+
   const renderTrade = ({ item }: { item: TradeItem }) => {
     const isSelected = selectedTrade === item.id;
   
@@ -222,14 +252,14 @@ const Inventory: React.FC<InventoryProps> = ({
   
           {/* Contenido del trade */}
           <View style={styles.tradeContent}>
-            <Image source={item.offeredImage} style={styles.tradeImage} />
+            <Image source={item.requestedImage} style={styles.tradeImage} />
             <Ionicons
               name="arrow-forward"
               size={30}
               color="#555"
               style={styles.arrowIcon}
             />
-            <Image source={item.requestedImage} style={styles.tradeImage} />
+            <Image source={item.offeredImage} style={styles.tradeImage} />
           </View>
         </View>
   
@@ -237,7 +267,7 @@ const Inventory: React.FC<InventoryProps> = ({
         {isSelected && (
           <TouchableOpacity
             style={styles.acceptButton}
-            /*onPress={() => handleAcceptTrade(item.id)}*/
+            onPress={() => handleAcceptTrade(item.id)}
           >
             <Text style={styles.acceptButtonText}>Aceptar</Text>
           </TouchableOpacity>
