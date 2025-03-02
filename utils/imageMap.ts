@@ -28,5 +28,13 @@ export const ClothesImageMap: { [key: string]: any } = {
   "winter_hat": require("@/assets/inventory/wardrobe/hats/winter_hat.png"),
 };
 
-export const GameObjectImageMap: { [key: string]: any } = {};
+export const GameObjectImageMap: { [key: string]: any } = {
+  "ultimate_pack": require("@/assets/shop/treasure.png"),
+  "mega_pack": require("@/assets/shop/chest.png"),
+  "big_pack": require("@/assets/shop/big_money_bag.png"),
+  "normal_pack": require("@/assets/shop/small_money_bag.png"),
+  "sad_pack": require("@/assets/shop/sad_money_bag.png"),
+  "small_lives_pack": require("@/assets/shop/band_aid.png"),
+  "big_lives_pack": require("@/assets/shop/juggernaut.png"),
+};
   

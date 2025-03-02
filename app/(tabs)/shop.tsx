@@ -4,72 +4,22 @@ import ProfileIcon from "@/components/profile-icon/ProfileIcon";
 import ShopItem from "@/components/shop-item/ShopItem";
 import SliderButton from "@/components/slider-button/SliderButton";
 import { useState, useEffect } from "react";
-import { getAllMoneyPacks, getAllClothesPacks } from "@/api/shop_api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getAllMoneyPacks, getAllClothesPacks, getShopItemById } from "@/api/shop_api";
+import { setPlayerCoins, setPlayerLiveCounter, setPlayerWardrobe } from "@/api/inventory_api";
+import { GameObjectImageMap, ClothesImageMap } from "@/utils/imageMap";
 
 interface Products {
   id: string;
   price: string;
   name: string;
   description: string;
-  image: any;
+  image_path: any;
   category: string;
   rarity: string;
+  items: any;
+  clothes: any;
 }
-
-const shopItems = [
-  {
-    id: "1",
-    title: "Ultimate Coin Treasure",
-    image: require("../../assets/shop/coins.png"),
-    price: "20.99 $",
-    rarity: "legendary",
-  },
-  {
-    id: "2",
-    title: "Mega Coin Chest",
-    image: require("../../assets/shop/coins.png"),
-    price: "15.99 $",
-    rarity: "epic",
-  },
-  {
-    id: "3",
-    title: "Big Coin Bag",
-    image: require("../../assets/shop/coins.png"),
-    price: "9.99 $",
-    rarity: "rare",
-  },
-  {
-    id: "4",
-    title: "Normal Coin Bag",
-    image: require("../../assets/shop/coins.png"),
-    price: "5.99 $",
-    rarity: "uncommon",
-  },
-  {
-    id: "5",
-    title: "Some Coins I Guess...",
-    image: require("../../assets/shop/coins.png"),
-    price: "2.99 $",
-    rarity: "common",
-  },
-];
-
-const clothesItems = [
-  {
-    id: "1",
-    title: "Cool Shirt",
-    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    price: "1000 coins",
-    rarity: "uncommon",
-  },
-  {
-    id: "2",
-    title: "Adventurer Hat",
-    image: require("../../assets/inventory/wardrobe/shirts/shirt1.png"),
-    price: "800 coins",
-    rarity: "rare",
-  },
-];
 
 export default function Shop() {
   const [isObjects, setIsObjects] = useState(true);
@@ -112,6 +62,90 @@ export default function Shop() {
 
   }, []);
 
+  const handleBuy = async (idList: any, name: string, price: string) => {
+    const playerId = await AsyncStorage.getItem("PlayerId");
+    if (isObjects) {
+      let coinAmount = 0;
+      let livesAmount = 0;
+      for (const id of idList) {
+        const { data, status } = await getShopItemById(id);
+        console.log("Shop item", data);
+  
+        if (status === 200) {
+          if (data.type === "lives"){
+            livesAmount += data.lives_given;
+          }
+          else{
+            coinAmount += data.coins_given;
+          }
+        }
+        else{
+          console.error(`${status} - ${data}`);
+        }
+      }
+  
+      if (coinAmount > 0){
+        const { data, status } = await setPlayerCoins(playerId, coinAmount);
+  
+        if (status === 200){
+          alert(`You bought ${coinAmount} coins`);
+        }
+        else {
+          console.error(`${status} - ${data}`);
+        }
+      }
+
+      if (livesAmount > 0){
+        const { data, status } = await setPlayerLiveCounter(playerId, livesAmount);
+        
+        if (status === 200){
+          alert(`You bought ${livesAmount} lives`);
+        }
+        else {
+          console.error(`${status} - ${data}`);
+        }
+      }
+
+    }
+    else {
+      const {data, status} = await getShopItemById(idList[0]);
+      if (status === 200){
+        if (playerId){
+          chargeCoins(playerId, price);
+          updatePlayerWardrobe(playerId, data.clothes.id, name);
+        }
+        else{
+          console.error("PlayerId is missing");
+        }
+      }
+    }
+  };
+
+  const updatePlayerWardrobe = async (playerId: string, clothesId: string, name: string) => {
+    const { data, status } = await setPlayerWardrobe(playerId, clothesId);
+
+    if (status === 200){
+      alert(`You bought ${name}`);
+      console.log("Added: ", data)
+    }
+    else {
+      console.error(`${status} - ${data}`);
+    }
+
+  };
+
+  const chargeCoins = async (playerId: string, coins: string) => {
+    let amoutToCharge = parseInt(coins) * -1;
+    const { data, status } = await setPlayerCoins(playerId, amoutToCharge);
+
+    if (status === 200){
+      console.log("Coins charged: ", data);
+    }
+    else {
+      console.error(`${status} - ${data}`);
+    }
+  };
+
   return (
     <ImageBackground
       source={require("../../assets/backgrounds/blue.png")}
@@ -134,11 +168,11 @@ export default function Shop() {
             renderItem={({ item }) => (
               <ShopItem
                 title={item.name}
-                image={item.image}
+                image={isObjects ? GameObjectImageMap[item.image_path] : ClothesImageMap[item.items[0].clothes.image_path]}
                 price={ isObjects ? item.price + "€" : item.price + " coins"}
                 description={item.description}
-                rarity={"legendary"}
-                onPress={() => alert(`Compraste ${item.name}`)}
+                rarity={item.rarity}
+                onPress={isObjects ? () => handleBuy(item.items, item.name, item.price) : () => handleBuy([item.items[0].id], item.name, item.price)}
               />
             )}
             contentContainerStyle={{ alignItems: "center", paddingBottom: 100 }}
