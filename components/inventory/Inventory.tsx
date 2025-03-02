@@ -10,7 +10,9 @@ import {
 import styles from "./InventoryStyles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { createTrade } from "@/api/trade_api";
+import { getActiveTrades } from "@/api/trade_api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { FoodImageMap } from "@/utils/imageMap";
 
 
 interface InventoryItem {
@@ -61,72 +63,7 @@ const Inventory: React.FC<InventoryProps> = ({
 
   
   // Ejemplo de trades activos
-  const activeTrades: TradeItem[] = [
-    {
-      id: "1",
-      itemName: "Manzana",
-      status: "Pendiente",
-      userProfile: require("../pet/assets/moringo.png"),
-      requestedImage: require("../../assets/inventory/food/ja/sushi.png"),
-      offeredImage: require("../../assets/inventory/food/ja/sushi.png"),
-    },
-    {
-      id: "2",
-      itemName: "Plátano",
-      status: "Completado",
-      userProfile: require("../pet/assets/moringo.png"),
-      requestedImage: require("../../assets/inventory/food/ja/sushi.png"),
-      offeredImage: require("../../assets/inventory/food/ja/sushi.png"),
-    },
-    {
-      id: "3",
-      itemName: "Plátano",
-      status: "Completado",
-      userProfile: require("../pet/assets/moringo.png"),
-      requestedImage: require("../../assets/inventory/food/ja/sushi.png"),
-      offeredImage: require("../../assets/inventory/food/ja/sushi.png"),
-    },
-    {
-      id: "4",
-      itemName: "Plátano",
-      status: "Completado",
-      userProfile: require("../pet/assets/moringo.png"),
-      requestedImage: require("../../assets/inventory/food/ja/sushi.png"),
-      offeredImage: require("../../assets/inventory/food/ja/sushi.png"),
-    },
-    {
-      id: "5",
-      itemName: "Plátano",
-      status: "Completado",
-      userProfile: require("../pet/assets/moringo.png"),
-      requestedImage: require("../../assets/inventory/food/ja/sushi.png"),
-      offeredImage: require("../../assets/inventory/food/ja/sushi.png"),
-    },
-    {
-      id: "6",
-      itemName: "Plátano",
-      status: "Completado",
-      userProfile: require("../pet/assets/moringo.png"),
-      requestedImage: require("../../assets/inventory/food/ja/sushi.png"),
-      offeredImage: require("../../assets/inventory/food/ja/sushi.png"),
-    },
-    {
-      id: "7",
-      itemName: "Plátano",
-      status: "Completado",
-      userProfile: require("../pet/assets/moringo.png"),
-      requestedImage: require("../../assets/inventory/food/ja/sushi.png"),
-      offeredImage: require("../../assets/inventory/food/ja/sushi.png"),
-    },
-    {
-      id: "8",
-      itemName: "Plátano",
-      status: "Completado",
-      userProfile: require("../pet/assets/moringo.png"),
-      requestedImage: require("../../assets/inventory/food/ja/sushi.png"),
-      offeredImage: require("../../assets/inventory/food/ja/sushi.png"),
-    },
-  ];
+  const [activeTrades, setActiveTrades] = useState<TradeItem[]>([]);
 
   // Obtener ítems con not-allowed si es ropa
   const getFilteredItems = () => {
@@ -180,74 +117,92 @@ const Inventory: React.FC<InventoryProps> = ({
 
 
   // Mostrar trades activos
-  const handleShowTrades = () => {
+  const handleShowTrades = async () => {
+    await fetchActiveTrades();
     setShowTrades(true);
     setModalVisible(false);
   };
 
   // Confirmar Trade
   // Confirmar Trade y enviarlo a la API
-    const handleConfirmTrade = async () => {
-      if (!previousItem || !selectedItem) {
-          alert("❌ Debes seleccionar dos ítems para intercambiar.");
-          return;
-      }
+  const handleConfirmTrade = async () => {
+    if (!previousItem || !selectedItem) {
+        alert("❌ Debes seleccionar dos ítems para intercambiar.");
+        return;
+    }
 
-      try {
-          console.log("📌 Confirmar Trade:", previousItem, selectedItem);
-          // Obtener el ID del jugador desde AsyncStorage
-          const storedPlayerId = await AsyncStorage.getItem("PlayerId");
-          if (!storedPlayerId) {
-              alert("❌ No se encontró el ID del jugador.");
-              return;
-          }
+    try {
+        console.log("📌 Confirmar Trade:", previousItem, selectedItem);
 
-          const playerId = parseInt(storedPlayerId, 10);
-          const inFoodId = parseInt(previousItem.id, 10);  // Convertir a número
-          const outFoodId = parseInt(selectedItem.id, 10); // Convertir a número
+        const storedPlayerId = await AsyncStorage.getItem("PlayerId");
+        if (!storedPlayerId) {
+            alert("❌ No se encontró el ID del jugador.");
+            return;
+        }
 
-          // Estructura del JSON enviado
-          const tradeData = {
-              player: playerId,
-              isActive: true,  // Se asume que el Trade está activo por defecto
-              in_food: inFoodId,
-              out_food: outFoodId
-          };
+        const playerId = parseInt(storedPlayerId, 10);
+        const inFoodId = parseInt(previousItem.id, 10);
+        const outFoodId = parseInt(selectedItem.id, 10);
 
-          console.log("📌 Enviando Trade:", tradeData);
+        const tradeData = {
+            player: playerId,
+            isActive: true,
+            in_food_id: inFoodId,
+            out_food_id: outFoodId
+        };
 
-          // Crear el trade en el backend
-          const response = await createTrade(tradeData);
+        console.log("📌 Enviando Trade:", tradeData);
 
-          if (response.status === 201) {
-              alert("✅ Trade creado con éxito.");
-              handleCloseModal();
-          } else {
-              console.error("❌ Error creando trade:", response.data);
-              alert("❌ Hubo un error al crear el trade.");
-          }
-      } catch (error) {
-          console.error("❌ Error en la solicitud:", error);
-          alert("❌ Error de conexión.");
-      }
+        const response = await createTrade(tradeData);
+
+        if (response.status === 201) {
+            alert("✅ Trade creado con éxito.");
+            handleCloseModal();
+        } else {
+            console.error("❌ Error creando trade:", response.data);
+            alert("❌ Hubo un error al crear el trade.");
+        }
+    } catch (error: any) {  // 🔹 Forzamos `error` a tipo `any`
+        console.error("❌ Error en la solicitud:", error);
+
+        if (error.response) {
+            console.log("🔍 Respuesta del servidor:", error.response.data);
+            alert("❌ Error del servidor: " + JSON.stringify(error.response.data));
+        } else {
+            alert("❌ Error de conexión.");
+        }
+    }
   };
 
 
 
-  // Renderizar ítem
-  const renderItem = ({ item }: { item: InventoryItem }) => (
-    <TouchableOpacity
-      style={[
-        styles.itemContainer,
-        selectedItem?.id === item.id && styles.selectedItem,
-      ]}
-      onPress={() => handleSelectItem(item)}
-    >
-      <Image source={item.image} style={styles.itemImage} />
-    </TouchableOpacity>
-  );
+  const fetchActiveTrades = async () => {
+    try {
+        console.log("🔹 Buscando trades activos...");
+        const response = await getActiveTrades();
+        
+        if (response.status === 200) {
+            console.log("✅ Trades activos obtenidos:", response.data);
 
-  // Renderizar cada trade activo
+            const formattedTrades = response.data.map((trade: any) => ({
+                id: trade.id.toString(),
+                itemName: trade.in_food.name,
+                status: trade.isActive ? "Pendiente" : "Completado",
+                userProfile: require("../pet/assets/moringo.png"),
+                requestedImage: FoodImageMap[trade.out_food.image_path],
+                offeredImage: FoodImageMap[trade.in_food.image_path]
+            }));
+
+            setActiveTrades(formattedTrades);
+        } else {
+            console.error("❌ Error obteniendo trades activos:", response.data);
+        }
+    } catch (error) {
+        console.error("❌ Error en la solicitud de trades:", error);
+    }
+  };
+
+
   const renderTrade = ({ item }: { item: TradeItem }) => (
     <View style={styles.tradeItem}>
       <View style={styles.tradeRow}>
@@ -256,14 +211,14 @@ const Inventory: React.FC<InventoryProps> = ({
 
         {/* Contenido del trade a la derecha */}
         <View style={styles.tradeContent}>
-          <Image source={item.requestedImage} style={styles.tradeImage} />
+          <Image source={item.offeredImage} style={styles.tradeImage} />
           <Ionicons
             name="arrow-forward"
             size={30}
             color="#555"
             style={styles.arrowIcon}
           />
-          <Image source={item.offeredImage} style={styles.tradeImage} />
+          <Image source={item.requestedImage} style={styles.tradeImage} />
         </View>
       </View>
     </View>
@@ -311,22 +266,22 @@ const Inventory: React.FC<InventoryProps> = ({
         <>
           <Text style={styles.tradeTitle}>Trades Activos</Text>
           <FlatList
-            data={activeTrades}
-            keyExtractor={(item) => item.id}
-            renderItem={renderTrade}
-            contentContainerStyle={{ width: "100%" }}
+              data={activeTrades}
+              keyExtractor={(item) => item.id}
+              renderItem={renderTrade}
+              contentContainerStyle={{ width: "100%" }}
           />
           <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => setShowTrades(false)}
+              style={styles.backButton}
+              onPress={() => setShowTrades(false)}
           >
-            <Ionicons
-              name="arrow-back"
-              size={20}
-              color="#fff"
-              style={styles.iconStyle}
-            />
-            <Text style={styles.buttonText}>Volver al Inventario</Text>
+              <Ionicons
+                  name="arrow-back"
+                  size={20}
+                  color="#fff"
+                  style={styles.iconStyle}
+              />
+              <Text style={styles.buttonText}>Volver al Inventario</Text>
           </TouchableOpacity>
         </>
       )}
