@@ -5,24 +5,22 @@ import Pet from "@/components/pet/Pet";
 import HungerBar from "@/components/hunger-bar/HungerBar";
 import MoneyCounter from "@/components/money-counter/MoneyCounter";
 import { getUserById } from "../api/user_api";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ProfileScreen() {
   const router = useRouter();
   const [username, setUsername] = useState("");
 
   useEffect(() => {
-
     const getUserData = async () => {
       const id = await AsyncStorage.getItem("UserId");
       const token = await AsyncStorage.getItem("Token");
 
       const { data, status } = await getUserById(id, token);
 
-      if (status === 200){
+      if (status === 200) {
         setUsername(data.username);
       }
-
     };
 
     getUserData();
@@ -61,16 +59,20 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
   },
+  profileDetails: {
+    alignItems: "center",
+    flexDirection: "column",
+    maxWidth: "50%",
+    flexShrink: 1,
+  },
   header: {
     marginVertical: 75,
     marginHorizontal: 20,
     alignSelf: "flex-start",
     flexDirection: "row",
     alignItems: "center",
-  },
-  profileDetails: {
-    alignItems: "center",
-    flexDirection: "column",
+    flexWrap: "wrap",
+    maxWidth: "90%",
   },
   username: {
     fontSize: 32,

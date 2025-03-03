@@ -1,12 +1,12 @@
 import { ImageBackground, View } from "react-native";
 import { useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";  // ✅ Importar AsyncStorage
+import AsyncStorage from "@react-native-async-storage/async-storage"; // ✅ Importar AsyncStorage
 import MoneyCounter from "@/components/money-counter/MoneyCounter";
 import Pet from "@/components/pet/Pet";
 import ProfileIcon from "@/components/profile-icon/ProfileIcon";
 import HungerBar from "@/components/hunger-bar/HungerBar";
 import FoodBar from "@/components/food-bar/FoodBar";
-import { getFoodListByPlayer } from "@/api/foodList_api";
+import { addFoodToPlayer, getFoodListByPlayer } from "@/api/foodList_api";
 
 export default function Index() {
   const [foodList, setFoodList] = useState([]);

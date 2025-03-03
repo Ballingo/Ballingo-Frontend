@@ -34,3 +34,18 @@ export const reduceFoodQuantity = async (foodItemId) => {
         return { data: error?.data, status: error?.status };
     }
 };
+
+export const addFoodToPlayer = async (playerId, foodId, quantity) => {
+    try {
+        const res = await api.post('add-food/', {
+            player_id: playerId,
+            food_id: foodId,
+            quantity: quantity
+        });
+
+        return { data: res.data, status: res.status };
+    } catch (err) {
+        const error = err.response;
+        return { data: error?.data, status: error?.status };
+    }
+};
