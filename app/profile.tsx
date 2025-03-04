@@ -8,6 +8,8 @@ import { getUserById } from "../api/user_api";
 import { getWardrobeByPlayer } from "../api/inventory_api";
 import { getAllClothes } from "../api/clothes_api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 
 interface Clothes {
   id: number;
@@ -28,6 +30,16 @@ interface Wardrobe {
 export default function ProfileScreen() {
   const router = useRouter();
   const [username, setUsername] = useState("");
+
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log("Relaoding the screen...");
+      setRefreshKey((prev) => prev + 1);
+    }, [])
+  );
+
   const [hatsCount, setHatsCount] = useState(0);
   const [accessoriesCount, setAccessoriesCount] = useState(0);
   const [totalHats, setTotalHats] = useState(0);
@@ -90,6 +102,7 @@ export default function ProfileScreen() {
       source={require("../assets/backgrounds/cyan.png")}
       style={{ flex: 1, width: "100%", height: "100%" }}
       resizeMode="cover"
+      key={refreshKey}
     >
       <View style={styles.container}>
         <MoneyCounter color="0AEFFF" />

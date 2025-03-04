@@ -14,6 +14,9 @@ import { getActiveTrades } from "@/api/trade_api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FoodImageMap } from "@/utils/imageMap";
 import { acceptTrade } from "@/api/trade_api";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
+import { addClothesToPet, getPetClothes } from "@/api/pet_api";
 
 
 interface InventoryItem {
@@ -61,7 +64,35 @@ const Inventory: React.FC<InventoryProps> = ({
   const [showTrades, setShowTrades] = useState<boolean>(false);
 
   const [selectedTrade, setSelectedTrade] = useState<string | null>(null);
+  const [selectedClothes, setSelectedClothes] = useState<string[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0);
   
+  useFocusEffect(
+    useCallback(() => {
+      console.log("Relaoding the screen...");
+      setRefreshKey((prev) => prev + 1);
+
+      const fetchClothes = async () => {
+        const storedPetId = await AsyncStorage.getItem("PetId");
+        if (!storedPetId) {
+          alert("❌ No se encontró el ID de la mascota.");
+          return;
+        }
+
+        console.log("👕 Fetching clothes for pet:", storedPetId);
+
+        const { data, status } = await getPetClothes(storedPetId);
+
+        if (status === 200 && data.accesories){
+          const petClothesIds = data.accesories.map((item: { id: number }) => item.id.toString());
+          setSelectedClothes(petClothesIds);
+        }
+
+      };
+
+      fetchClothes();
+    }, [])
+  );
   
   // Ejemplo de trades activos
   const [activeTrades, setActiveTrades] = useState<TradeItem[]>([]);
@@ -85,9 +116,41 @@ const Inventory: React.FC<InventoryProps> = ({
   };
 
   // Manejar la selección de ítems
-  const handleSelectItem = (item: InventoryItem) => {
+  const handleSelectItem = async (item: InventoryItem) => {
     setSelectedItem(item);
-    if (!isClothes) {
+    if (isClothes) {
+      const storedPetId = await AsyncStorage.getItem("PetId");
+      if (!storedPetId) {
+        alert("❌ No se encontró el ID de la mascota.");
+        return;
+      }
+
+      console.log(`👕 Adding item (${item.id}) to pet (${storedPetId})...`);
+
+      const {data, status} = await addClothesToPet(storedPetId, item.id);
+
+      if (status === 200) {
+        if (item.id !== "0"){
+          console.log("✅ Clothes added to your pet:", data);
+
+          setSelectedClothes(() => {
+            const updatedSelection = data.accesories.map((clothes: { id: number }) => clothes.id.toString());
+            return updatedSelection;
+          });
+
+          alert("✅ Clothes added to pet.");
+        }
+        else{
+          console.log("✅ All clothes removed: ", data);
+          alert("✅ Removed all clothes from your pet.");
+          setSelectedClothes([]);
+        }
+      } else {
+        console.error("❌ Error:", data);
+        alert("❌ Could not add clothes to your pet.");
+      }
+    }
+    else{
       setModalVisible(true);
       setTradeStep(isTrading ? "confirm" : "initial");
     }
@@ -278,7 +341,7 @@ const Inventory: React.FC<InventoryProps> = ({
   
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} key={refreshKey}>
       {!showTrades && (
         <View style={styles.navbar}>
           {categories.map((category) => (
@@ -305,7 +368,7 @@ const Inventory: React.FC<InventoryProps> = ({
             <TouchableOpacity
               style={[
                 styles.itemContainer,
-                selectedItem?.id === item.id && styles.selectedItem,
+                selectedClothes.includes(item.id.toString()) && styles.selectedItem,
               ]}
               onPress={() => handleSelectItem(item)}
             >

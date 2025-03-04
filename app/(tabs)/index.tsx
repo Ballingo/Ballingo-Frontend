@@ -7,10 +7,20 @@ import ProfileIcon from "@/components/profile-icon/ProfileIcon";
 import HungerBar from "@/components/hunger-bar/HungerBar";
 import FoodBar from "@/components/food-bar/FoodBar";
 import { addFoodToPlayer, getFoodListByPlayer } from "@/api/foodList_api";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 
 export default function Index() {
   const [foodList, setFoodList] = useState([]);
   const [playerId, setPlayerId] = useState<number | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log("Relaoding the screen...");
+      setRefreshKey((prev) => prev + 1);
+    }, [])
+  );
 
   useEffect(() => {
     const fetchPlayerIdAndFood = async () => {
@@ -55,6 +65,7 @@ export default function Index() {
       source={require("../../assets/backgrounds/green.png")}
       style={{ flex: 1, width: "100%", height: "100%" }}
       resizeMode="cover"
+      key={refreshKey}
     >
       {/* Contador de dinero y perfil */}
       <MoneyCounter color="0AFF99" />

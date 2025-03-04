@@ -61,6 +61,21 @@ export const handleErrorUserSignUp = (error) => {
     }
 };
 
+export const getLastLogin = async (userId, token) => {
+    try{
+        const res = await api.get(`last_login/${userId}`, 
+            {
+                headers: {'Authorization': `Token ${token}`}
+            }
+        );
+        return {data: res.data, status: res.status};
+    }
+    catch(err){
+        const error = err.response
+        return {data: error.data, status: error.status};
+    }
+};
+
 export const handleErrorUserLogin = (error) => {
     if (error.error){
         alert(`${error.error}`);
