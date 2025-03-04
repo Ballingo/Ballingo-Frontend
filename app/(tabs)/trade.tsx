@@ -1,5 +1,5 @@
 import { ImageBackground, View, Text } from "react-native";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MoneyCounter from "@/components/money-counter/MoneyCounter";
 import ProfileIcon from "@/components/profile-icon/ProfileIcon";
@@ -8,6 +8,7 @@ import Pet from "@/components/pet/Pet";
 import { getFoodListByPlayer } from "@/api/foodList_api";
 import { getAllFood } from "@/api/food_api";
 import { FoodImageMap } from "@/utils/imageMap";
+import { useFocusEffect } from "@react-navigation/native";
 
 interface InventoryItem {
   id: string;
@@ -19,6 +20,14 @@ export default function Trade() {
   const [userFood, setUserFood] = useState<InventoryItem[]>([]);
   const [allFood, setAllFood] = useState<InventoryItem[]>([]);
   const [playerId, setPlayerId] = useState<number | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+  
+  useFocusEffect(
+    useCallback(() => {
+      console.log("Relaoding the screen...");
+      setRefreshKey((prev) => prev + 1);
+    }, [])
+  );
 
   useEffect(() => {
     const fetchPlayerIdAndFood = async () => {
@@ -108,6 +117,7 @@ export default function Trade() {
       source={require("../../assets/backgrounds/red.png")}
       style={{ flex: 1, width: "100%", height: "100%" }}
       resizeMode="cover"
+      key={refreshKey}
     >
       {/* Contador de dinero y perfil */}
       <MoneyCounter color="FF0000" />

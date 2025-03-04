@@ -6,10 +6,20 @@ import HungerBar from "@/components/hunger-bar/HungerBar";
 import MoneyCounter from "@/components/money-counter/MoneyCounter";
 import { getUserById } from "../api/user_api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 
 export default function ProfileScreen() {
   const router = useRouter();
   const [username, setUsername] = useState("");
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log("Relaoding the screen...");
+      setRefreshKey((prev) => prev + 1);
+    }, [])
+  );
 
   useEffect(() => {
     const getUserData = async () => {
@@ -31,6 +41,7 @@ export default function ProfileScreen() {
       source={require("../assets/backgrounds/cyan.png")}
       style={{ flex: 1, width: "100%", height: "100%" }}
       resizeMode="cover"
+      key={refreshKey}
     >
       <View style={styles.container}>
         <MoneyCounter color="0AEFFF" />

@@ -1,12 +1,13 @@
 import { ImageBackground, View, Text } from "react-native";
 import MoneyCounter from "@/components/money-counter/MoneyCounter";
 import ProfileIcon from "@/components/profile-icon/ProfileIcon";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getWardrobeByPlayer } from "@/api/inventory_api";
 import { ClothesImageMap } from "@/utils/imageMap";
 import Pet from "@/components/pet/Pet";
 import Inventory from "@/components/inventory/Inventory";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 
 interface InventoryItem {
   id: string;
@@ -16,6 +17,14 @@ interface InventoryItem {
 
 export default function Wardrobe() {
   const [clothes, setClothes] = useState<InventoryItem[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log("Relaoding the screen...");
+      setRefreshKey((prev) => prev + 1);
+    }, [])
+  );
 
   useEffect(() => {
     async function loadWardrobe() {
@@ -65,6 +74,7 @@ export default function Wardrobe() {
       source={require("../../assets/backgrounds/orange.png")}
       style={{ flex: 1, width: "100%", height: "100%" }}
       resizeMode="cover"
+      key={refreshKey}
     >
       {/* Contador de dinero y perfil */}
       <MoneyCounter color="FF8700" />

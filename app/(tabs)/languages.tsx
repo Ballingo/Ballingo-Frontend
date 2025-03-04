@@ -13,14 +13,14 @@ import {
 import MoneyCounter from "@/components/money-counter/MoneyCounter";
 import ProfileIcon from "@/components/profile-icon/ProfileIcon";
 import { useRouter } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
+import { createPet } from "@/api/pet_api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width } = Dimensions.get("window");
 
 export default function Languages() {
-  const [selectedLanguage, setSelectedLanguage] = useState<string>("English");
-  const scrollViewRef = useRef<ScrollView>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const router = useRouter();
 
   const languages = [
     { name: "English", flag: "en", image: require("../../assets/flags/en.svg") },
@@ -30,9 +30,24 @@ export default function Languages() {
     { name: "Japanese", flag: "ja", image: require("../../assets/flags/ja.svg") },
   ];
 
+  const [selectedLanguage, setSelectedLanguage] = useState<any>(languages[0]);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const router = useRouter();
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log("Relaoding the screen...");
+      let index = languages.indexOf(selectedLanguage);
+      currentIndex === 0 ? scrollToIndex(0) : scrollToIndex(index);
+      setRefreshKey((prev) => prev + 1);
+    }, [])
+  );
+
   const handleSelectLanguage = (index: number) => {
     setCurrentIndex(index);
-    setSelectedLanguage(languages[index].name);
+    setSelectedLanguage(languages[index]);
   };
 
   const handleNext = () => {
@@ -60,10 +75,23 @@ export default function Languages() {
     handleSelectLanguage(index);
   };
 
-  const handleConfirmSelection = () => {
+  const handleConfirmSelection = async () => {
     if (selectedLanguage) {
-      console.log(`Selected language: ${selectedLanguage}`);
-      router.push("../level-map");  // Lleva a la pantalla de niveles
+      console.log(`Selected language: ${selectedLanguage.name}`);
+
+      const playerId = await AsyncStorage.getItem("PlayerId");
+      const {data, status} = await createPet(playerId, selectedLanguage.flag, 100, false);
+
+      if (status === 201) {
+        console.log("Pet created", data);
+        await AsyncStorage.setItem("PetId", data.id);
+        
+        router.push("../level-map");  // Lleva a la pantalla de niveles
+      }
+      else {
+        console.error(`${status} - ${data}`);
+      }
+
     } else {
       alert("Please select a language first.");
     }
@@ -74,6 +102,7 @@ export default function Languages() {
       source={require("../../assets/backgrounds/purple.png")}
       style={{ flex: 1, width: "100%", height: "100%" }}
       resizeMode="cover"
+      key={refreshKey}
     >
       <MoneyCounter color="BE0AFF" />
       <ProfileIcon size={50} style={{ zIndex: 10 }} />
@@ -115,7 +144,7 @@ export default function Languages() {
         </View>
 
         {selectedLanguage && (
-          <Text style={styles.selectedText}>Selected: {selectedLanguage}</Text>
+          <Text style={styles.selectedText}>Selected: {selectedLanguage.name}</Text>
         )}
 
         <Button title="Confirm Selection" onPress={handleConfirmSelection} />

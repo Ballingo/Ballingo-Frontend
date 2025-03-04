@@ -11,6 +11,8 @@ import { useRouter } from "expo-router";
 import Svg, { Line } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
 import LevelPopup from "@/components/level-pop-up/LevelPopUp"; // Asegúrate de la ruta correcta
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 
 // Generar niveles dinámicamente
 const levels = Array.from({ length: 18 }, (_, i) => ({
@@ -30,6 +32,14 @@ export default function LevelMap() {
   const [popupVisible, setPopupVisible] = useState(false);
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
   const [isUnlocked, setIsUnlocked] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log("Relaoding the screen...");
+      setRefreshKey((prev) => prev + 1);
+    }, [])
+  );
 
   useEffect(() => {
     scrollViewRef.current?.scrollToEnd({ animated: false });
@@ -42,7 +52,7 @@ export default function LevelMap() {
   };
 
   return (
-    <ImageBackground style={styles.background}>
+    <ImageBackground style={styles.background} key={refreshKey}>
       {/* Botón para regresar a la pantalla de idiomas */}
       <TouchableOpacity
         style={styles.backButton}

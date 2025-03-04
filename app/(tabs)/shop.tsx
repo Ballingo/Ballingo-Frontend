@@ -3,11 +3,12 @@ import MoneyCounter from "@/components/money-counter/MoneyCounter";
 import ProfileIcon from "@/components/profile-icon/ProfileIcon";
 import ShopItem from "@/components/shop-item/ShopItem";
 import SliderButton from "@/components/slider-button/SliderButton";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getAllMoneyPacks, getAllClothesPacks, getShopItemById } from "@/api/shop_api";
 import { setPlayerCoins, setPlayerLiveCounter, setPlayerWardrobe } from "@/api/inventory_api";
 import { GameObjectImageMap, ClothesImageMap } from "@/utils/imageMap";
+import { useFocusEffect } from "@react-navigation/native";
 
 interface Products {
   id: string;
@@ -25,6 +26,14 @@ export default function Shop() {
   const [isObjects, setIsObjects] = useState(true);
   const [moneyItems, setMoneyItems] = useState<Products[]>([]);
   const [gameItems, setGameItems] = useState<Products[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log("Relaoding the screen...");
+      setRefreshKey((prev) => prev + 1);
+    }, [])
+  );
 
   const handleToggle = (isLeft: boolean) => {
     setIsObjects(isLeft);
@@ -89,6 +98,7 @@ export default function Shop() {
   
         if (status === 200){
           alert(`You bought ${coinAmount} coins`);
+          setRefreshKey((prev) => prev + 1);
         }
         else {
           console.error(`${status} - ${data}`);
@@ -100,6 +110,7 @@ export default function Shop() {
         
         if (status === 200){
           alert(`You bought ${livesAmount} lives`);
+          setRefreshKey((prev) => prev + 1);
         }
         else {
           console.error(`${status} - ${data}`);
@@ -111,8 +122,14 @@ export default function Shop() {
       const {data, status} = await getShopItemById(idList[0]);
       if (status === 200){
         if (playerId){
-          chargeCoins(playerId, price);
-          updatePlayerWardrobe(playerId, data.clothes.id, name);
+          const transaction = await chargeCoins(playerId, price);
+          if (transaction){
+            updatePlayerWardrobe(playerId, data.clothes.id, name);
+            setRefreshKey((prev) => prev + 1);
+          }
+          else{
+            alert("You don't have enough coins");
+          }
         }
         else{
           console.error("PlayerId is missing");
@@ -140,9 +157,11 @@ export default function Shop() {
 
     if (status === 200){
       console.log("Coins charged: ", data);
+      return true;
     }
     else {
       console.error(`${status} - ${data}`);
+      return false;
     }
   };
 
@@ -151,6 +170,7 @@ export default function Shop() {
       source={require("../../assets/backgrounds/blue.png")}
       style={{ flex: 1, width: "100%", height: "100%" }}
       resizeMode="cover"
+      key={refreshKey}
     >
       <MoneyCounter color="147DF5" />
       <ProfileIcon size={50} style={{ zIndex: 10 }} />
