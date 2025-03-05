@@ -19,6 +19,8 @@ import { createPet } from "@/api/pet_api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { updatePlayerLanguage } from "@/api/player_api";
 import { setLastLogin } from "@/api/user_api";
+import { setPlayerProgress } from "@/api/player_progress_api";
+import { playerHasPet } from "@/api/pet_api";
 
 const { width } = Dimensions.get("window");
 
@@ -84,23 +86,36 @@ export default function Languages() {
       const playerId = await AsyncStorage.getItem("PlayerId");
       const userId = await AsyncStorage.getItem("UserId");
       const token = await AsyncStorage.getItem("Token");
-      const {data, status} = await createPet(playerId, selectedLanguage.flag, 100, false);
 
-      if (status === 201) {
-        console.log("Pet created", data);
-        await AsyncStorage.setItem("PetId", data.id);
 
-        await updatePlayerLanguage(playerId, selectedLanguage.flag);
-        await AsyncStorage.setItem("ActualLanguage", selectedLanguage.flag);
-        await setLastLogin(userId, token);
+
+
+
+      console.log("playerId", playerId);
+      console.log("selectedLanguage.flag", selectedLanguage.flag);
+      const has_pet = await playerHasPet(playerId, selectedLanguage.flag);
+
+      if (has_pet.data.id) {
+
+        await AsyncStorage.setItem("PetId", has_pet.data.id);
+
+      } else {
         
-        router.push("../level-map");  // Lleva a la pantalla de niveles
-      }
-      else {
-        console.error(`${status} - ${data}`);
+        const {data, status} = await createPet(playerId, selectedLanguage.flag, 100, false);
+        console.log("Pet created", data);
+
+        await AsyncStorage.setItem("PetId", data.id);
+        await setPlayerProgress(playerId, selectedLanguage.flag, 1);
+        
       }
 
 
+      await updatePlayerLanguage(playerId, selectedLanguage.flag);
+      await AsyncStorage.setItem("ActualLanguage", selectedLanguage.flag);
+      await setLastLogin(userId, token);
+
+      
+      router.push("../level-map");  // Lleva a la pantalla de niveles
 
 
     } else {

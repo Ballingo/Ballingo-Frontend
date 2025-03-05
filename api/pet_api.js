@@ -157,3 +157,18 @@ export const increaseHunger = async (userId, petId, token) => {
     }
 };
 
+
+
+export const playerHasPet = async (playerId, language) => {
+    try {
+        const res = await api.post(`pet/has_pet/`, {
+            player_id: playerId,
+            language_code: language
+        });
+        return { data: res.data, status: res.status };
+    }
+    catch (err) {
+        const error = err.response;
+        return { data: error.data, status: error.status };
+    }
+}
