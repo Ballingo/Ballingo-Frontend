@@ -17,6 +17,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { createPet } from "@/api/pet_api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { updatePlayerLanguage } from "@/api/player_api";
 
 const { width } = Dimensions.get("window");
 
@@ -85,6 +86,9 @@ export default function Languages() {
       if (status === 201) {
         console.log("Pet created", data);
         await AsyncStorage.setItem("PetId", data.id);
+
+        await updatePlayerLanguage(playerId, selectedLanguage.flag);
+        await AsyncStorage.setItem("ActualLanguage", selectedLanguage.flag);
         
         router.push("../level-map");  // Lleva a la pantalla de niveles
       }

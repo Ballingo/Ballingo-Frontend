@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Image,
@@ -8,6 +8,8 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import styles from "./ProfileIconStyles";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { PetSkinImageMap } from "@/utils/imageMap";
 
 interface ProfileIconProps {
   imageUrl?: string;
@@ -26,6 +28,17 @@ const ProfileIcon: React.FC<ProfileIconProps> = ({
     console.log("Perfil clickeado");
     router.push("/profile");
   };
+  const [actualLanguage, setActualLanguage] = useState<string>("");
+  
+
+  useEffect(() => {
+    const fetchLanguage = async () => {
+      const storedLanguage = await AsyncStorage.getItem("ActualLanguage");
+      setActualLanguage(storedLanguage || "en");
+    }
+
+    fetchLanguage();
+  }, []);
 
   return (
     <TouchableOpacity onPress={handlePress} activeOpacity={0.7} style={style}>
@@ -37,7 +50,7 @@ const ProfileIcon: React.FC<ProfileIconProps> = ({
       >
         <Image
           source={
-            imageUrl ? { uri: imageUrl } : require("../pet/assets/moringo.png")
+            PetSkinImageMap[actualLanguage]
           }
           style={[
             styles.image,

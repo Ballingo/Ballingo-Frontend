@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -17,6 +17,7 @@ import { acceptTrade } from "@/api/trade_api";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { addClothesToPet, getPetClothes } from "@/api/pet_api";
+import { PetSkinImageMap } from "@/utils/imageMap";
 
 
 interface InventoryItem {
@@ -62,10 +63,12 @@ const Inventory: React.FC<InventoryProps> = ({
   );
   const [isTrading, setIsTrading] = useState<boolean>(false);
   const [showTrades, setShowTrades] = useState<boolean>(false);
+  
 
   const [selectedTrade, setSelectedTrade] = useState<string | null>(null);
   const [selectedClothes, setSelectedClothes] = useState<string[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [actualLanguage, setActualLanguage] = useState<string>("");
   
   useFocusEffect(
     useCallback(() => {
@@ -93,6 +96,16 @@ const Inventory: React.FC<InventoryProps> = ({
       fetchClothes();
     }, [])
   );
+
+  useEffect(() => {
+    const fetchLanguage = async () => {
+      const storedLanguage = await AsyncStorage.getItem("ActualLanguage");
+      setActualLanguage(storedLanguage || "en");
+    };
+
+    fetchLanguage();
+  }, []);
+
   
   // Ejemplo de trades activos
   const [activeTrades, setActiveTrades] = useState<TradeItem[]>([]);
@@ -249,12 +262,12 @@ const Inventory: React.FC<InventoryProps> = ({
             console.log("✅ Trades activos obtenidos:", response.data);
 
             const formattedTrades = response.data.map((trade: any) => ({
-                id: trade.id.toString(),
-                itemName: trade.in_food.name,
-                status: trade.isActive ? "Pendiente" : "Completado",
-                userProfile: require("../pet/assets/moringo.png"),
-                requestedImage: FoodImageMap[trade.out_food.image_path],
-                offeredImage: FoodImageMap[trade.in_food.image_path]
+              id: trade.id.toString(),
+              itemName: trade.in_food.name,
+              status: trade.isActive ? "Pendiente" : "Completado",
+              userProfile: PetSkinImageMap[actualLanguage],
+              requestedImage: FoodImageMap[trade.out_food.image_path],
+              offeredImage: FoodImageMap[trade.in_food.image_path]
             }));
 
             setActiveTrades(formattedTrades);
