@@ -13,6 +13,8 @@ import { Ionicons } from "@expo/vector-icons";
 import LevelPopup from "@/components/level-pop-up/LevelPopUp"; // Asegúrate de la ruta correcta
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
+import { getLevels } from "@/api/player_progress_api"
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Generar niveles dinámicamente
 const levels = Array.from({ length: 18 }, (_, i) => ({
@@ -26,6 +28,9 @@ const levelPositions = levels.map((_, index) => ({
   y: 2100 - index * 120,
 }));
 
+
+
+
 export default function LevelMap() {
   const router = useRouter();
   const scrollViewRef = useRef<ScrollView>(null);
@@ -33,6 +38,9 @@ export default function LevelMap() {
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [levels, setLevels] = useState<any[]>([]);
+  const [questionnarie_id, setQuestionnarie_id] = useState<number | null>(null);
+
 
   useFocusEffect(
     useCallback(() => {
@@ -45,13 +53,49 @@ export default function LevelMap() {
     scrollViewRef.current?.scrollToEnd({ animated: false });
   }, []);
 
-  const handleLevelPress = (level: number, unlocked: boolean) => {
+
+  useEffect(() => {
+    const fetchLevels = async () => {
+      try {
+        const playerId = await AsyncStorage.getItem("PlayerId");
+        const language = await AsyncStorage.getItem("ActualLanguage");
+
+        if (!playerId || !language) {
+          console.error("No se encontró el PlayerId o ActualLanguage");
+          return;
+        }
+
+        const levelsData = await getLevels(playerId, language);
+
+        console.log("Datos de niveles:", levelsData);
+
+        // 🔹 Asegúrate de que levelsData es un array antes de hacer .map()
+        if (!Array.isArray(levelsData)) {
+          console.error("Error: los datos recibidos no son un array", levelsData);
+          return;
+        }
+
+        setLevels(levelsData);
+
+        console.log("Niveles formateados:", levels); 
+      } catch (error) {
+        console.error("Error obteniendo los niveles:", error);
+      }
+    };
+
+    fetchLevels();
+  }, [refreshKey]);
+
+
+
+  const handleLevelPress = (level: number, unlocked: boolean, questionnarie_id: number) => {
     setSelectedLevel(level);
     setIsUnlocked(unlocked);
     setPopupVisible(true);
+    setQuestionnarie_id(questionnarie_id);
   };
 
-  return (
+  return (  
     <ImageBackground style={styles.background} key={refreshKey}>
       {/* Botón para regresar a la pantalla de idiomas */}
       <TouchableOpacity
@@ -94,6 +138,7 @@ export default function LevelMap() {
           {/* Renderizar niveles */}
           {levels.map((level, index) => {
             const position = levelPositions[index];
+            console.log("Level:", level);
             return (
               <TouchableOpacity
                 key={level.id}
@@ -105,10 +150,10 @@ export default function LevelMap() {
                     backgroundColor: level.unlocked ? "#4CAF50" : "#D3D3D3",
                   },
                 ]}
-                onPress={() => handleLevelPress(level.id, level.unlocked)}
+                onPress={() => handleLevelPress(level.questionnaire.level, level.unlocked, level.questionnaire.id)}
                 disabled={!level.unlocked}
               >
-                <Text style={styles.levelText}>{level.id}</Text>
+                <Text style={styles.levelText}>{level.questionnaire.level}</Text>
               </TouchableOpacity>
             );
           })}
@@ -122,6 +167,7 @@ export default function LevelMap() {
           onClose={() => setPopupVisible(false)}
           level={selectedLevel}
           unlocked={isUnlocked}
+          questionnarie_id = {questionnarie_id ?? -1}
         />
       )}
     </ImageBackground>

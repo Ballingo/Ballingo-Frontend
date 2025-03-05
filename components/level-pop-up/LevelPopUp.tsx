@@ -8,15 +8,15 @@ interface LevelPopupProps {
   onClose: () => void;
   level: number;
   unlocked: boolean;
+  questionnarie_id: number;
 }
 
-const LevelPopup: React.FC<LevelPopupProps> = ({ visible, onClose, level, unlocked }) => {
+const LevelPopup: React.FC<LevelPopupProps> = ({ visible, onClose, level, unlocked, questionnarie_id }) => {
   const router = useRouter();
 
   const handlePlay = () => {
     onClose();
-    //router.push(`/quiz?level=${level}`); // Navega a la pantalla del cuestionario con el nivel
-    router.push(`/quiz?level=${level}`);
+    router.push(`/quiz?level=${level}&questionnarie_id=${questionnarie_id}`); // 🔹 Pasamos ambos parámetros separados
   };
 
   return (

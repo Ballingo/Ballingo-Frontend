@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Image, Animated, Modal } from "react-nati
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ProgressBar } from "react-native-paper";
 import styles from "./QuizScreenStyles";
+import { getQuestionnaire } from "@/api/questionnaire_api";
 
 // Lista de imágenes de comida disponibles
 const foodImages = [
@@ -29,7 +30,7 @@ const questions = [
 
 const QuizScreen: React.FC = () => {
   const router = useRouter();
-  const { level } = useLocalSearchParams();
+  const { level, questionnarie_id } = useLocalSearchParams();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -48,6 +49,14 @@ const QuizScreen: React.FC = () => {
       router.replace("/level-map");
     }
   };
+
+
+  useEffect(() => {
+    getQuestionnaire(questionnarie_id).then((data) => {
+      console.log(data.data.questions);
+    });
+  }, []);
+
 
   // 👇 Se ejecuta SOLO cuando se completa el cuestionario
   useEffect(() => {
