@@ -9,6 +9,7 @@ import FoodBar from "@/components/food-bar/FoodBar";
 import { addFoodToPlayer, getFoodListByPlayer } from "@/api/foodList_api";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
+import { increaseHunger } from "@/api/pet_api";
 
 export default function Index() {
   const [foodList, setFoodList] = useState([]);
@@ -19,8 +20,22 @@ export default function Index() {
     useCallback(() => {
       console.log("Relaoding the screen...");
       setRefreshKey((prev) => prev + 1);
+      petCheckHunger();
     }, [])
   );
+
+  const petCheckHunger = async () => {
+    const userId = await AsyncStorage.getItem("UserId");
+    const token = await AsyncStorage.getItem("Token");
+    const petId = await AsyncStorage.getItem("PetId");
+
+    if (userId && token && petId) {
+      const response = await increaseHunger(parseInt(petId), parseInt(userId), token);
+      if (response.status === 200) {
+        console.log("Hunger increased");
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchPlayerIdAndFood = async () => {

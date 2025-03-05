@@ -1,4 +1,5 @@
 import axios from "axios";
+import { DateTime } from "luxon";
 
 const api = axios.create(
     {
@@ -52,6 +53,26 @@ export const getUserById = async (userId, token) => {
 export const getLastLogin = async (userId, token) => {
     try{
         const res = await api.get(`last_login/${userId}`, 
+            {
+                headers: {'Authorization': `Token ${token}`}
+            }
+        );
+        return {data: res.data, status: res.status};
+    }
+    catch(err){
+        const error = err.response
+        return {data: error.data, status: error.status};
+    }
+};
+
+export const setLastLogin = async (userId, token) => {
+    try{
+        const newLastLogin = DateTime.utc().toFormat("yyyy-MM-dd HH:mm:ss.SSSSSSZ");
+
+        const res = await api.put(`last_login/${userId}`,
+            {
+                last_login: newLastLogin
+            },
             {
                 headers: {'Authorization': `Token ${token}`}
             }
