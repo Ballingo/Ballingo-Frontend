@@ -18,6 +18,7 @@ import { useCallback } from "react";
 import { createPet } from "@/api/pet_api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { updatePlayerLanguage } from "@/api/player_api";
+import { setLastLogin } from "@/api/user_api";
 
 const { width } = Dimensions.get("window");
 
@@ -81,6 +82,8 @@ export default function Languages() {
       console.log(`Selected language: ${selectedLanguage.name}`);
 
       const playerId = await AsyncStorage.getItem("PlayerId");
+      const userId = await AsyncStorage.getItem("UserId");
+      const token = await AsyncStorage.getItem("Token");
       const {data, status} = await createPet(playerId, selectedLanguage.flag, 100, false);
 
       if (status === 201) {
@@ -89,12 +92,16 @@ export default function Languages() {
 
         await updatePlayerLanguage(playerId, selectedLanguage.flag);
         await AsyncStorage.setItem("ActualLanguage", selectedLanguage.flag);
+        await setLastLogin(userId, token);
         
         router.push("../level-map");  // Lleva a la pantalla de niveles
       }
       else {
         console.error(`${status} - ${data}`);
       }
+
+
+
 
     } else {
       alert("Please select a language first.");
