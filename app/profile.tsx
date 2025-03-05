@@ -115,7 +115,7 @@ export default function ProfileScreen() {
           />
           <View style={styles.profileDetails}>
             <Text style={styles.username}>{username}</Text>
-            <HungerBar hungerLevel={100} width={100} />
+            <HungerBar width={100} />
           </View>
         </View>
         

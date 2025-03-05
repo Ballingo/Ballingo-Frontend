@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { View, Image, ScrollView, TouchableOpacity, Text } from "react-native";
 import { reduceFoodQuantity } from "@/api/foodList_api";
+import { getFoodById } from "@/api/food_api";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -11,14 +12,18 @@ import { GestureDetector, Gesture } from "react-native-gesture-handler";
 import styles from "./FoodBarStyles";
 import { AntDesign } from "@expo/vector-icons";
 import { FoodImageMap } from "@/utils/imageMap";
+import { setHungerBar } from "@/api/pet_api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface FoodBarProps {
   foodList: { id: number; food: { image_path: string }; quantity: number }[];
+  refreshFoodList: () => void;
 }
 
-const FoodBar: React.FC<FoodBarProps> = ({ foodList }) => {
+const FoodBar: React.FC<FoodBarProps> = ({ foodList, refreshFoodList  }) => {
   const scrollRef = useRef<ScrollView>(null);
   const [foods, setFoods] = useState(foodList);
+  console.log("🔹 Lista de alimentos:", foodList);
 
   useEffect(() => {
     setFoods(foodList.filter((food) => food.quantity > 0));
@@ -33,22 +38,74 @@ const FoodBar: React.FC<FoodBarProps> = ({ foodList }) => {
     scrollRef.current?.scrollToEnd({ animated: true });
   };
 
-  const handleReduceQuantity = async (foodItemId: number) => {
+  const handleReduceQuantity = async (foodItemId: number, item: any) => {
+    console.log("🔹 Reduciendo cantidad de alimento:", foodItemId);
     const response = await reduceFoodQuantity(foodItemId);
   
     if (response.status === 200) {
-      setFoods((prevFoods) =>
-        prevFoods
-          .map((food) =>
-            food.id === foodItemId ? { ...food, quantity: response.data.new_quantity } : food
-          )
-          .filter((food) => food.quantity > 0)
-      );
-    } else {
+      const isFed = await FeedPet(item.food.id);
+      if (isFed){
+        console.log("Fed your pet: ", item.food.name);
+
+        setFoods((prevFoods) =>
+          prevFoods
+            .map((food) =>
+              food.id === foodItemId ? { ...food, quantity: response.data.new_quantity } : food
+            )
+            .filter((food) => food.quantity > 0)
+        );
+
+        refreshFoodList();
+      }
+      else{
+        console.error("❌ Could not feed your pet");
+      }
+
+    } 
+    else {
       console.error("❌ Error reduciendo cantidad:", response.data);
     }
   };
   
+  const FeedPet = async (foodId: number) => {
+    const petId = await AsyncStorage.getItem("PetId");
+    const {data, status} = await getFoodById(foodId);
+    console.log("Food :", data);
+
+    if (status === 200){
+      if (petId){
+        let isFed = await upDateFoodBar(petId, data.hunger_points);
+        if (isFed){
+          return true;
+        }
+        else{
+          return false;
+        }
+      }
+      else{
+        console.error("❌ Could not find your pet: ", data);
+        return false;
+      }
+    }
+    else{
+      console.error("❌ Could not find food: ", data);
+      return false;
+    }
+
+  };
+
+  const upDateFoodBar = async (petId: string, hungerPoints: number) => {
+    const {data, status} = await setHungerBar(petId, hungerPoints);
+    console.log("Pet hunger info: ", data);
+
+    if (status === 200){
+      return true;
+    }
+    else{
+      return false;
+    }
+
+  };
 
   return (
     <View style={styles.container}>
@@ -67,7 +124,7 @@ const FoodBar: React.FC<FoodBarProps> = ({ foodList }) => {
             key={food.id}
             image={FoodImageMap[food.food.image_path]}
             quantity={food.quantity}
-            onReduceQuantity={() => handleReduceQuantity(food.id)}
+            onReduceQuantity={() => handleReduceQuantity(food.id, food)}
           />
         ))}
       </ScrollView>

@@ -57,6 +57,19 @@ export const getHungerBar = async (petId) => {
     }   
 };
 
+export const setHungerBar = async (petId, hungerPoints) => {
+    try{
+        const res = await api.put(`pet/${petId}/set_hunger/`, {
+            hunger: parseInt(hungerPoints),
+        });
+        return { data: res.data, status: res.status };
+    }
+    catch(err){
+        const error = err.response;
+        return { data: error.data, status: error.status };
+    }
+};
+
 export const getPetByPlayerAndLanguage = async (playerId, language) => {
     try {
         const res = await api.get(`pet/by-player/`, {

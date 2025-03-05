@@ -49,18 +49,6 @@ export const getUserById = async (userId, token) => {
     }
 }
 
-export const handleErrorUserSignUp = (error) => {
-    if (error.emailError && error.usernameError){
-        alert("Username and Email already exists");
-    }
-    if (error.usernameError && !error.emailError){
-        alert("Username already exists");
-    }
-    if (error.emailError && !error.usernameError){
-        alert("Email already exists");
-    }
-};
-
 export const getLastLogin = async (userId, token) => {
     try{
         const res = await api.get(`last_login/${userId}`, 
@@ -73,6 +61,18 @@ export const getLastLogin = async (userId, token) => {
     catch(err){
         const error = err.response
         return {data: error.data, status: error.status};
+    }
+};
+
+export const handleErrorUserSignUp = (error) => {
+    if (error.emailError && error.usernameError){
+        alert("Username and Email already exists");
+    }
+    if (error.usernameError && !error.emailError){
+        alert("Username already exists");
+    }
+    if (error.emailError && !error.usernameError){
+        alert("Email already exists");
     }
 };
 

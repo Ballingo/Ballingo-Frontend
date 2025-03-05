@@ -14,3 +14,13 @@ export const getAllFood= async () => {
         return { data: error?.data, status: error?.status };
     }
 };
+
+export const getFoodById = async (foodId) => {
+    try {
+        const res = await api.get(`food/${foodId}`);
+        return { data: res.data, status: res.status };
+    } catch (err) {
+        const error = err.response;
+        return { data: error?.data, status: error?.status };
+    }
+};

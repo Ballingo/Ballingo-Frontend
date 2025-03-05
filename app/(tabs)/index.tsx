@@ -60,6 +60,13 @@ export default function Index() {
     }
   };
 
+  const refreshFoodList = () => {
+    if (playerId) {
+      fetchFoodList(playerId);
+      setRefreshKey((prev) => prev + 1);
+    }
+  };
+
   return (
     <ImageBackground
       source={require("../../assets/backgrounds/green.png")}
@@ -74,11 +81,11 @@ export default function Index() {
       {/* Contenedor de mascota y barra de hambre */}
       <View style={{ alignItems: "center", flex: 1, justifyContent: "center" }}>
         <Pet />
-        <HungerBar hungerLevel={100} width={60} />
+        <HungerBar width={60} />
       </View>
 
       {/* Barra de alimentos debajo de la mascota */}
-      <FoodBar foodList={foodList} />
+      <FoodBar foodList={foodList} refreshFoodList={refreshFoodList} />
     </ImageBackground>
   );
 }
