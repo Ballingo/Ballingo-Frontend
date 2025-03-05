@@ -15,6 +15,8 @@ export default function Index() {
   const [foodList, setFoodList] = useState([]);
   const [playerId, setPlayerId] = useState<number | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [petId, setPetId] = useState<string | null>(null);
+
 
   useFocusEffect(
     useCallback(() => {
@@ -27,10 +29,12 @@ export default function Index() {
   const petCheckHunger = async () => {
     const userId = await AsyncStorage.getItem("UserId");
     const token = await AsyncStorage.getItem("Token");
-    const petId = await AsyncStorage.getItem("PetId");
 
-    if (userId && token && petId) {
-      const response = await increaseHunger(parseInt(petId), parseInt(userId), token);
+    const storedPetId = await AsyncStorage.getItem("PetId");
+    setPetId(storedPetId === "undefined" ? null : storedPetId);
+      
+    if (userId && token && storedPetId) {
+      const response = await increaseHunger(parseInt(userId), parseInt(storedPetId), token);
       if (response.status === 200) {
         console.log("Hunger increased");
       }
@@ -96,8 +100,11 @@ export default function Index() {
       {/* Contenedor de mascota y barra de hambre */}
       <View style={{ alignItems: "center", flex: 1, justifyContent: "center" }}>
         <Pet />
-        <HungerBar width={60} />
+        
+        {petId && petId !== "undefined" && <HungerBar width={60} />}
+
       </View>
+
 
       {/* Barra de alimentos debajo de la mascota */}
       <FoodBar foodList={foodList} refreshFoodList={refreshFoodList} />

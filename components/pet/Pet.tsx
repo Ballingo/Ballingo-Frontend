@@ -24,7 +24,12 @@ const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle }) => {
   useEffect(() => {
     const fetchLanguage = async () => {
       const storedLanguage = await AsyncStorage.getItem("ActualLanguage");
-      setActualLanguage(storedLanguage || "en");
+
+      if (storedLanguage == null || storedLanguage === "null") {
+        setActualLanguage("");
+        return;
+      }
+      setActualLanguage(storedLanguage);
     };
 
     fetchLanguage();

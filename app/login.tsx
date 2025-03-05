@@ -35,7 +35,7 @@ export default function LoginScreen() {
 
         if (response.status === 200) {
           await AsyncStorage.setItem("PlayerId", response.data.id);
-          const petInfo = await getPetByPlayerAndLanguage(response.data.id, response.data.actualLanguage);
+          const petInfo = await getPetByPlayerAndLanguage(response.data.id, response.data.actualLanguage);  
           await AsyncStorage.setItem("PetId", petInfo.data.id);
           await AsyncStorage.setItem("ActualLanguage", response.data.actualLanguage);
 

@@ -96,7 +96,8 @@ export const getPetByPlayerAndLanguage = async (playerId, language) => {
     }
 };
 
-export const increaseHunger = async (userId, token, petId) => {
+export const increaseHunger = async (userId, petId, token) => {
+    console.log(`🔍 Checking huner for user ${userId} and pet ${petId}`);
     try {
 
         const { data, status } = await getLastLogin(userId, token);
@@ -109,6 +110,9 @@ export const increaseHunger = async (userId, token, petId) => {
         const lastLogin = DateTime.fromISO(data.last_login, { zone: 'utc' });
         const diffHours = now.diff(lastLogin, 'hours').hours;
 
+        console.log(`🔍 Now: ${now.toISO()}`);
+        console.log(`🔍 Last login: ${lastLogin.toISO()}`);
+        console.log(`🔍 Difference in hours: ${diffHours.toFixed(4)}`);
 
         if (diffHours <= 0) {
             return { data: "No time has passed, hunger remains the same", status: 200 };
@@ -125,11 +129,15 @@ export const increaseHunger = async (userId, token, petId) => {
 
         let currentHunger = hungerData.hunger;
         const hungerReductionRate = 2;
-        let newHunger = currentHunger - Math.floor(diffHours * hungerReductionRate);
 
-        console.log(`🔄 New hunger level: ${newHunger}`);
+        console.log(`Current hunger level: ${currentHunger}`);
+        console.log('Diff hours:', diffHours);
+        console.log('Hunger reduction rate:', hungerReductionRate);
+        let hungerFactor = Math.floor(diffHours * hungerReductionRate);
 
-        const hungerResponse = await setHungerBar(petId, newHunger);
+        console.log(`🔄 New hunger level: ${hungerFactor}`);
+
+        const hungerResponse = await setHungerBar(petId, -hungerFactor);
         if (hungerResponse.status !== 200) {
             return { data: "Could not set your pet's hunger bar", status: hungerResponse.status };
         }
@@ -143,6 +151,7 @@ export const increaseHunger = async (userId, token, petId) => {
         return { data: lastLoginData, status: lastLoginStatus };
 
     } catch (err) {
+        console.log("❌ Error:", err);
         const error = err.response;
         return { data: error?.data || "Unknown error", status: error?.status || 500 };
     }

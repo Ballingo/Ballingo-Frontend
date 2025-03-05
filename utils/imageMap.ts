@@ -44,4 +44,5 @@ export const PetSkinImageMap: { [key: string]: any } = {
   "de": require("@/assets/pets/de.png"),
   "ja": require("@/assets/pets/ja.png"),
   "ar": require("@/assets/pets/ar.png"),
+  "" : require("@/assets/pets/NA.png"),
 };  

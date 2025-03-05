@@ -10,27 +10,27 @@ interface HungerBarProps {
 }
 
 const HungerBar: React.FC<HungerBarProps> = ({ width }) => {
-  const [hungerBar, setHungerBar] = useState<number>(100);
+  const [hungerBar, setHungerBar] = useState<number>(0);
   
   useEffect(() => {
     const fetchHungerBar = async () => {
       const petId = await AsyncStorage.getItem("PetId");
 
-      if (!petId){
-        console.error("❌ Couldn't get find pet");
+      if (petId !== "undefined") {
+        const {data, status} = await getHungerBar(petId);
+
+        if (status === 200) {
+          console.log("✅ Hunger bar data:", data);
+          setHungerBar(data.hunger);
+        }
+        else {
+          console.error("❌ Error getting hunger bar:", data);
+        }
+      } else {
+        //console.error("❌ Couldn't get find pet");
         return
       }
-
-      const {data, status} = await getHungerBar(petId);
-
-      if (status === 200) {
-        console.log("✅ Hunger bar data:", data);
-        setHungerBar(data.hunger);
-      }
-      else {
-        console.error("❌ Error getting hunger bar:", data);
-      }
-
+      
     };
     fetchHungerBar();
   }, []);
