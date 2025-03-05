@@ -19,3 +19,16 @@ export const setPlayerProgress = async (playerId, language, level) => {
         return { data: error?.data || "Error desconocido", status: error?.status || 500 };
     }
 };
+
+export const getLevels = async (playerId, language) => {
+    try {
+        const res = await api.post(`get_levels/`, {
+            player_id: playerId,
+            language_code: language,
+        });
+        return res.data || [];
+    } catch (err) {
+        const error = err.response;
+        return { data: error?.data || "Error desconocido", status: error?.status || 500 };
+    }
+}
