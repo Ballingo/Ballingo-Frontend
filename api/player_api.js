@@ -13,3 +13,15 @@ export const getPlayerByUserId = async (userId) => {
         return { data: error?.data, status: error?.status };
     }
 };
+
+export const updatePlayerLanguage = async (playerId, newLanguage) => {
+    try {
+        const res = await api.put(`${playerId}/update_language/`, {
+            actualLanguage: newLanguage
+        });
+        return { data: res.data, status: res.status };
+    } catch (err) {
+        const error = err.response;
+        return { data: error?.data, status: error?.status };
+    }
+}

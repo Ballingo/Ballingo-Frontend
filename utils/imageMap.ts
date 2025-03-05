@@ -37,4 +37,11 @@ export const GameObjectImageMap: { [key: string]: any } = {
   "small_lives_pack": require("@/assets/shop/band_aid.png"),
   "big_lives_pack": require("@/assets/shop/juggernaut.png"),
 };
-  
+
+export const PetSkinImageMap: { [key: string]: any } = {
+  "es": require("@/assets/pets/es.png"),
+  "en": require("@/assets/pets/en.png"),
+  "de": require("@/assets/pets/de.png"),
+  "ja": require("@/assets/pets/ja.png"),
+  "ar": require("@/assets/pets/ar.png"),
+};  

@@ -54,5 +54,16 @@ export const getHungerBar = async (petId) => {
     catch(err){
         const error = err.response;
         return { data: error.data, status: error.status };
+    }   
+};
+
+export const getPetByPlayerAndLanguage = async (playerId, language) => {
+    try {
+        const res = await api.get(`pet/by-player/`, {
+            params: { player_id: playerId, language: language }
+        });
+        return { data: res.data, status: res.status };
+    } catch (err) {
+        return { data: err.response?.data || "Error desconocido", status: err.response?.status || 500 };
     }
 };

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View, ImageStyle, ViewStyle } from "react-native";
 import Animated, {
   useSharedValue,
@@ -8,6 +8,8 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import styles from "./PetStyles";
+import { PetSkinImageMap } from "@/utils/imageMap";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Separar las props de estilo para View y Image
 interface PetProps {
@@ -17,8 +19,16 @@ interface PetProps {
 
 const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle }) => {
   const rotation = useSharedValue(0);
+  const [actualLanguage, setActualLanguage] = useState<string>("");
 
   useEffect(() => {
+    const fetchLanguage = async () => {
+      const storedLanguage = await AsyncStorage.getItem("ActualLanguage");
+      setActualLanguage(storedLanguage || "en");
+    };
+
+    fetchLanguage();
+
     rotation.value = withRepeat(
       withSequence(
         withTiming(5, { duration: 2500 }),
@@ -36,7 +46,8 @@ const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle }) => {
   return (
     <View style={[styles.container, containerStyle]}>
       <Animated.Image
-        source={require("./assets/moringo.png")}
+
+        source={PetSkinImageMap[actualLanguage]}
         style={[styles.image, animatedStyle, imageStyle]}
       />
     </View>

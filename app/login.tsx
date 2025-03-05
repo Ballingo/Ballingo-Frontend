@@ -11,6 +11,7 @@ import { useRouter } from "expo-router";
 import { loginUser, handleErrorUserLogin } from "../api/user_api";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getPlayerByUserId } from "../api/player_api";
+import { getPetByPlayerAndLanguage  } from "../api/pet_api";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -34,6 +35,12 @@ export default function LoginScreen() {
 
         if (response.status === 200) {
           await AsyncStorage.setItem("PlayerId", response.data.id);
+          const petInfo = await getPetByPlayerAndLanguage(response.data.id, response.data.actualLanguage);
+          await AsyncStorage.setItem("PetId", petInfo.data.id);
+          await AsyncStorage.setItem("ActualLanguage", response.data.actualLanguage);
+
+
+
           console.log("✅ Player data:", response.data); 
         }
         else {
