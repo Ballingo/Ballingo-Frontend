@@ -19,7 +19,6 @@ import { useCallback } from "react";
 import { addClothesToPet, getPetClothes } from "@/api/pet_api";
 import { PetSkinImageMap } from "@/utils/imageMap";
 
-
 interface InventoryItem {
   id: string;
   category: string;
@@ -42,9 +41,6 @@ interface InventoryProps {
   isClothes?: boolean;
 }
 
-
-
-
 const Inventory: React.FC<InventoryProps> = ({
   categories,
   items,
@@ -63,13 +59,12 @@ const Inventory: React.FC<InventoryProps> = ({
   );
   const [isTrading, setIsTrading] = useState<boolean>(false);
   const [showTrades, setShowTrades] = useState<boolean>(false);
-  
 
   const [selectedTrade, setSelectedTrade] = useState<string | null>(null);
   const [selectedClothes, setSelectedClothes] = useState<string[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const [actualLanguage, setActualLanguage] = useState<string>("");
-  
+
   useFocusEffect(
     useCallback(() => {
       console.log("Relaoding the screen...");
@@ -86,11 +81,12 @@ const Inventory: React.FC<InventoryProps> = ({
 
         const { data, status } = await getPetClothes(storedPetId);
 
-        if (status === 200 && data.accesories){
-          const petClothesIds = data.accesories.map((item: { id: number }) => item.id.toString());
+        if (status === 200 && data.accesories) {
+          const petClothesIds = data.accesories.map((item: { id: number }) =>
+            item.id.toString()
+          );
           setSelectedClothes(petClothesIds);
         }
-
       };
 
       fetchClothes();
@@ -106,10 +102,10 @@ const Inventory: React.FC<InventoryProps> = ({
     fetchLanguage();
   }, []);
 
-  
   // Ejemplo de trades activos
   const [activeTrades, setActiveTrades] = useState<TradeItem[]>([]);
 
+  console.log("isTrading:", isTrading, "isClothes:", isClothes);
   // Obtener ítems con not-allowed si es ropa
   const getFilteredItems = () => {
     const baseItems = filteredItems.filter(
@@ -140,20 +136,21 @@ const Inventory: React.FC<InventoryProps> = ({
 
       console.log(`👕 Adding item (${item.id}) to pet (${storedPetId})...`);
 
-      const {data, status} = await addClothesToPet(storedPetId, item.id);
+      const { data, status } = await addClothesToPet(storedPetId, item.id);
 
       if (status === 200) {
-        if (item.id !== "0"){
+        if (item.id !== "0") {
           console.log("✅ Clothes added to your pet:", data);
 
           setSelectedClothes(() => {
-            const updatedSelection = data.accesories.map((clothes: { id: number }) => clothes.id.toString());
+            const updatedSelection = data.accesories.map(
+              (clothes: { id: number }) => clothes.id.toString()
+            );
             return updatedSelection;
           });
 
           alert("✅ Clothes added to pet.");
-        }
-        else{
+        } else {
           console.log("✅ All clothes removed: ", data);
           alert("✅ Removed all clothes from your pet.");
           setSelectedClothes([]);
@@ -162,8 +159,7 @@ const Inventory: React.FC<InventoryProps> = ({
         console.error("❌ Error:", data);
         alert("❌ Could not add clothes to your pet.");
       }
-    }
-    else{
+    } else {
       setModalVisible(true);
       setTradeStep(isTrading ? "confirm" : "initial");
     }
@@ -191,8 +187,6 @@ const Inventory: React.FC<InventoryProps> = ({
     setTradeStep("select");
   };
 
-
-
   // Mostrar trades activos
   const handleShowTrades = async () => {
     await fetchActiveTrades();
@@ -204,98 +198,96 @@ const Inventory: React.FC<InventoryProps> = ({
   // Confirmar Trade y enviarlo a la API
   const handleConfirmTrade = async () => {
     if (!previousItem || !selectedItem) {
-        alert("❌ Debes seleccionar dos ítems para intercambiar.");
-        return;
+      alert("❌ Debes seleccionar dos ítems para intercambiar.");
+      return;
     }
 
     try {
-        console.log("📌 Confirmar Trade:", previousItem, selectedItem);
+      console.log("📌 Confirmar Trade:", previousItem, selectedItem);
 
-        const storedPlayerId = await AsyncStorage.getItem("PlayerId");
-        if (!storedPlayerId) {
-            alert("❌ No se encontró el ID del jugador.");
-            return;
-        }
+      const storedPlayerId = await AsyncStorage.getItem("PlayerId");
+      if (!storedPlayerId) {
+        alert("❌ No se encontró el ID del jugador.");
+        return;
+      }
 
-        const playerId = parseInt(storedPlayerId, 10);
-        const inFoodId = parseInt(previousItem.id, 10);
-        const outFoodId = parseInt(selectedItem.id, 10);
+      const playerId = parseInt(storedPlayerId, 10);
+      const inFoodId = parseInt(previousItem.id, 10);
+      const outFoodId = parseInt(selectedItem.id, 10);
 
-        const tradeData = {
-            player: playerId,
-            isActive: true,
-            in_food_id: inFoodId,
-            out_food_id: outFoodId
-        };
+      const tradeData = {
+        player: playerId,
+        isActive: true,
+        in_food_id: inFoodId,
+        out_food_id: outFoodId,
+      };
 
-        console.log("📌 Enviando Trade:", tradeData);
+      console.log("📌 Enviando Trade:", tradeData);
 
-        const response = await createTrade(tradeData);
+      const response = await createTrade(tradeData);
 
-        if (response.status === 201) {
-            alert("✅ Trade creado con éxito.");
-            handleCloseModal();
-        } else {
-            console.error("❌ Error creando trade:", response.data);
-            alert("❌ Hubo un error al crear el trade.");
-        }
-    } catch (error: any) {  // 🔹 Forzamos `error` a tipo `any`
-        console.error("❌ Error en la solicitud:", error);
+      if (response.status === 201) {
+        alert("✅ Trade creado con éxito.");
+        handleCloseModal();
+      } else {
+        console.error("❌ Error creando trade:", response.data);
+        alert("❌ Hubo un error al crear el trade.");
+      }
+    } catch (error: any) {
+      // 🔹 Forzamos `error` a tipo `any`
+      console.error("❌ Error en la solicitud:", error);
 
-        if (error.response) {
-            console.log("🔍 Respuesta del servidor:", error.response.data);
-            alert("❌ Error del servidor: " + JSON.stringify(error.response.data));
-        } else {
-            alert("❌ Error de conexión.");
-        }
+      if (error.response) {
+        console.log("🔍 Respuesta del servidor:", error.response.data);
+        alert("❌ Error del servidor: " + JSON.stringify(error.response.data));
+      } else {
+        alert("❌ Error de conexión.");
+      }
     }
   };
-
-
 
   const fetchActiveTrades = async () => {
     try {
-        console.log("🔹 Buscando trades activos...");
-        const response = await getActiveTrades();
-        
-        if (response.status === 200) {
-            console.log("✅ Trades activos obtenidos:", response.data);
+      console.log("🔹 Buscando trades activos...");
+      const response = await getActiveTrades();
 
-            const formattedTrades = response.data.map((trade: any) => ({
-              id: trade.id.toString(),
-              itemName: trade.in_food.name,
-              status: trade.isActive ? "Pendiente" : "Completado",
-              userProfile: PetSkinImageMap[actualLanguage],
-              requestedImage: FoodImageMap[trade.out_food.image_path],
-              offeredImage: FoodImageMap[trade.in_food.image_path]
-            }));
+      if (response.status === 200) {
+        console.log("✅ Trades activos obtenidos:", response.data);
 
-            setActiveTrades(formattedTrades);
-        } else {
-            console.error("❌ Error obteniendo trades activos:", response.data);
-        }
+        const formattedTrades = response.data.map((trade: any) => ({
+          id: trade.id.toString(),
+          itemName: trade.in_food.name,
+          status: trade.isActive ? "Pendiente" : "Completado",
+          userProfile: PetSkinImageMap[actualLanguage],
+          requestedImage: FoodImageMap[trade.out_food.image_path],
+          offeredImage: FoodImageMap[trade.in_food.image_path],
+        }));
+
+        setActiveTrades(formattedTrades);
+      } else {
+        console.error("❌ Error obteniendo trades activos:", response.data);
+      }
     } catch (error) {
-        console.error("❌ Error en la solicitud de trades:", error);
+      console.error("❌ Error en la solicitud de trades:", error);
     }
   };
-
 
   const handleAcceptTrade = async (tradeId: string) => {
     try {
       console.log(`📌 Aceptando trade con ID: ${tradeId}`);
-  
+
       // Obtener el ID del jugador desde AsyncStorage
       const storedPlayerId = await AsyncStorage.getItem("PlayerId");
       if (!storedPlayerId) {
         alert("❌ No se encontró el ID del jugador.");
         return;
       }
-  
+
       const playerId = parseInt(storedPlayerId, 10);
-  
+
       // Llamada a la API para aceptar el trade
       const response = await acceptTrade(tradeId, playerId);
-  
+
       if (response.status === 200) {
         alert("✅ Trade aceptado con éxito.");
         await fetchActiveTrades(); // Recargar trades después de aceptar uno
@@ -309,11 +301,9 @@ const Inventory: React.FC<InventoryProps> = ({
     }
   };
 
-
-
   const renderTrade = ({ item }: { item: TradeItem }) => {
     const isSelected = selectedTrade === item.id;
-  
+
     return (
       <TouchableOpacity
         onPress={() => setSelectedTrade(isSelected ? null : item.id)} // Alternar selección
@@ -325,7 +315,7 @@ const Inventory: React.FC<InventoryProps> = ({
         <View style={styles.tradeRow}>
           {/* Imagen de perfil a la izquierda */}
           <Image source={item.userProfile} style={styles.profileImage} />
-  
+
           {/* Contenido del trade */}
           <View style={styles.tradeContent}>
             <Image source={item.requestedImage} style={styles.tradeImage} />
@@ -338,7 +328,7 @@ const Inventory: React.FC<InventoryProps> = ({
             <Image source={item.offeredImage} style={styles.tradeImage} />
           </View>
         </View>
-  
+
         {/* Mostrar el botón solo si está expandido */}
         {isSelected && (
           <TouchableOpacity
@@ -351,18 +341,36 @@ const Inventory: React.FC<InventoryProps> = ({
       </TouchableOpacity>
     );
   };
-  
 
   return (
-    <View style={styles.container} key={refreshKey}>
+    <View
+      style={[
+        styles.container,
+        !isTrading && !isClothes && styles.redBackground,
+        isClothes && styles.orangeBackground,
+      ]}
+      key={refreshKey}
+    >
       {!showTrades && (
-        <View style={styles.navbar}>
+        <View
+          style={[
+            styles.navbar,
+            !isTrading && !isClothes && styles.redNavbar,
+            isClothes && styles.orangeNavbar,
+          ]}
+        >
           {categories.map((category) => (
             <TouchableOpacity
               key={category}
               style={[
                 styles.navButton,
-                selectedCategory === category && styles.activeNavButton,
+                selectedCategory === category &&
+                  !isTrading &&
+                  !isClothes &&
+                  styles.redActiveButton,
+                selectedCategory === category &&
+                  isClothes &&
+                  styles.orangeActiveButton,
               ]}
               onPress={() => setSelectedCategory(category)}
             >
@@ -381,7 +389,8 @@ const Inventory: React.FC<InventoryProps> = ({
             <TouchableOpacity
               style={[
                 styles.itemContainer,
-                selectedClothes.includes(item.id.toString()) && styles.selectedItem,
+                selectedClothes.includes(item.id.toString()) &&
+                  styles.selectedItem,
               ]}
               onPress={() => handleSelectItem(item)}
             >
@@ -395,22 +404,22 @@ const Inventory: React.FC<InventoryProps> = ({
         <>
           <Text style={styles.tradeTitle}>Trades Activos</Text>
           <FlatList
-              data={activeTrades}
-              keyExtractor={(item) => item.id}
-              renderItem={renderTrade}
-              contentContainerStyle={{ width: "100%" }}
+            data={activeTrades}
+            keyExtractor={(item) => item.id}
+            renderItem={renderTrade}
+            contentContainerStyle={{ width: "100%" }}
           />
           <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => setShowTrades(false)}
+            style={styles.backButton}
+            onPress={() => setShowTrades(false)}
           >
-              <Ionicons
-                  name="arrow-back"
-                  size={20}
-                  color="#fff"
-                  style={styles.iconStyle}
-              />
-              <Text style={styles.buttonText}>Volver al Inventario</Text>
+            <Ionicons
+              name="arrow-back"
+              size={20}
+              color="#fff"
+              style={styles.iconStyle}
+            />
+            <Text style={styles.buttonText}>Volver al Inventario</Text>
           </TouchableOpacity>
         </>
       )}
@@ -474,24 +483,43 @@ const Inventory: React.FC<InventoryProps> = ({
                   )}
 
                   {tradeStep === "confirm" && previousItem && (
-                      <>
-                          <View style={styles.tradeContainer}>
-                              <View style={styles.imageBox}>
-                                  <Image source={previousItem.image} style={styles.modalImage2} />
-                              </View>
+                    <>
+                      <View style={styles.tradeContainer}>
+                        <View style={styles.imageBox}>
+                          <Image
+                            source={previousItem.image}
+                            style={styles.modalImage2}
+                          />
+                        </View>
 
-                              <Ionicons name="arrow-forward" size={30} color="#333" style={styles.arrowIcon} />
+                        <Ionicons
+                          name="arrow-forward"
+                          size={30}
+                          color="#333"
+                          style={styles.arrowIcon}
+                        />
 
-                              <View style={styles.imageBox}>
-                                  <Image source={selectedItem.image} style={styles.modalImage2} />
-                              </View>
-                          </View>
+                        <View style={styles.imageBox}>
+                          <Image
+                            source={selectedItem.image}
+                            style={styles.modalImage2}
+                          />
+                        </View>
+                      </View>
 
-                          <TouchableOpacity style={styles.modalButton} onPress={handleConfirmTrade}>
-                              <Ionicons name="checkmark-circle-outline" size={20} color="#fff" style={styles.iconStyle} />
-                              <Text style={styles.buttonText}>Confirmar Trade</Text>
-                          </TouchableOpacity>
-                      </>
+                      <TouchableOpacity
+                        style={styles.modalButton}
+                        onPress={handleConfirmTrade}
+                      >
+                        <Ionicons
+                          name="checkmark-circle-outline"
+                          size={20}
+                          color="#fff"
+                          style={styles.iconStyle}
+                        />
+                        <Text style={styles.buttonText}>Confirmar Trade</Text>
+                      </TouchableOpacity>
+                    </>
                   )}
                 </>
               )}

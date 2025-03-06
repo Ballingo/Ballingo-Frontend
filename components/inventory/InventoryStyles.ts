@@ -6,17 +6,41 @@ export default StyleSheet.create({
   container: {
     width: '80%',
     height: height * 0.5,
-    backgroundColor: '#f0f0f0',
     borderRadius: 5,
+  },
+  redBackground: {
+    borderWidth: 2,
+    borderColor: '#FF0000',
+    backgroundColor: '#FF6565',
+  },
+  orangeBackground: {
+    borderWidth: 2,
+    borderColor: '#FF8700',
+    backgroundColor: '#FFB45C',
   },
   navbar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginBottom: 10,
     paddingVertical: 10,
-    backgroundColor: '#d9d9d9',
     borderTopLeftRadius: 5,
     borderTopRightRadius: 5,
+  },
+  redNavbar: {
+    backgroundColor: '#FF4C4C',
+    borderBottomWidth: 1,
+    borderColor: '#FF0000',
+  },
+  orangeNavbar: {
+    backgroundColor: '#FFA945',
+    borderBottomWidth: 1,
+    borderColor: '#FF8700',
+  },
+  redActiveButton: {
+    backgroundColor: '#FF2E2E',
+  },
+  orangeActiveButton: {
+    backgroundColor: '#FF9315',
   },
   navButton: {
     padding: 8,
