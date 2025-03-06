@@ -20,6 +20,22 @@ export const setPlayerProgress = async (playerId, language, level) => {
     }
 };
 
+export const getPlayerProgress = async (playerId, language) => {
+    try {
+        const res = await api.get('get_progress/', {
+            params: {
+                player_id: playerId,
+                language_code: language
+            }
+        });
+        return { data: res.data, status: res.status };
+    }
+    catch (err) {
+        const error = err.response;
+        return { data: error.data, status: error.status };
+    }
+};
+
 export const getLevels = async (playerId, language) => {
     try {
         const res = await api.post(`get_levels/`, {
