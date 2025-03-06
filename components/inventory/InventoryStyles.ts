@@ -22,7 +22,6 @@ export default StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginBottom: 10,
-    paddingVertical: 10,
     borderTopLeftRadius: 5,
     borderTopRightRadius: 5,
   },
@@ -43,8 +42,11 @@ export default StyleSheet.create({
     backgroundColor: '#FF9315',
   },
   navButton: {
-    padding: 8,
-    borderRadius: 5,
+    display: "flex",
+    flex: 1,
+    paddingVertical: 15,
+    borderTopLeftRadius: 3,
+    borderTopRightRadius: 3,
   },
   activeNavButton: {
     backgroundColor: '#555',
@@ -52,6 +54,7 @@ export default StyleSheet.create({
   navText: {
     color: '#000',
     fontWeight: 'bold',
+    textAlign: "center",
   },
   grid: {
     alignItems: 'flex-start',
