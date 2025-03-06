@@ -118,7 +118,14 @@ export default function RegisterScreen() {
           <TextInput
             style={[
               styles.input,
-              { borderColor: isEmailValid ? "#6cff86" : "#ff6c6c" },
+              {
+                borderColor:
+                  email === ""
+                    ? "#9f6cff"
+                    : isEmailValid
+                    ? "#6cff86"
+                    : "#ff6c6c",
+              },
             ]}
             placeholder="Email"
             value={email}

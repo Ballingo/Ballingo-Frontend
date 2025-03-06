@@ -9,9 +9,9 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { loginUser, handleErrorUserLogin } from "../api/user_api";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getPlayerByUserId } from "../api/player_api";
-import { getPetByPlayerAndLanguage  } from "../api/pet_api";
+import { getPetByPlayerAndLanguage } from "../api/pet_api";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -20,11 +20,10 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (username && password) {
-
       const credentials = { username, password };
       const { data, status } = await loginUser(credentials);
 
-      if (status === 200){
+      if (status === 200) {
         alert(`Bienvenido de nuevo, ${username}`);
 
         router.replace("/(tabs)");
@@ -35,23 +34,24 @@ export default function LoginScreen() {
 
         if (response.status === 200) {
           await AsyncStorage.setItem("PlayerId", response.data.id);
-          const petInfo = await getPetByPlayerAndLanguage(response.data.id, response.data.actualLanguage);  
+          const petInfo = await getPetByPlayerAndLanguage(
+            response.data.id,
+            response.data.actualLanguage
+          );
           await AsyncStorage.setItem("PetId", petInfo.data.id);
-          await AsyncStorage.setItem("ActualLanguage", response.data.actualLanguage);
+          await AsyncStorage.setItem(
+            "ActualLanguage",
+            response.data.actualLanguage
+          );
 
-
-
-          console.log("✅ Player data:", response.data); 
-        }
-        else {
+          console.log("✅ Player data:", response.data);
+        } else {
           console.error("❌ Error obteniendo el jugador:", response.data);
         }
       }
 
       handleErrorUserLogin(data);
-
-    }
-    else {
+    } else {
       alert("Por favor, ingresa tu usuario y contraseña.");
     }
   };
