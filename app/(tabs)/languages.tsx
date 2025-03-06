@@ -19,7 +19,7 @@ import { createPet } from "@/api/pet_api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { updatePlayerLanguage } from "@/api/player_api";
 import { setLastLogin } from "@/api/user_api";
-import { setPlayerProgress } from "@/api/player_progress_api";
+import { setPlayerProgress, getPlayerProgress } from "@/api/player_progress_api";
 import { playerHasPet } from "@/api/pet_api";
 
 const { width } = Dimensions.get("window");
@@ -87,20 +87,35 @@ export default function Languages() {
       const userId = await AsyncStorage.getItem("UserId");
       const token = await AsyncStorage.getItem("Token");
 
-
-
-
-
       console.log("playerId", playerId);
       console.log("selectedLanguage.flag", selectedLanguage.flag);
       const has_pet = await playerHasPet(playerId, selectedLanguage.flag);
 
       if (has_pet.data.id) {
-
+        console.log("Pet already exists", has_pet.data.id);
         await AsyncStorage.setItem("PetId", has_pet.data.id);
 
+        const hasProgress = await getPlayerProgress(playerId, selectedLanguage.flag);
+  
+        if (hasProgress.data.error === "Player progress not found" && hasProgress.status === 404){
+          console.log("Player progress does not exist, creating one...");
+
+          const {data, status} = await setPlayerProgress(playerId, selectedLanguage.flag, 1);
+          console.log("Player progress created", data);
+
+          if (status !== 201) {
+            console.error("Error creating player progress");
+            return;
+          }
+
+          await updatePlayerLanguage(playerId, selectedLanguage.flag);
+          await AsyncStorage.setItem("ActualLanguage", selectedLanguage.flag);
+          await setLastLogin(userId, token);
+
+        }
+
       } else {
-        
+        console.log("Pet does not exist, creating one...");
         const {data, status} = await createPet(playerId, selectedLanguage.flag, 100, false);
         console.log("Pet created", data);
 
@@ -108,7 +123,6 @@ export default function Languages() {
         await setPlayerProgress(playerId, selectedLanguage.flag, 1);
         
       }
-
 
       await updatePlayerLanguage(playerId, selectedLanguage.flag);
       await AsyncStorage.setItem("ActualLanguage", selectedLanguage.flag);

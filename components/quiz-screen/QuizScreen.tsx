@@ -13,33 +13,21 @@ const foodImages = [
 
 const coinImage = require("../../assets/shop/coins.png");
 
-const questions = [
-  {
-    id: 1,
-    question: "¿Cuál es la capital de Francia?",
-    options: ["Madrid", "París", "Berlín", "Londres"],
-    correctAnswer: "París",
-  },
-  {
-    id: 2,
-    question: "¿Cuánto es 5 + 3?",
-    options: ["5", "8", "12", "15"],
-    correctAnswer: "8",
-  },
-];
-
 const QuizScreen: React.FC = () => {
   const router = useRouter();
   const { level, questionnarie_id } = useLocalSearchParams();
+
+  // 1) En lugar de un array fijo, manejamos el estado de las preguntas
+  const [questions, setQuestions] = useState<any[]>([]);
+  
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const progress = (currentQuestionIndex + 1) / questions.length;
+  const progress = questions.length > 0 ? (currentQuestionIndex + 1) / questions.length : 0;
   const foodImage = foodImages[Math.floor(Math.random() * foodImages.length)];
-
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const handleBack = () => {
@@ -50,17 +38,43 @@ const QuizScreen: React.FC = () => {
     }
   };
 
+  // 2) Cuando cargue el componente, hacemos la petición y mapeamos los datos
+  useEffect(() => {
+    const fetchQuestionnaireById = async () => {
+      const { data, status } = await getQuestionnaire(questionnarie_id);
+      console.log("Preguntas: ", data);
+
+      if (status !== 200) {
+        console.error("Error al obtener el cuestionario");
+        return;
+      }
+
+      // data.questions es un array con objetos como:
+      // {
+      //   id: 3,
+      //   title: 'General read air race.',
+      //   correct_answer: 3,
+      //   answers: Array(4) [...]
+      // }
+      // Ajustamos al formato que usamos en el Quiz:
+      const transformedQuestions = data.questions.map((q: any) => {
+        return {
+          id: q.id,
+          question: q.title,
+          correctAnswer: q.answers[q.correct_answer],
+          options: q.answers,
+        };
+      });
+
+      setQuestions(transformedQuestions);
+    };
+
+    fetchQuestionnaireById();
+  }, [questionnarie_id]);
 
   useEffect(() => {
-    getQuestionnaire(questionnarie_id).then((data) => {
-      console.log(data.data.questions);
-    });
-  }, []);
-
-
-  // 👇 Se ejecuta SOLO cuando se completa el cuestionario
-  useEffect(() => {
-    if (currentQuestionIndex >= questions.length) {
+    // Si ya pasamos la última pregunta, mostramos el modal
+    if (currentQuestionIndex >= questions.length && questions.length > 0) {
       setModalVisible(true);
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -68,7 +82,7 @@ const QuizScreen: React.FC = () => {
         useNativeDriver: true,
       }).start();
     }
-  }, [currentQuestionIndex]); // 👈 Se ejecuta solo cuando `currentQuestionIndex` cambia
+  }, [currentQuestionIndex, questions, fadeAnim]);
 
   const handleAnswer = (option: string) => {
     setSelectedOption(option);
@@ -84,6 +98,15 @@ const QuizScreen: React.FC = () => {
     setShowResult(false);
   };
 
+  // 3) Renderizar dependiendo de si ya tenemos preguntas cargadas
+  if (!questions || questions.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Text>Cargando preguntas...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -91,13 +114,13 @@ const QuizScreen: React.FC = () => {
         <ProgressBar progress={progress} color="#4CAF50" style={styles.progressBar} />
       </View>
 
-      {/* 🛑 Evita renderizar el cuestionario si ya terminó */}
+      {/* Mostramos la pregunta si no hemos llegado al final */}
       {currentQuestionIndex < questions.length && (
         <View style={styles.questionContainer}>
           <Text style={styles.question}>{questions[currentQuestionIndex].question}</Text>
 
           <View style={styles.optionsContainer}>
-            {questions[currentQuestionIndex].options.map((option) => (
+            {questions[currentQuestionIndex].options.map((option: string) => (
               <TouchableOpacity
                 key={option}
                 style={[
@@ -131,7 +154,9 @@ const QuizScreen: React.FC = () => {
         <View style={styles.modalBackground}>
           <Animated.View style={[styles.modalContainer, { opacity: fadeAnim }]}>
             <Text style={styles.modalTitle}>¡Has completado el cuestionario!</Text>
-            <Text style={styles.modalScore}>Puntaje: {score}/{questions.length}</Text>
+            <Text style={styles.modalScore}>
+              Puntaje: {score}/{questions.length}
+            </Text>
 
             <View style={styles.rewardItem}>
               <Image source={foodImage} style={styles.rewardImage} />
