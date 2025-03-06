@@ -52,7 +52,7 @@ export default StyleSheet.create({
     backgroundColor: '#555',
   },
   navText: {
-    color: '#000',
+    color: '#F9F7F7',
     fontWeight: 'bold',
     textAlign: "center",
   },
