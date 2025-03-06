@@ -23,7 +23,7 @@ interface WardrobeItem {
 
 interface Wardrobe {
   id: number;
-  items: WardrobeItem[]; // Definir correctamente el tipo de items
+  items: WardrobeItem[];
   player: number;
 }
 
@@ -35,7 +35,7 @@ export default function ProfileScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      console.log("Relaoding the screen...");
+      console.log("Reloading the screen...");
       setRefreshKey((prev) => prev + 1);
     }, [])
   );
@@ -47,41 +47,49 @@ export default function ProfileScreen() {
 
   useEffect(() => {
     const getUserData = async () => {
-      const playerId = await AsyncStorage.getItem("PlayerId");  
+      const playerId = await AsyncStorage.getItem("PlayerId");
       const id = await AsyncStorage.getItem("UserId");
-      const token = await AsyncStorage.getItem("Token"); 
-  
+      const token = await AsyncStorage.getItem("Token");
+
       if (!playerId) {
-        return; 
+        return;
       }
 
       const { data, status } = await getUserById(id, token);
-  
+
       if (status === 200) {
         setUsername(data.username);
       }
-  
+
       const wardrobeResponse = await getWardrobeByPlayer(playerId);
       if (wardrobeResponse.status === 200) {
         const wardrobe: Wardrobe = wardrobeResponse.data;
-       
+
         const wardrobeItems = wardrobe.items || [];
 
         const clothesResponse = await getAllClothes();
         if (clothesResponse.status === 200) {
           const allClothes: Clothes[] = clothesResponse.data;
 
-          const totalHatsCount = allClothes.filter((item) => item.type === 'hat').length;
-          const totalAccessoriesCount = allClothes.filter((item) => item.type === 'accesories').length;
-        
+          const totalHatsCount = allClothes.filter(
+            (item) => item.type === "hat"
+          ).length;
+          const totalAccessoriesCount = allClothes.filter(
+            (item) => item.type === "accesories"
+          ).length;
+
           const userHatsCount = wardrobeItems.filter((item) => {
-            const clothesItem = allClothes.find((clothes) => clothes.id === item.id);
-            return clothesItem?.type === 'hat';
+            const clothesItem = allClothes.find(
+              (clothes) => clothes.id === item.id
+            );
+            return clothesItem?.type === "hat";
           }).length;
 
           const userAccessoriesCount = wardrobeItems.filter((item) => {
-            const clothesItem = allClothes.find((clothes) => clothes.id === item.id);
-            return clothesItem?.type === 'accesories';
+            const clothesItem = allClothes.find(
+              (clothes) => clothes.id === item.id
+            );
+            return clothesItem?.type === "accesories";
           }).length;
 
           setTotalHats(totalHatsCount);
@@ -115,14 +123,19 @@ export default function ProfileScreen() {
           />
           <View style={styles.profileDetails}>
             <Text style={styles.username}>{username}</Text>
-            <HungerBar width={100} />
+            <View style={styles.hungerBarContainer}>
+              <HungerBar width={100} />
+            </View>
           </View>
         </View>
-        
-        
+
         <View style={styles.inventory}>
-          <Text style={styles.inventoryText}>Hats: {hatsCount}/{totalHats}</Text>
-          <Text style={styles.inventoryText}>Accessories: {accessoriesCount}/{totalAccessories}</Text>
+          <Text style={styles.inventoryText}>
+            Hats: {hatsCount}/{totalHats}
+          </Text>
+          <Text style={styles.inventoryText}>
+            Accessories: {accessoriesCount}/{totalAccessories}
+          </Text>
         </View>
 
         <View style={styles.footer}>
@@ -139,40 +152,40 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   profileDetails: {
-    alignItems: "center",
     flexDirection: "column",
-    maxWidth: "50%",
-    flexShrink: 1,
+    flex: 1,
+    marginLeft: 10,
   },
   header: {
     marginVertical: 75,
     marginHorizontal: 20,
-    alignSelf: "flex-start",
+    alignSelf: "stretch",
     flexDirection: "row",
     alignItems: "center",
-    flexWrap: "wrap",
-    maxWidth: "90%",
   },
   username: {
     fontSize: 32,
     fontWeight: "bold",
     color: "#333",
   },
+  hungerBarContainer: {
+    width: "95%",
+  },
   inventory: {
     marginTop: 20,
     padding: 20,
-    backgroundColor: "#7DEFFF", 
-    borderRadius: 15, 
+    backgroundColor: "#7DEFFF",
+    borderRadius: 15,
     width: "80%",
     alignItems: "center",
-    borderWidth: 2, 
+    borderWidth: 2,
     borderColor: "#7DB4FF",
-    elevation: 5, 
+    elevation: 5,
   },
   inventoryText: {
     fontSize: 18,
-    color: "#FFF", 
-    fontWeight: "600", 
+    color: "#FFF",
+    fontWeight: "600",
     marginVertical: 5,
   },
   footer: {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -13,15 +13,19 @@ import { getPlayerByUserId } from "../api/player_api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Pet from "@/components/pet/Pet";
 import Animated, {
+  withDelay,
   FadeIn,
   FadeInUp,
   useSharedValue,
   withSpring,
   useAnimatedStyle,
+  withRepeat,
+  withTiming,
   FadeInDown,
+  Easing,
+  interpolate,
 } from "react-native-reanimated";
 import { useFocusEffect } from "@react-navigation/native";
-import { useCallback } from "react";
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -33,16 +37,31 @@ export default function RegisterScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      console.log("Relaoding the screen...");
+      console.log("Reloading the screen...");
       setRefreshKey((prev) => prev + 1);
     }, [])
   );
 
   const scale = useSharedValue(1);
+  const petPositionX = useSharedValue(-100); // Inicia fuera de la pantalla a la izquierda
+  const petPositionY = useSharedValue(0);
+
+  const letters = "BALLINGO".split("");
+
+  const letterColorValues = letters.map(() => useSharedValue(0));
 
   const animatedButtonStyle = useAnimatedStyle(() => {
     return {
       transform: [{ scale: scale.value }],
+    };
+  });
+
+  const petAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { translateX: petPositionX.value },
+        { translateY: petPositionY.value },
+      ],
     };
   });
 
@@ -86,6 +105,19 @@ export default function RegisterScreen() {
     }
   };
 
+  React.useEffect(() => {
+    // Animación de entrada del Pet
+    petPositionX.value = withTiming(0, {
+      duration: 10000,
+      easing: Easing.out(Easing.exp),
+    });
+    petPositionY.value = withRepeat(
+      withSpring(-20, { damping: 2, stiffness: 50 }),
+      -1,
+      true
+    );
+  }, []);
+
   return (
     <ImageBackground
       source={require("../assets/backgrounds/space.png")}
@@ -93,8 +125,87 @@ export default function RegisterScreen() {
       resizeMode="cover"
       key={refreshKey}
     >
+      <View style={styles.ballingoContainer}>
+        {letters.map((letter, index) => {
+          const offset = useSharedValue(0);
+
+          offset.value = withRepeat(
+            withTiming(1, {
+              duration: 2000,
+              easing: Easing.inOut(Easing.ease),
+            }),
+            -1,
+            true
+          );
+
+          letterColorValues[index].value = withDelay(
+            index * 400,
+            withRepeat(
+              withTiming(1, { duration: 6000, easing: Easing.linear }),
+              -1,
+              true
+            )
+          );
+
+          const letterStyle = useAnimatedStyle(() => {
+            const translateY = interpolate(offset.value, [0, 0], [0, -20], {
+              extrapolateLeft: "clamp",
+              extrapolateRight: "clamp",
+            });
+
+            const colorProgress = letterColorValues[index].value;
+
+            const goldColors = [
+              { r: 255, g: 225, b: 105 }, // Oro claro
+              { r: 255, g: 195, b: 0 }, // Oro medio
+              { r: 201, g: 152, b: 11 }, // Oro oscuro
+              { r: 255, g: 225, b: 105 }, // Oro claro (para cerrar el ciclo)
+            ];
+
+            const colorIndex = Math.floor(
+              colorProgress * (goldColors.length - 1)
+            );
+            const nextColorIndex = (colorIndex + 1) % goldColors.length;
+            const blend = colorProgress * (goldColors.length - 1) - colorIndex;
+
+            const r = Math.round(
+              goldColors[colorIndex].r +
+                blend *
+                  (goldColors[nextColorIndex].r - goldColors[colorIndex].r)
+            );
+            const g = Math.round(
+              goldColors[colorIndex].g +
+                blend *
+                  (goldColors[nextColorIndex].g - goldColors[colorIndex].g)
+            );
+            const b = Math.round(
+              goldColors[colorIndex].b +
+                blend *
+                  (goldColors[nextColorIndex].b - goldColors[colorIndex].b)
+            );
+
+            return {
+              transform: [{ translateY }],
+              color: `rgb(${r}, ${g}, ${b})`,
+              textShadowColor: `rgb(${r}, ${g}, ${b})`,
+              textShadowOffset: { width: 2, height: 2 },
+              textShadowRadius: 10,
+            };
+          });
+
+          return (
+            <Animated.Text
+              key={index}
+              style={[styles.ballingoLetter, letterStyle]}
+              entering={FadeInDown.delay(300 + index * 200).duration(1000)}
+            >
+              {letter}
+            </Animated.Text>
+          );
+        })}
+      </View>
       <View style={styles.container}>
-        <Animated.View entering={FadeIn.duration(1000)}>
+        <Animated.View style={petAnimatedStyle}>
           <Pet imageStyle={{ width: 175, height: 175 }} type={""} />
         </Animated.View>
 
@@ -176,6 +287,17 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
+  ballingoContainer: {
+    alignSelf: "center",
+    position: "absolute",
+    flexDirection: "row",
+    marginTop: 120,
+  },
+  ballingoLetter: {
+    fontSize: 56,
+    fontWeight: "bold",
+    marginHorizontal: 2,
+  },
   container: { flex: 1, justifyContent: "center", padding: 20 },
   title: {
     fontSize: 24,
