@@ -4,6 +4,11 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { ProgressBar } from "react-native-paper";
 import styles from "./QuizScreenStyles";
 import { getQuestionnaire } from "@/api/questionnaire_api";
+import { getCoinsNumber } from "@/utils/functions";
+import { setCompletedLevel } from "@/api/player_progress_api";
+
+
+
 
 // Lista de imágenes de comida disponibles
 const foodImages = [
@@ -15,7 +20,13 @@ const coinImage = require("../../assets/shop/coins.png");
 
 const QuizScreen: React.FC = () => {
   const router = useRouter();
-  const { level, questionnarie_id } = useLocalSearchParams();
+
+  const { levelData } = useLocalSearchParams();
+  const parsedLevelData =
+  typeof levelData === "string"
+      ? JSON.parse(decodeURIComponent(levelData))
+      : levelData; // Si ya es objeto, lo dejamos como está
+
 
   // 1) En lugar de un array fijo, manejamos el estado de las preguntas
   const [questions, setQuestions] = useState<any[]>([]);
@@ -25,7 +36,6 @@ const QuizScreen: React.FC = () => {
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
-
   const progress = questions.length > 0 ? (currentQuestionIndex + 1) / questions.length : 0;
   const foodImage = foodImages[Math.floor(Math.random() * foodImages.length)];
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -38,25 +48,15 @@ const QuizScreen: React.FC = () => {
     }
   };
 
-  // 2) Cuando cargue el componente, hacemos la petición y mapeamos los datos
   useEffect(() => {
     const fetchQuestionnaireById = async () => {
-      const { data, status } = await getQuestionnaire(questionnarie_id);
-      console.log("Preguntas: ", data);
+      const { data, status } = await getQuestionnaire(parsedLevelData?.id);
 
       if (status !== 200) {
         console.error("Error al obtener el cuestionario");
         return;
       }
 
-      // data.questions es un array con objetos como:
-      // {
-      //   id: 3,
-      //   title: 'General read air race.',
-      //   correct_answer: 3,
-      //   answers: Array(4) [...]
-      // }
-      // Ajustamos al formato que usamos en el Quiz:
       const transformedQuestions = data.questions.map((q: any) => {
         return {
           id: q.id,
@@ -67,10 +67,12 @@ const QuizScreen: React.FC = () => {
       });
 
       setQuestions(transformedQuestions);
+      
+      console.log("Cuestionario completado: ", data);
     };
 
     fetchQuestionnaireById();
-  }, [questionnarie_id]);
+  }, [parsedLevelData?.id]);
 
   useEffect(() => {
     // Si ya pasamos la última pregunta, mostramos el modal
@@ -83,6 +85,22 @@ const QuizScreen: React.FC = () => {
       }).start();
     }
   }, [currentQuestionIndex, questions, fadeAnim]);
+
+  useEffect(() => {
+    // Si el cuestionario ha terminado y la puntuación es perfecta
+    if (modalVisible && score === questions.length) {
+      console.log("✅ Usuario completó el nivel con puntuación perfecta. Marcando como completado...");
+  
+      if (parsedLevelData?.id) {
+        setCompletedLevel(parsedLevelData.id)
+          .then(() => console.log(`Nivel ${parsedLevelData.id} marcado como completado.`))
+          .catch((error) => console.error("Error al marcar nivel como completado:", error));
+      } else {
+        console.error("❌ No se encontró el ID del nivel.");
+      }
+    }
+  }, [modalVisible, score, questions.length, parsedLevelData?.id]);
+  
 
   const handleAnswer = (option: string) => {
     setSelectedOption(option);
@@ -110,7 +128,7 @@ const QuizScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Nivel {level || "1"}</Text>
+        <Text style={styles.title}>Level {parsedLevelData?.questionnaire?.level || "1"}</Text>
         <ProgressBar progress={progress} color="#4CAF50" style={styles.progressBar} />
       </View>
 
@@ -155,20 +173,25 @@ const QuizScreen: React.FC = () => {
           <Animated.View style={[styles.modalContainer, { opacity: fadeAnim }]}>
             <Text style={styles.modalTitle}>¡Has completado el cuestionario!</Text>
             <Text style={styles.modalScore}>
-              Puntaje: {score}/{questions.length}
+              Score: {score}/{questions.length}
             </Text>
 
+            {/* Mostrar comida siempre */}
             <View style={styles.rewardItem}>
               <Image source={foodImage} style={styles.rewardImage} />
-              <Text style={styles.rewardText}>¡Conseguiste comida!</Text>
-            </View>
-            <View style={styles.rewardItem}>
-              <Image source={coinImage} style={styles.rewardImage} />
-              <Text style={styles.rewardText}>+10 Monedas</Text>
+              <Text style={styles.rewardText}> You got food !</Text>
             </View>
 
+            {/* Mostrar monedas solo si el cuestionario no está completado */}
+            {!parsedLevelData?.completed && (
+              <View style={styles.rewardItem}>
+                <Image source={coinImage} style={styles.rewardImage} />
+                <Text style={styles.rewardText}>+{getCoinsNumber(score)} Coins</Text>
+              </View>
+            )}
+
             <TouchableOpacity style={styles.modalButton} onPress={handleBack}>
-              <Text style={styles.modalButtonText}>Aceptar</Text>
+              <Text style={styles.modalButtonText}>Accept</Text>
             </TouchableOpacity>
           </Animated.View>
         </View>

@@ -36,13 +36,25 @@ export const getPlayerProgress = async (playerId, language) => {
     }
 };
 
-export const getLevels = async (playerId, language) => {
+export const getUserLevels = async (playerId, language) => {
     try {
-        const res = await api.post(`get_levels/`, {
+        const res = await api.post(`get_user_levels/`, {
             player_id: playerId,
             language_code: language,
         });
         return res.data || [];
+    } catch (err) {
+        const error = err.response;
+        return { data: error?.data || "Error desconocido", status: error?.status || 500 };
+    }
+}
+
+export const setCompletedLevel = async (playerProgressId) => {
+    try {
+        const res = await api.put('set_completed/', {
+            player_progress_id: playerProgressId
+        });
+        return { data: res.data, status: res.status };
     } catch (err) {
         const error = err.response;
         return { data: error?.data || "Error desconocido", status: error?.status || 500 };

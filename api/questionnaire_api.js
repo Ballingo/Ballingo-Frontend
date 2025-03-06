@@ -16,3 +16,17 @@ export const getQuestionnaire = async (questionnaireId) => {
         return { data: error.data, status: error.status };
     }
 };
+
+
+export const getQuestionnairesByLanguage = async (languageCode) => {
+    try {
+        const res = await api.get(`questionnaire/by_language/`, {
+            params: { language_code: languageCode },
+        });
+
+        return { data: res.data, status: res.status };
+    } catch (err) {
+        const error = err.response;
+        return { data: error?.data, status: error?.status };
+    }
+};
