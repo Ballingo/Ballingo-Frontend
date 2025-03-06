@@ -9,21 +9,28 @@ import Animated, {
 } from "react-native-reanimated";
 import styles from "./PetStyles";
 import { PetSkinImageMap } from "@/utils/imageMap";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Separar las props de estilo para View y Image
 interface PetProps {
   containerStyle?: ViewStyle;
   imageStyle?: ImageStyle;
+  type?: string;
 }
 
-const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle }) => {
+const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle, type }) => {
   const rotation = useSharedValue(0);
   const [actualLanguage, setActualLanguage] = useState<string>("");
 
   useEffect(() => {
+    let storedLanguage;
     const fetchLanguage = async () => {
-      const storedLanguage = await AsyncStorage.getItem("ActualLanguage");
+      console.log(type);
+      if (type === undefined) {
+        storedLanguage = await AsyncStorage.getItem("ActualLanguage");
+      } else {
+        storedLanguage = type;
+      }
 
       if (storedLanguage == null || storedLanguage === "null") {
         setActualLanguage("");
@@ -51,7 +58,6 @@ const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle }) => {
   return (
     <View style={[styles.container, containerStyle]}>
       <Animated.Image
-
         source={PetSkinImageMap[actualLanguage]}
         style={[styles.image, animatedStyle, imageStyle]}
       />
