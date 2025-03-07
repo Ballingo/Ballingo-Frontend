@@ -4,44 +4,34 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { ProgressBar } from "react-native-paper";
 import styles from "./QuizScreenStyles";
 import { getQuestionnaire } from "@/api/questionnaire_api";
-import { getCoinsNumber } from "@/utils/functions";
-import { setCompletedLevel } from "@/api/player_progress_api";
+import { getCoinsNumber, getFoodNumber, getRandomFoodId } from "@/utils/functions";
+import { setCompletedLevel, getisCompleted } from "@/api/player_progress_api";
 import { setPlayerCoins } from "@/api/inventory_api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { setPlayerProgress } from "@/api/player_progress_api";
-
-
-
-
-// Lista de imágenes de comida disponibles
-const foodImages = [
-  require("../../assets/inventory/food/ja/sushi.png"),
-  require("../../assets/inventory/food/es/squid_rings.png"),
-];
+import { addFoodToPlayer } from "@/api/foodList_api"; 
+import { FoodImageMap } from "@/utils/imageMap";
 
 const coinImage = require("../../assets/shop/coins.png");
 
 const QuizScreen: React.FC = () => {
   const router = useRouter();
-
   const { levelData } = useLocalSearchParams();
-  const parsedLevelData =
-  typeof levelData === "string"
+  const parsedLevelData = typeof levelData === "string"
       ? JSON.parse(decodeURIComponent(levelData))
-      : levelData; // Si ya es objeto, lo dejamos como está
+      : levelData; 
 
-
-  // 1) En lugar de un array fijo, manejamos el estado de las preguntas
   const [questions, setQuestions] = useState<any[]>([]);
-  
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const progress = questions.length > 0 ? (currentQuestionIndex + 1) / questions.length : 0;
-  const foodImage = foodImages[Math.floor(Math.random() * foodImages.length)];
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [foodObject, setFoodObject] = useState<any>(null);
+  const [foodAmount, setFoodAmount] = useState(0);
+  const [alreadyCompleted, setAlreadyCompleted] = useState(false);
 
   const handleBack = () => {
     if (router.canGoBack()) {
@@ -60,25 +50,20 @@ const QuizScreen: React.FC = () => {
         return;
       }
 
-      const transformedQuestions = data.questions.map((q: any) => {
-        return {
-          id: q.id,
-          question: q.title,
-          correctAnswer: q.answers[q.correct_answer],
-          options: q.answers,
-        };
-      });
+      const transformedQuestions = data.questions.map((q: any) => ({
+        id: q.id,
+        question: q.title,
+        correctAnswer: q.answers[q.correct_answer],
+        options: q.answers,
+      }));
 
       setQuestions(transformedQuestions);
-      
-      console.log("Cuestionario completado: ", data);
     };
 
     fetchQuestionnaireById();
   }, [parsedLevelData?.id]);
 
   useEffect(() => {
-    // Si ya pasamos la última pregunta, mostramos el modal
     if (currentQuestionIndex >= questions.length && questions.length > 0) {
       setModalVisible(true);
       Animated.timing(fadeAnim, {
@@ -90,59 +75,54 @@ const QuizScreen: React.FC = () => {
   }, [currentQuestionIndex, questions, fadeAnim]);
 
   useEffect(() => {
-    // Si el usuario terminó el cuestionario y obtuvo una puntuación perfecta
-    if (modalVisible && score === questions.length) {
-      console.log("✅ Usuario completó el nivel con puntuación perfecta. Marcando como completado...");
+    if (modalVisible) {
+      (async () => {
+        try {
+          const playerId = await AsyncStorage.getItem("PlayerId");
+          const selectedLanguage = await AsyncStorage.getItem("ActualLanguage");
   
-      if (parsedLevelData?.id) {
-        // 1️⃣ Marcar el nivel como completado si aún no lo estaba
-        if (!parsedLevelData?.completed) {
-          setCompletedLevel(parsedLevelData?.id)
-            .then(() => console.log(`✅ Nivel ${parsedLevelData?.id} marcado como completado.`))
-            .catch((error) => console.error("❌ Error al marcar nivel como completado:", error));
+          if (!playerId || !selectedLanguage) {
+            console.error("❌ No se encontró PlayerId o ActualLanguage en AsyncStorage.");
+            return;
+          }
+  
+          const {data, status} = await getisCompleted(parsedLevelData?.id);
+          console.log("🔍 Comprobando si el nivel ya está completado:", data, status);
+
+          // 🚨 Si el nivel ya está completado, no damos recompensas y salimos
+          if (status === 200 && data.completed === true) {
+            console.log("🎯 Nivel ya completado previamente. No se otorgan recompensas.");
+            setAlreadyCompleted(true);
+            return;
+          }
+  
+          // 1️⃣ Obtener comida y monedas
+          const foodObjectData = await getRandomFoodId();
+          const calculatedFoodAmount = getFoodNumber(score);
+          const coinsWon = getCoinsNumber(score);
+  
+          setFoodObject(foodObjectData);
+          setFoodAmount(calculatedFoodAmount);
+  
+          console.log(`💰 Jugador ganó ${coinsWon} monedas y ${calculatedFoodAmount} comidas (${foodObjectData?.name}).`);
+  
+          // 2️⃣ Otorgar recompensas
+          await setPlayerCoins(playerId, coinsWon);
+          await addFoodToPlayer(playerId, foodObjectData.id, calculatedFoodAmount);
+  
+          // 3️⃣ Si el jugador obtuvo puntuación perfecta, se marca el nivel como completado
+          if (score === questions.length) {
+            await setCompletedLevel(parsedLevelData?.id);
+            console.log(`✅ Nivel ${parsedLevelData?.id} marcado como completado.`);
+            await setPlayerProgress(playerId, selectedLanguage, parsedLevelData?.level + 1);
+          }
+  
+        } catch (error) {
+          console.error("❌ Error al actualizar monedas o progreso:", error);
         }
-  
-        // 2️⃣ Obtener monedas ganadas
-        const coinsWon = getCoinsNumber(score);
-  
-        // 3️⃣ Si el nivel no estaba completado, otorgar monedas
-        if (!parsedLevelData?.completed && coinsWon > 0) {
-          (async () => {
-            try {
-              const playerId = await AsyncStorage.getItem("PlayerId");
-              const selectedLanguage = await AsyncStorage.getItem("ActualLanguage");
-        
-              if (!playerId) {
-                console.error("❌ No se encontró el PlayerId en AsyncStorage.");
-                return;
-              }
-        
-              if (!selectedLanguage) {
-                console.error("❌ No se encontró el ActualLanguage en AsyncStorage.");
-                return;
-              }
-        
-              // 1️⃣ Otorgar monedas al jugador
-              await setPlayerCoins(playerId, coinsWon);
-              console.log(`💰 Se agregaron ${coinsWon} monedas al jugador ${playerId}.`);
-        
-              // 2️⃣ Actualizar el progreso del jugador al siguiente nivel
-              await setPlayerProgress(playerId, selectedLanguage, parsedLevelData?.level + 1);
-              console.log(`🚀 Se actualizó el progreso del jugador ${playerId} al nivel ${parsedLevelData?.level + 1}.`);
-        
-            } catch (error) {
-              console.error("❌ Error al actualizar monedas o progreso:", error);
-            }
-          })();
-        }
-        
-      } else {
-        console.error("❌ No se encontró el ID del nivel.");
-      }
+      })();
     }
-  }, [modalVisible, score, questions.length, parsedLevelData?.id]);
-  
-  
+  }, [modalVisible, score]);  
 
   const handleAnswer = (option: string) => {
     setSelectedOption(option);
@@ -158,7 +138,6 @@ const QuizScreen: React.FC = () => {
     setShowResult(false);
   };
 
-  // 3) Renderizar dependiendo de si ya tenemos preguntas cargadas
   if (!questions || questions.length === 0) {
     return (
       <View style={styles.container}>
@@ -174,7 +153,6 @@ const QuizScreen: React.FC = () => {
         <ProgressBar progress={progress} color="#4CAF50" style={styles.progressBar} />
       </View>
 
-      {/* Mostramos la pregunta si no hemos llegado al final */}
       {currentQuestionIndex < questions.length && (
         <View style={styles.questionContainer}>
           <Text style={styles.question}>{questions[currentQuestionIndex].question}</Text>
@@ -209,26 +187,34 @@ const QuizScreen: React.FC = () => {
         </TouchableOpacity>
       )}
 
-      {/* POP-UP MODAL DE RECOMPENSAS */}
       <Modal animationType="fade" transparent={true} visible={modalVisible}>
         <View style={styles.modalBackground}>
           <Animated.View style={[styles.modalContainer, { opacity: fadeAnim }]}>
-            <Text style={styles.modalTitle}>¡Has completado el cuestionario!</Text>
+            <Text style={styles.modalTitle}>You completed the questionnaire!</Text>
             <Text style={styles.modalScore}>
               Score: {score}/{questions.length}
             </Text>
 
-            {/* Mostrar comida siempre */}
-            <View style={styles.rewardItem}>
-              <Image source={foodImage} style={styles.rewardImage} />
-              <Text style={styles.rewardText}> You got food !</Text>
-            </View>
+            {score > 0 && foodObject && (
+              <View style={styles.rewardItem}>
+                <Image source={FoodImageMap[foodObject.image_path]} style={styles.rewardImage} />
+                <Text style={styles.rewardText}>{`You got ${foodObject.name} x${foodAmount}`}</Text>
+              </View>
+            )}
 
-            {/* Mostrar monedas solo si el cuestionario no está completado */}
             {!parsedLevelData?.completed && (
               <View style={styles.rewardItem}>
-                <Image source={coinImage} style={styles.rewardImage} />
-                <Text style={styles.rewardText}>+{getCoinsNumber(score)} Coins</Text>
+                {
+                  alreadyCompleted
+                    ? <Text style={styles.rewardText}>You already completed this level!</Text>
+                    :
+                    (
+                      <>
+                        <Image source={coinImage} style={styles.rewardImage} />
+                        <Text style={styles.rewardText}>{`You got ${getCoinsNumber(score)} coins!`}</Text>
+                      </>
+                    )
+                }
               </View>
             )}
 
