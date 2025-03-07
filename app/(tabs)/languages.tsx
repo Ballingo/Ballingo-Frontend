@@ -81,14 +81,9 @@ export default function Languages() {
 
   const handleConfirmSelection = async () => {
     if (selectedLanguage) {
-      console.log(`Selected language: ${selectedLanguage.name}`);
-
       const playerId = await AsyncStorage.getItem("PlayerId");
       const userId = await AsyncStorage.getItem("UserId");
       const token = await AsyncStorage.getItem("Token");
-
-      console.log("playerId", playerId);
-      console.log("selectedLanguage.flag", selectedLanguage.flag);
       const has_pet = await playerHasPet(playerId, selectedLanguage.flag);
 
       if (has_pet.data.id) {

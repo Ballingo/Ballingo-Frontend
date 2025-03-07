@@ -25,7 +25,6 @@ const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle, type }) => {
   useEffect(() => {
     let storedLanguage;
     const fetchLanguage = async () => {
-      console.log(type);
       if (type === undefined) {
         storedLanguage = await AsyncStorage.getItem("ActualLanguage");
       } else {
