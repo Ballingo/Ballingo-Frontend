@@ -49,10 +49,10 @@ export const getUserLevels = async (playerId, language) => {
     }
 }
 
-export const setCompletedLevel = async (playerProgressId) => {
+export const setCompletedLevel = async (questionnaireId) => {
     try {
         const res = await api.put('set_completed/', {
-            player_progress_id: playerProgressId
+            questionnaire_id: questionnaireId
         });
         return { data: res.data, status: res.status };
     } catch (err) {

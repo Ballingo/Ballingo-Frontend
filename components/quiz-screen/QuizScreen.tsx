@@ -6,6 +6,9 @@ import styles from "./QuizScreenStyles";
 import { getQuestionnaire } from "@/api/questionnaire_api";
 import { getCoinsNumber } from "@/utils/functions";
 import { setCompletedLevel } from "@/api/player_progress_api";
+import { setPlayerCoins } from "@/api/inventory_api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { setPlayerProgress } from "@/api/player_progress_api";
 
 
 
@@ -87,19 +90,58 @@ const QuizScreen: React.FC = () => {
   }, [currentQuestionIndex, questions, fadeAnim]);
 
   useEffect(() => {
-    // Si el cuestionario ha terminado y la puntuación es perfecta
+    // Si el usuario terminó el cuestionario y obtuvo una puntuación perfecta
     if (modalVisible && score === questions.length) {
       console.log("✅ Usuario completó el nivel con puntuación perfecta. Marcando como completado...");
   
       if (parsedLevelData?.id) {
-        setCompletedLevel(parsedLevelData.id)
-          .then(() => console.log(`Nivel ${parsedLevelData.id} marcado como completado.`))
-          .catch((error) => console.error("Error al marcar nivel como completado:", error));
+        // 1️⃣ Marcar el nivel como completado si aún no lo estaba
+        if (!parsedLevelData?.completed) {
+          setCompletedLevel(parsedLevelData?.id)
+            .then(() => console.log(`✅ Nivel ${parsedLevelData?.id} marcado como completado.`))
+            .catch((error) => console.error("❌ Error al marcar nivel como completado:", error));
+        }
+  
+        // 2️⃣ Obtener monedas ganadas
+        const coinsWon = getCoinsNumber(score);
+  
+        // 3️⃣ Si el nivel no estaba completado, otorgar monedas
+        if (!parsedLevelData?.completed && coinsWon > 0) {
+          (async () => {
+            try {
+              const playerId = await AsyncStorage.getItem("PlayerId");
+              const selectedLanguage = await AsyncStorage.getItem("ActualLanguage");
+        
+              if (!playerId) {
+                console.error("❌ No se encontró el PlayerId en AsyncStorage.");
+                return;
+              }
+        
+              if (!selectedLanguage) {
+                console.error("❌ No se encontró el ActualLanguage en AsyncStorage.");
+                return;
+              }
+        
+              // 1️⃣ Otorgar monedas al jugador
+              await setPlayerCoins(playerId, coinsWon);
+              console.log(`💰 Se agregaron ${coinsWon} monedas al jugador ${playerId}.`);
+        
+              // 2️⃣ Actualizar el progreso del jugador al siguiente nivel
+              await setPlayerProgress(playerId, selectedLanguage, parsedLevelData?.level + 1);
+              console.log(`🚀 Se actualizó el progreso del jugador ${playerId} al nivel ${parsedLevelData?.level + 1}.`);
+        
+            } catch (error) {
+              console.error("❌ Error al actualizar monedas o progreso:", error);
+            }
+          })();
+        }
+        
       } else {
         console.error("❌ No se encontró el ID del nivel.");
       }
     }
   }, [modalVisible, score, questions.length, parsedLevelData?.id]);
+  
   
 
   const handleAnswer = (option: string) => {
@@ -128,7 +170,7 @@ const QuizScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Level {parsedLevelData?.questionnaire?.level || "1"}</Text>
+        <Text style={styles.title}>Level {parsedLevelData?.level || "1"}</Text>
         <ProgressBar progress={progress} color="#4CAF50" style={styles.progressBar} />
       </View>
 
