@@ -29,8 +29,7 @@ import Pet from "@/components/pet/Pet";
 
 export default function LoginScreen() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
 
   const scale = useSharedValue(1);
@@ -55,44 +54,6 @@ export default function LoginScreen() {
       ],
     };
   });
-
-  const handleLogin = async () => {
-    if (username && password) {
-      const credentials = { username, password };
-      const { data, status } = await loginUser(credentials);
-
-      if (status === 200) {
-        alert(`Bienvenido de nuevo, ${username}`);
-        router.replace("/(tabs)");
-
-        await AsyncStorage.setItem("Token", data.token);
-        await AsyncStorage.setItem("UserId", data.user_id);
-
-        const response = await getPlayerByUserId(data.user_id);
-
-        if (response.status === 200) {
-          await AsyncStorage.setItem("PlayerId", response.data.id);
-          const petInfo = await getPetByPlayerAndLanguage(
-            response.data.id,
-            response.data.actualLanguage
-          );
-          await AsyncStorage.setItem("PetId", petInfo.data.id);
-          await AsyncStorage.setItem(
-            "ActualLanguage",
-            response.data.actualLanguage
-          );
-
-          console.log("✅ Player data:", response.data);
-        } else {
-          console.error("❌ Error obteniendo el jugador:", response.data);
-        }
-      } else {
-        handleErrorUserLogin(data);
-      }
-    } else {
-      alert("Por favor, ingresa tu usuario y contraseña.");
-    }
-  };
 
   React.useEffect(() => {
     // Animación de entrada del Pet
@@ -202,56 +163,35 @@ export default function LoginScreen() {
           style={styles.title}
           entering={FadeInUp.delay(800).duration(800)}
         >
-          Log In
+          Forgot your password?
         </Animated.Text>
 
-        <Animated.View entering={FadeInUp.delay(800).duration(800)}>
-          <TextInput
-            style={styles.input}
-            placeholder="Username"
-            value={username}
-            onChangeText={setUsername}
-          />
-        </Animated.View>
-
-        <Animated.View entering={FadeInUp.delay(1000).duration(800)}>
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-        </Animated.View>
-
         <Animated.View entering={FadeInUp.delay(1200).duration(800)}>
+          <Text style={styles.infoText}>
+            Enter your email adress and we will send you instructions to reset
+            your password
+          </Text>
+        </Animated.View>
+
+        <Animated.View entering={FadeInUp.delay(1400).duration(800)}>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+          />
+        </Animated.View>
+
+        <Animated.View entering={FadeInUp.delay(1600).duration(800)}>
           <TouchableOpacity
             style={[styles.button, animatedButtonStyle]}
             onPress={() => {
               scale.value = withSpring(0.9, { damping: 2 }, () => {
                 scale.value = withSpring(1);
               });
-              handleLogin();
             }}
           >
             <Text style={styles.buttonText}>Confirm</Text>
-          </TouchableOpacity>
-        </Animated.View>
-
-        <Animated.View entering={FadeIn.delay(2200).duration(800)}>
-          <TouchableOpacity
-            onPress={() => router.push("/forgot-password")}
-            style={styles.linkContainer}
-          >
-            <Text style={styles.linkText}>Forgot password</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => router.push("/sign-up")}
-            style={styles.linkContainer}
-          >
-            <Text style={styles.linkText}>
-              Don't have an account? Register here!
-            </Text>
           </TouchableOpacity>
         </Animated.View>
       </View>
@@ -289,8 +229,7 @@ const styles = StyleSheet.create({
     color: "#000",
     backgroundColor: "#F9F7F7",
   },
-  linkContainer: { marginTop: 10, alignItems: "center" },
-  linkText: { color: "#ba95ff", textDecorationLine: "underline" },
+  infoText: { color: "#ba95ff", marginBottom: 20, textAlign: "justify" },
   button: {
     padding: 10,
     backgroundColor: "#4e00dd",

@@ -69,7 +69,7 @@ export default StyleSheet.create({
   },
 
   tradeNavImage: {
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: "#222831",
     borderRadius: "50%",
   },
