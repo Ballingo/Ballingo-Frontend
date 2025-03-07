@@ -21,7 +21,7 @@ export default function Trade() {
   const [allFood, setAllFood] = useState<InventoryItem[]>([]);
   const [playerId, setPlayerId] = useState<number | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
-  
+
   useFocusEffect(
     useCallback(() => {
       console.log("Relaoding the screen...");
@@ -54,47 +54,23 @@ export default function Trade() {
 
   const fetchUserFoodList = async (id: number) => {
     try {
-        console.log("🔹 Llamando API con playerId:", id);
-        const response = await getFoodListByPlayer(id);
+      console.log("🔹 Llamando API con playerId:", id);
+      const response = await getFoodListByPlayer(id);
 
-        if (response.status === 200) {
-            console.log("✅ Lista de comida obtenida:", response.data);
-
-            const formattedFood = response.data.food_items
-                .filter((item: any) => item.quantity > 0) // Filtrar comidas con cantidad > 0
-                .map((item: any) => ({
-                    id: item.food.id.toString(),
-                    category: item.food.language,
-                    image: FoodImageMap[item.food.image_path], // Función para obtener la imagen
-                }));
-
-            console.log("📦 Comida formateada para userFood:", formattedFood);
-
-            setUserFood(formattedFood);
-        } else {
-            console.error("❌ Error obteniendo la lista de comida:", response.data);
-        }
-    } catch (error) {
-        console.error("❌ Error en la llamada a la API:", error);
-    }
-  };  
-
-  
-
-
-  const fetchAllFoodList = async () => {
-    try {
-      const response = await getAllFood();
-  
       if (response.status === 200) {
-        
-        const formattedFood = response.data.map((item: any) => ({
-          id: item.id.toString(),
-          category: item.language,
-          image: FoodImageMap[item.image_path], // Función para obtener la imagen
-        }));
-  
-        setAllFood(formattedFood);
+        console.log("✅ Lista de comida obtenida:", response.data);
+
+        const formattedFood = response.data.food_items
+          .filter((item: any) => item.quantity > 0) // Filtrar comidas con cantidad > 0
+          .map((item: any) => ({
+            id: item.food.id.toString(),
+            category: item.food.language,
+            image: FoodImageMap[item.food.image_path], // Función para obtener la imagen
+          }));
+
+        console.log("📦 Comida formateada para userFood:", formattedFood);
+
+        setUserFood(formattedFood);
       } else {
         console.error("❌ Error obteniendo la lista de comida:", response.data);
       }
@@ -103,6 +79,25 @@ export default function Trade() {
     }
   };
 
+  const fetchAllFoodList = async () => {
+    try {
+      const response = await getAllFood();
+
+      if (response.status === 200) {
+        const formattedFood = response.data.map((item: any) => ({
+          id: item.id.toString(),
+          category: item.language,
+          image: FoodImageMap[item.image_path], // Función para obtener la imagen
+        }));
+
+        setAllFood(formattedFood);
+      } else {
+        console.error("❌ Error obteniendo la lista de comida:", response.data);
+      }
+    } catch (error) {
+      console.error("❌ Error en la llamada a la API:", error);
+    }
+  };
 
   // Nuevo useEffect para imprimir la lista de comida una vez que se actualice food
   useEffect(() => {
@@ -143,7 +138,13 @@ export default function Trade() {
 
         {userFood.length > 0 ? (
           <Inventory
-            categories={["es", "en", "de", "ja", "ar"]}
+            categories={[
+              { name: "es", image: require("../../assets/flags/es.svg") },
+              { name: "en", image: require("../../assets/flags/en.svg") },
+              { name: "de", image: require("../../assets/flags/de.svg") },
+              { name: "ja", image: require("../../assets/flags/ja.svg") },
+              { name: "ar", image: require("../../assets/flags/ar.svg") },
+            ]}
             items={userFood}
             allItems={allFood}
             isClothes={false}

@@ -62,6 +62,18 @@ export default StyleSheet.create({
     marginInline: 5,
   },
 
+  navImage: {
+    height: 32,
+    width: 32,
+    alignSelf: "center",
+  },
+
+  tradeNavImage: {
+    borderWidth: 2,
+    borderColor: "#222831",
+    borderRadius: "50%",
+  },
+
   itemContainer: {
     display: 'flex',
     alignItems: 'center',

@@ -34,8 +34,13 @@ interface TradeItem {
   offeredImage: any;
 }
 
+interface Category {
+  name: string;
+  image: any;
+}
+
 interface InventoryProps {
-  categories: string[];
+  categories: Category[];
   items: InventoryItem[];
   allItems?: InventoryItem[];
   isClothes?: boolean;
@@ -48,9 +53,11 @@ const Inventory: React.FC<InventoryProps> = ({
   isClothes = false,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>(
-    categories[0]
+    categories[0].name
   );
-  const [filteredItems, setFilteredItems] = useState<InventoryItem[]>(allItems ?? items);
+  const [filteredItems, setFilteredItems] = useState<InventoryItem[]>(
+    allItems ?? items
+  );
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const [previousItem, setPreviousItem] = useState<InventoryItem | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -186,14 +193,13 @@ const Inventory: React.FC<InventoryProps> = ({
     const updatedItems = (allItems ?? items).filter(
       (item) => item.id !== selectedItem?.id
     );
-  
+
     setFilteredItems(updatedItems);
     setTradeStep("select");
   };
 
   // Mostrar trades activos
   const handleShowTrades = async () => {
-
     if (!selectedItem) {
       alert("❌ Debes seleccionar un ítem primero.");
       return;
@@ -268,8 +274,7 @@ const Inventory: React.FC<InventoryProps> = ({
           (trade: any) => trade.in_food.id.toString() === itemId
         );
 
-        const formattedTrades = filteredTrades.map((trade: any) => (
-          {
+        const formattedTrades = filteredTrades.map((trade: any) => ({
           id: trade.id.toString(),
           itemName: trade.in_food.name,
           status: trade.isActive ? "Pendiente" : "Completado",
@@ -318,9 +323,8 @@ const Inventory: React.FC<InventoryProps> = ({
 
   const renderTrade = ({ item }: { item: TradeItem }) => {
     const isSelected = selectedTrade === item.id;
-    
-    console.log("🔹 Trade seleccionado:", item);
 
+    console.log("🔹 Trade seleccionado:", item);
 
     return (
       <TouchableOpacity
@@ -364,7 +368,7 @@ const Inventory: React.FC<InventoryProps> = ({
     <View
       style={[
         styles.container,
-        !isTrading && !isClothes && styles.redBackground,
+        !isClothes && styles.redBackground,
         isClothes && styles.orangeBackground,
       ]}
       key={refreshKey}
@@ -373,26 +377,29 @@ const Inventory: React.FC<InventoryProps> = ({
         <View
           style={[
             styles.navbar,
-            !isTrading && !isClothes && styles.redNavbar,
+            !isClothes && styles.redNavbar,
             isClothes && styles.orangeNavbar,
           ]}
         >
           {categories.map((category) => (
             <TouchableOpacity
-              key={category}
+              key={category.name}
               style={[
                 styles.navButton,
-                selectedCategory === category &&
+                selectedCategory === category.name &&
                   !isTrading &&
                   !isClothes &&
                   styles.redActiveButton,
-                selectedCategory === category &&
+                selectedCategory === category.name &&
                   isClothes &&
                   styles.orangeActiveButton,
               ]}
-              onPress={() => setSelectedCategory(category)}
+              onPress={() => setSelectedCategory(category.name)}
             >
-              <Text style={styles.navText}>{category}</Text>
+              <Image
+                source={category.image}
+                style={[styles.navImage, !isClothes && styles.tradeNavImage]}
+              />
             </TouchableOpacity>
           ))}
         </View>
@@ -473,13 +480,20 @@ const Inventory: React.FC<InventoryProps> = ({
                       <View style={styles.buttonContainer}>
                         {/* Mostrar "Create" solo si el usuario tiene el ítem */}
                         {items.some((item) => item.id === selectedItem?.id) && (
-                          <TouchableOpacity style={styles.modalButton} onPress={handleTrade}>
-                            <Ionicons name="add-circle-outline" size={20} color="#fff" style={styles.iconStyle} />
+                          <TouchableOpacity
+                            style={styles.modalButton}
+                            onPress={handleTrade}
+                          >
+                            <Ionicons
+                              name="add-circle-outline"
+                              size={20}
+                              color="#fff"
+                              style={styles.iconStyle}
+                            />
                             <Text style={styles.buttonText}>Create</Text>
                           </TouchableOpacity>
                         )}
 
-                        
                         <TouchableOpacity
                           style={styles.modalButton}
                           onPress={handleShowTrades}
