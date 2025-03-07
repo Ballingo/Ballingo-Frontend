@@ -232,7 +232,7 @@ const Inventory: React.FC<InventoryProps> = ({
       const outFoodId = parseInt(selectedItem.id, 10);
 
       const tradeData = {
-        player: playerId,
+        player_id: playerId,
         isActive: true,
         in_food_id: inFoodId,
         out_food_id: outFoodId,
