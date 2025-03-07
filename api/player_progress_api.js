@@ -60,3 +60,18 @@ export const setCompletedLevel = async (questionnaireId) => {
         return { data: error?.data || "Error desconocido", status: error?.status || 500 };
     }
 }
+
+export const getisCompleted = async (questionnaireId) => {
+    try {
+        const res = await api.get('get_completed/', {
+            params: {
+                questionnaire_id: questionnaireId
+            }
+        });
+        return { data: res.data, status: res.status };
+    }
+    catch (err) {
+        const error = err.response;
+        return { data: error.data, status: error.status };
+    }
+};
