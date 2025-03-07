@@ -50,7 +50,7 @@ const Inventory: React.FC<InventoryProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string>(
     categories[0]
   );
-  const [filteredItems, setFilteredItems] = useState<InventoryItem[]>(items);
+  const [filteredItems, setFilteredItems] = useState<InventoryItem[]>(allItems ?? items);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const [previousItem, setPreviousItem] = useState<InventoryItem | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -105,7 +105,6 @@ const Inventory: React.FC<InventoryProps> = ({
   // Ejemplo de trades activos
   const [activeTrades, setActiveTrades] = useState<TradeItem[]>([]);
 
-  console.log("isTrading:", isTrading, "isClothes:", isClothes);
   // Obtener ítems con not-allowed si es ropa
   const getFilteredItems = () => {
     const baseItems = filteredItems.filter(
@@ -172,7 +171,7 @@ const Inventory: React.FC<InventoryProps> = ({
     setPreviousItem(null);
     setTradeStep("initial");
     setIsTrading(false);
-    setFilteredItems(items);
+    setFilteredItems(allItems ?? items);
     setShowTrades(false); // Cierra también la vista de trades
   };
 
@@ -183,13 +182,24 @@ const Inventory: React.FC<InventoryProps> = ({
     }
     setIsTrading(true);
     setModalVisible(false);
-    setFilteredItems(allItems ?? items);
+
+    const updatedItems = (allItems ?? items).filter(
+      (item) => item.id !== selectedItem?.id
+    );
+  
+    setFilteredItems(updatedItems);
     setTradeStep("select");
   };
 
   // Mostrar trades activos
   const handleShowTrades = async () => {
-    await fetchActiveTrades();
+
+    if (!selectedItem) {
+      alert("❌ Debes seleccionar un ítem primero.");
+      return;
+    }
+
+    await fetchActiveTrades(selectedItem.id);
     setShowTrades(true);
     setModalVisible(false);
   };
@@ -246,7 +256,7 @@ const Inventory: React.FC<InventoryProps> = ({
     }
   };
 
-  const fetchActiveTrades = async () => {
+  const fetchActiveTrades = async (itemId?: string) => {
     try {
       console.log("🔹 Buscando trades activos...");
       const response = await getActiveTrades();
@@ -254,11 +264,16 @@ const Inventory: React.FC<InventoryProps> = ({
       if (response.status === 200) {
         console.log("✅ Trades activos obtenidos:", response.data);
 
-        const formattedTrades = response.data.map((trade: any) => ({
+        const filteredTrades = response.data.filter(
+          (trade: any) => trade.in_food.id.toString() === itemId
+        );
+
+        const formattedTrades = filteredTrades.map((trade: any) => (
+          {
           id: trade.id.toString(),
           itemName: trade.in_food.name,
           status: trade.isActive ? "Pendiente" : "Completado",
-          userProfile: PetSkinImageMap[actualLanguage],
+          userProfile: PetSkinImageMap[trade.player.actualLanguage],
           requestedImage: FoodImageMap[trade.out_food.image_path],
           offeredImage: FoodImageMap[trade.in_food.image_path],
         }));
@@ -303,6 +318,9 @@ const Inventory: React.FC<InventoryProps> = ({
 
   const renderTrade = ({ item }: { item: TradeItem }) => {
     const isSelected = selectedTrade === item.id;
+    
+    console.log("🔹 Trade seleccionado:", item);
+
 
     return (
       <TouchableOpacity
@@ -453,19 +471,15 @@ const Inventory: React.FC<InventoryProps> = ({
                       </View>
 
                       <View style={styles.buttonContainer}>
-                        <TouchableOpacity
-                          style={styles.modalButton}
-                          onPress={handleTrade}
-                        >
-                          <Ionicons
-                            name="add-circle-outline"
-                            size={20}
-                            color="#fff"
-                            style={styles.iconStyle}
-                          />
-                          <Text style={styles.buttonText}>Create</Text>
-                        </TouchableOpacity>
+                        {/* Mostrar "Create" solo si el usuario tiene el ítem */}
+                        {items.some((item) => item.id === selectedItem?.id) && (
+                          <TouchableOpacity style={styles.modalButton} onPress={handleTrade}>
+                            <Ionicons name="add-circle-outline" size={20} color="#fff" style={styles.iconStyle} />
+                            <Text style={styles.buttonText}>Create</Text>
+                          </TouchableOpacity>
+                        )}
 
+                        
                         <TouchableOpacity
                           style={styles.modalButton}
                           onPress={handleShowTrades}

@@ -45,7 +45,6 @@ const FoodBar: React.FC<FoodBarProps> = ({ foodList, refreshFoodList  }) => {
     if (response.status === 200) {
       const isFed = await FeedPet(item.food.id);
       if (isFed){
-        console.log("Fed your pet: ", item.food.name);
 
         setFoods((prevFoods) =>
           prevFoods
@@ -70,7 +69,6 @@ const FoodBar: React.FC<FoodBarProps> = ({ foodList, refreshFoodList  }) => {
   const FeedPet = async (foodId: number) => {
     const petId = await AsyncStorage.getItem("PetId");
     const {data, status} = await getFoodById(foodId);
-    console.log("Food :", data);
 
     if (status === 200){
       if (petId){
@@ -96,7 +94,6 @@ const FoodBar: React.FC<FoodBarProps> = ({ foodList, refreshFoodList  }) => {
 
   const upDateFoodBar = async (petId: string, hungerPoints: number) => {
     const {data, status} = await setHungerBar(petId, hungerPoints);
-    console.log("Pet hunger info: ", data);
 
     if (status === 200){
       return true;
@@ -142,7 +139,6 @@ const DraggableFood: React.FC<{
   onReduceQuantity: () => void;
 }> = ({ image, quantity, onReduceQuantity }) => {
   if (quantity <= 0) return null;
-  console.log("🔹 Cargando imagen:", image);
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
   const scale = useSharedValue(1);

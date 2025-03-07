@@ -68,10 +68,7 @@ export default function LevelMap() {
         
         
         const levelsData = await getQuestionnairesByLanguage(language);
-        console.log("Datos de TODOS los niveles:", levelsData.data);
-
         const userLevels = await getUserLevels(playerId, language);
-        console.log("Datos de niveles del usuario:", userLevels);
 
         const N = userLevels.length;
 
@@ -89,7 +86,6 @@ export default function LevelMap() {
   
         setLevels(formattedLevels);
 
-        console.log("Niveles formateados:", levels); 
       } catch (error) {
         console.error("Error obteniendo los niveles:", error);
       }
@@ -101,7 +97,6 @@ export default function LevelMap() {
 
 
   const handleLevelPress = (levelObject: any) => {
-    console.log("Este es el objeto", levelObject);
     setSelectedLevel(levelObject.level);
     setPopupVisible(true);
     setLevelObject(levelObject);

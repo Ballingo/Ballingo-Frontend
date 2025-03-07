@@ -87,7 +87,6 @@ export default function Trade() {
       const response = await getAllFood();
   
       if (response.status === 200) {
-        console.log("✅ Lista de toda la comida de la DB:", response.data.food_items);
         
         const formattedFood = response.data.map((item: any) => ({
           id: item.id.toString(),

@@ -25,7 +25,6 @@ const ProfileIcon: React.FC<ProfileIconProps> = ({
   const router = useRouter();
 
   const handlePress = () => {
-    console.log("Perfil clickeado");
     router.push("/profile");
   };
   const [actualLanguage, setActualLanguage] = useState<string>("");

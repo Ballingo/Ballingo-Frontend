@@ -42,7 +42,6 @@ export default function Shop() {
   useEffect(() => {
     const fetchMoneyItems = async () => {
       const {data, status} = await getAllMoneyPacks();
-      console.log("Money packs", data);
 
       if (status === 200) {
         setMoneyItems(data);
@@ -55,7 +54,6 @@ export default function Shop() {
 
     const fetchGameItems = async () => {
       const {data, status} = await getAllClothesPacks();
-      console.log("Clothes packs", data);
 
       if (status === 200) {
         setGameItems(data);
@@ -78,7 +76,6 @@ export default function Shop() {
       let livesAmount = 0;
       for (const id of idList) {
         const { data, status } = await getShopItemById(id);
-        console.log("Shop item", data);
   
         if (status === 200) {
           if (data.type === "lives"){
@@ -143,7 +140,6 @@ export default function Shop() {
 
     if (status === 200){
       alert(`You bought ${name}`);
-      console.log("Added: ", data)
     }
     else {
       console.error(`${status} - ${data}`);
@@ -156,7 +152,6 @@ export default function Shop() {
     const { data, status } = await setPlayerCoins(playerId, amoutToCharge);
 
     if (status === 200){
-      console.log("Coins charged: ", data);
       return true;
     }
     else {

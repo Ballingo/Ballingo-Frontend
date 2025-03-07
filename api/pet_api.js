@@ -110,16 +110,9 @@ export const increaseHunger = async (userId, petId, token) => {
         const lastLogin = DateTime.fromISO(data.last_login, { zone: 'utc' });
         const diffHours = now.diff(lastLogin, 'hours').hours;
 
-        console.log(`🔍 Now: ${now.toISO()}`);
-        console.log(`🔍 Last login: ${lastLogin.toISO()}`);
-        console.log(`🔍 Difference in hours: ${diffHours.toFixed(4)}`);
-
         if (diffHours <= 0) {
             return { data: "No time has passed, hunger remains the same", status: 200 };
         }
-
-        console.log(`Last login: ${diffHours.toFixed(2)} hours ago`);
-
 
         const { data: hungerData, status: hungerStatus } = await getHungerBar(petId);
 
@@ -127,15 +120,8 @@ export const increaseHunger = async (userId, petId, token) => {
             return { data: "Could not get your pet's hunger bar", status: hungerStatus };
         }
 
-        let currentHunger = hungerData.hunger;
         const hungerReductionRate = 2;
-
-        console.log(`Current hunger level: ${currentHunger}`);
-        console.log('Diff hours:', diffHours);
-        console.log('Hunger reduction rate:', hungerReductionRate);
         let hungerFactor = Math.floor(diffHours * hungerReductionRate);
-
-        console.log(`🔄 New hunger level: ${hungerFactor}`);
 
         const hungerResponse = await setHungerBar(petId, -hungerFactor);
         if (hungerResponse.status !== 200) {

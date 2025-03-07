@@ -15,7 +15,6 @@ const MoneyCounter: React.FC<MoneyCounterProps> = ({ color }) => {
   const [coins, setCoins] = useState();
 
   const handlePress = () => {
-    console.log("Shop clicked");
     router.push("/shop");
   };
 
