@@ -18,6 +18,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { addClothesToPet, getPetClothes } from "@/api/pet_api";
 import { PetSkinImageMap } from "@/utils/imageMap";
+import LoadingScreen from "@/components/loading-screen/LoadingScreen";
 
 interface InventoryItem {
   id: string;
@@ -71,28 +72,31 @@ const Inventory: React.FC<InventoryProps> = ({
   const [selectedClothes, setSelectedClothes] = useState<string[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const [actualLanguage, setActualLanguage] = useState<string>("");
-
+  const [isLoading, setIsLoading] = useState(true);
+  
   useFocusEffect(
     useCallback(() => {
-      console.log("Relaoding the screen...");
       setRefreshKey((prev) => prev + 1);
 
       const fetchClothes = async () => {
-        const storedPetId = await AsyncStorage.getItem("PetId");
-        if (!storedPetId) {
-          alert("❌ No se encontró el ID de la mascota.");
-          return;
-        }
+        try {
+          const storedPetId = await AsyncStorage.getItem("PetId");
+          if (!storedPetId) {
+            alert("❌ No se encontró el ID de la mascota.");
+            return;
+          }
 
-        console.log("👕 Fetching clothes for pet:", storedPetId);
-
-        const { data, status } = await getPetClothes(storedPetId);
-
-        if (status === 200 && data.accesories) {
-          const petClothesIds = data.accesories.map((item: { id: number }) =>
-            item.id.toString()
-          );
-          setSelectedClothes(petClothesIds);
+          const { data, status } = await getPetClothes(storedPetId);
+          if (status === 200 && data.accesories) {
+            const petClothesIds = data.accesories.map(
+              (item: { id: number }) => item.id.toString()
+            );
+            setSelectedClothes(petClothesIds);
+          }
+        } catch (error) {
+          console.error("❌ Error en fetchClothes:", error);
+        } finally {
+          setIsLoading(false); // Se actualiza el estado al terminar la carga
         }
       };
 
@@ -373,6 +377,15 @@ const Inventory: React.FC<InventoryProps> = ({
       ]}
       key={refreshKey}
     >
+
+      {isLoading && (
+        <Modal transparent={true} visible={true}>
+          <View style={{ flex: 1 }}>
+            <LoadingScreen />
+          </View>
+        </Modal>
+      )}
+
       {!showTrades && (
         <View
           style={[
