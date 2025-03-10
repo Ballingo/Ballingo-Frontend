@@ -1,6 +1,20 @@
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
+
+  fullScreenContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: "100%",
+    height: "100%",
+    zIndex: 1000, // Asegura que esté encima de todo
+    backgroundColor: "white", // O el color de fondo que prefieras
+    
+  },
+
   container: {
     position: 'absolute',
     flexDirection: 'row',
