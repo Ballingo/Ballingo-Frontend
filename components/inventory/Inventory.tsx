@@ -159,7 +159,7 @@ const Inventory: React.FC<InventoryProps> = ({
             return updatedSelection;
           });
 
-          alert("✅ Clothes added to pet.");
+          //alert("✅ Clothes added to pet.");
         } else {
           console.log("✅ All clothes removed: ", data);
           alert("✅ Removed all clothes from your pet.");

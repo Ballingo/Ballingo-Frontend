@@ -97,6 +97,7 @@ export default function Wardrobe() {
             width: 200,
             height: 200,
           }}
+          screen="inventory"
         />
 
         {clothes.length > 0 ? (

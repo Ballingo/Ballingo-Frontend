@@ -35,6 +35,17 @@ export const getPetClothes = async (petId) => {
     }
 };
 
+export const getImagePathPetClothes = async (petId) => {
+    try{
+        const res = await api.get(`pet/${petId}/get_accesories_img`);
+        return { data: res.data, status: res.status };
+    }
+    catch(err){
+        const error = err.response;
+        return { data: error.data, status: error.status };
+    }
+};
+
 export const addClothesToPet = async (petId, clothesId) => {
     try{
         const res = await api.put(`pet/${petId}/set_accesories/`, {
