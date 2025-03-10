@@ -29,14 +29,17 @@ export default function Index() {
   const petCheckHunger = async () => {
     const userId = await AsyncStorage.getItem("UserId");
     const token = await AsyncStorage.getItem("Token");
+    
+    const playerId = await AsyncStorage.getItem("PlayerId");
 
     const storedPetId = await AsyncStorage.getItem("PetId");
     setPetId(storedPetId === "undefined" ? null : storedPetId);
       
-    if (userId && token && storedPetId) {
-      const response = await increaseHunger(parseInt(userId), parseInt(storedPetId), token);
+    if (userId && playerId && token && storedPetId) {
+      const response = await increaseHunger(parseInt(userId), parseInt(playerId), parseInt(storedPetId), token);
       if (response.status === 200) {
         console.log("Hunger increased");
+        setRefreshKey((prev) => prev + 1);
       }
     }
   };

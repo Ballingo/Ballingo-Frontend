@@ -9,6 +9,7 @@ import Animated, {
 } from "react-native-reanimated";
 import styles from "./PetStyles";
 import { PetSkinImageMap } from "@/utils/imageMap";
+import { getIsDead }from "@/api/pet_api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ClothesImageMap } from "@/utils/imageMap";
 import { ClothesPositionByScreenMap } from "@/utils/positionMap";
@@ -29,8 +30,7 @@ const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle, type, screen = "i
   const rotation = useSharedValue(0);
   const [actualLanguage, setActualLanguage] = useState<string>("");
   const [selectedClothes, setSelectedClothes] = useState<string[]>([]);
-
-
+  const [isDead, setIsDead] = useState<boolean>(false);
 
   useEffect(() => {
     let storedLanguage;
@@ -48,7 +48,16 @@ const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle, type, screen = "i
       setActualLanguage(storedLanguage);
     };
 
+    const fetchStatus = async () => {
+      const petId = await AsyncStorage.getItem("PetId");
+      const {data, status} = await getIsDead(petId);
+      if(status === 200) {
+        setIsDead(data.isDead);
+      }
+    };
+
     fetchLanguage();
+    fetchStatus();
 
     rotation.value = withRepeat(
       withSequence(
@@ -107,8 +116,12 @@ const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle, type, screen = "i
         })}
 
         {/* Imagen animada de la bola */}
-        <Animated.Image source={PetSkinImageMap[actualLanguage]} style={[styles.image, imageStyle]} />
+        <Animated.Image
+          source={ isDead === false ? PetSkinImageMap[actualLanguage] : PetSkinImageMap["ded"] }
+          style={[styles.image, animatedStyle, imageStyle]}
+        />
       </Animated.View>
+
     </View>
   );
 };
