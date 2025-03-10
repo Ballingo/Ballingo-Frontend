@@ -16,6 +16,7 @@ import { useCallback } from "react";
 import { getUserLevels } from "@/api/player_progress_api"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getQuestionnairesByLanguage } from "@/api/questionnaire_api";
+import LoadingScreen from "@/components/loading-screen/LoadingScreen";
 
 
 // Disposición geométrica en zig-zag (reducido a 5 niveles)
@@ -39,6 +40,7 @@ export default function LevelMap() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [levels, setLevels] = useState<any[]>([]);
   const [levelObject, setLevelObject] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
 
   useFocusEffect(
@@ -63,6 +65,7 @@ export default function LevelMap() {
 
         if (!playerId || !language) {
           console.error("No se encontró el PlayerId o ActualLanguage");
+          setIsLoading(false);
           return;
         }
         
@@ -76,6 +79,7 @@ export default function LevelMap() {
         // 🔹 Asegúrate de que levelsData es un array antes de hacer .map()
         if (!Array.isArray(levelsData.data)) {
           console.error("Error: los datos recibidos no son un array", levelsData);
+          setIsLoading(false);
           return;
         }
 
@@ -85,9 +89,10 @@ export default function LevelMap() {
         }));
   
         setLevels(formattedLevels);
-
+        setIsLoading(false);
       } catch (error) {
         console.error("Error obteniendo los niveles:", error);
+        setIsLoading(false);
       }
     };
 
@@ -105,74 +110,79 @@ export default function LevelMap() {
   return (  
     <ImageBackground style={styles.background} key={refreshKey}>
       {/* Botón para regresar a la pantalla de idiomas */}
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => router.push("/languages")}
-      >
-        <Ionicons name="arrow-back" size={20} color="#FFF" />
-        <Text style={styles.backButtonText}>Volver a Languages</Text>
-      </TouchableOpacity>
 
-      <ScrollView
-        ref={scrollViewRef}
-        contentContainerStyle={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.mapContainer}>
-          {/* Conectar niveles con líneas rectas */}
-          <View style={styles.svgContainer}>
-            <Svg width="100%" height="2200">
-              {levelPositions.map((pos, index) => {
-                if (index < levelPositions.length - 1) {
-                  const nextPos = levelPositions[index + 1];
-                  return (
-                    <Line
-                      key={`line-${index}`}
-                      x1={pos.x + 30}
-                      y1={pos.y + 30}
-                      x2={nextPos.x + 30}
-                      y2={nextPos.y + 30}
-                      stroke="#FFD700"
-                      strokeWidth={4}
-                    />
-                  );
-                }
-                return null;
+      {isLoading && <LoadingScreen />}
+
+      
+      {!isLoading && (
+        <>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.push("/languages")}
+          >
+            <Ionicons name="arrow-back" size={20} color="#FFF" />
+            <Text style={styles.backButtonText}>Volver a Languages</Text>
+          </TouchableOpacity>
+
+          <ScrollView
+            ref={scrollViewRef}
+            contentContainerStyle={styles.scrollContainer}
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.mapContainer}>
+              <View style={styles.svgContainer}>
+                <Svg width="100%" height="2200">
+                  {levelPositions.map((pos, index) => {
+                    if (index < levelPositions.length - 1) {
+                      const nextPos = levelPositions[index + 1];
+                      return (
+                        <Line
+                          key={`line-${index}`}
+                          x1={pos.x + 30}
+                          y1={pos.y + 30}
+                          x2={nextPos.x + 30}
+                          y2={nextPos.y + 30}
+                          stroke="#FFD700"
+                          strokeWidth={4}
+                        />
+                      );
+                    }
+                    return null;
+                  })}
+                </Svg>
+              </View>
+
+              {levels.map((level, index) => {
+                const position = levelPositions[index];
+                return (
+                  <TouchableOpacity
+                    key={level.id}
+                    style={[
+                      styles.levelButton,
+                      {
+                        left: position.x,
+                        top: position.y,
+                        backgroundColor: level.unlocked ? "#4CAF50" : "#D3D3D3",
+                      },
+                    ]}
+                    onPress={() => handleLevelPress(level)}
+                    disabled={!level.unlocked}
+                  >
+                    <Text style={styles.levelText}>{level.level}</Text>
+                  </TouchableOpacity>
+                );
               })}
-            </Svg>
-          </View>
+            </View>
+          </ScrollView>
 
-          {/* Renderizar niveles */}
-          {levels.map((level, index) => {
-            const position = levelPositions[index];
-            return (
-              <TouchableOpacity
-                key={level.id}
-                style={[
-                  styles.levelButton,
-                  {
-                    left: position.x,
-                    top: position.y,
-                    backgroundColor: level.unlocked ? "#4CAF50" : "#D3D3D3",
-                  },
-                ]}
-                onPress={() => handleLevelPress(level)}
-                disabled={!level.unlocked}
-              >
-                <Text style={styles.levelText}>{level.level}</Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </ScrollView>
-
-      {/* Popup de nivel */}
-      {selectedLevel !== null && (
-        <LevelPopup
-          visible={popupVisible}
-          onClose={() => setPopupVisible(false)}
-          levelObject= {levelObject}
-        />
+          {selectedLevel !== null && (
+            <LevelPopup
+              visible={popupVisible}
+              onClose={() => setPopupVisible(false)}
+              levelObject={levelObject}
+            />
+          )}
+        </>
       )}
     </ImageBackground>
   );
