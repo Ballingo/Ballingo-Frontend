@@ -102,7 +102,7 @@ export default function Index() {
 
       {/* Contenedor de mascota y barra de hambre */}
       <View style={{ alignItems: "center", flex: 1, justifyContent: "center" }}>
-        <Pet />
+        <Pet screen="index"/>
         
         {petId && petId !== "undefined" && <HungerBar width={60} />}
 

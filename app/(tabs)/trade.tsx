@@ -134,6 +134,7 @@ export default function Trade() {
             width: 200,
             height: 200,
           }}
+          screen="inventory"
         />
 
         {userFood.length > 0 ? (
