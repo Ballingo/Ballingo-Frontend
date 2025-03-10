@@ -165,11 +165,9 @@ export const increaseHunger = async (userId, playerId, petId, token) => {
                     return { data: "Could not set your pet's status", status: newStatus.status };
                 }
             }
-            else{
-                const newLives = await setPlayerLiveCounter(playerId, lives);
-                if (newLives.status !== 200) {
-                    return { data: "Could not set your lives", status: newLives.status };
-                }
+            const newLives = await setPlayerLiveCounter(playerId, lives);
+            if (newLives.status !== 200) {
+                return { data: "Could not set your lives", status: newLives.status };
             }
         }
 
