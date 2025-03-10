@@ -1,7 +1,7 @@
 import axios from "axios";
 import { DateTime } from "luxon";
 import { getLastLogin, setLastLogin } from "./user_api"; 
-import { getPlayerLiveCounter, setPlayerLiveCounter } from "./inventory_api";
+import { getPlayerLiveCounter, changeLivesAfterDeath } from "./inventory_api";
 
 const api = axios.create(
     {
@@ -176,9 +176,16 @@ export const increaseHunger = async (userId, playerId, petId, token) => {
                     return { data: "Could not set your pet's status", status: newStatus.status };
                 }
             }
-            const newLives = await setPlayerLiveCounter(playerId, lives);
+            const newLives = await changeLivesAfterDeath(playerId, lives);
             if (newLives.status !== 200) {
                 return { data: "Could not set your lives", status: newLives.status };
+            }
+
+            if (lives !== 0){
+                const newLifeHubger = await setHungerBar(petId, 100);
+                if (newLifeHubger.status !== 200) {
+                    return { data: "Could not set your pet's hunger bar", status: newLifeHubger.status };
+                }
             }
         }
 

@@ -67,11 +67,28 @@ export const getPlayerLiveCounter = async (playerId) => {
     }
 };
 
+//This DB call, increases the amount of lives and is used when the player buys lives
 export const setPlayerLiveCounter = async (playerId, amount) => {
+    try{
+        const res = await api.put(`inventory/buy-lives/${playerId}/`, 
+            {
+                lives_counter: parseInt(amount)
+            }
+        );
+        return { data: res.data, status: res.status };
+    }
+    catch(err){
+        const error = err.response;
+        return { data: error.data, status: error.status };
+    }
+};
+
+//This DB call, sets the amount of lives to 'lives' and is used when the player dies
+export const changeLivesAfterDeath = async (playerId, lives) => {
     try{
         const res = await api.put(`inventory/set-lives/${playerId}/`, 
             {
-                lives_counter: parseInt(amount)
+                lives_counter: lives
             }
         );
         return { data: res.data, status: res.status };
