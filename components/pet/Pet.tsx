@@ -9,6 +9,7 @@ import Animated, {
 } from "react-native-reanimated";
 import styles from "./PetStyles";
 import { PetSkinImageMap } from "@/utils/imageMap";
+import { getIsDead }from "@/api/pet_api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Separar las props de estilo para View y Image
@@ -21,6 +22,7 @@ interface PetProps {
 const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle, type }) => {
   const rotation = useSharedValue(0);
   const [actualLanguage, setActualLanguage] = useState<string>("");
+  const [isDead, setIsDead] = useState<boolean>(false);
 
   useEffect(() => {
     let storedLanguage;
@@ -38,7 +40,16 @@ const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle, type }) => {
       setActualLanguage(storedLanguage);
     };
 
+    const fetchStatus = async () => {
+      const petId = await AsyncStorage.getItem("PetId");
+      const {data, status} = await getIsDead(petId);
+      if(status === 200) {
+        setIsDead(data.isDead);
+      }
+    };
+
     fetchLanguage();
+    fetchStatus();
 
     rotation.value = withRepeat(
       withSequence(
@@ -57,7 +68,7 @@ const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle, type }) => {
   return (
     <View style={[styles.container, containerStyle]}>
       <Animated.Image
-        source={PetSkinImageMap[actualLanguage]}
+        source={ isDead === false ? PetSkinImageMap[actualLanguage] : PetSkinImageMap["ded"] }
         style={[styles.image, animatedStyle, imageStyle]}
       />
     </View>

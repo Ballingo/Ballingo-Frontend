@@ -1,6 +1,7 @@
 import axios from "axios";
 import { DateTime } from "luxon";
 import { getLastLogin, setLastLogin } from "./user_api"; 
+import { getPlayerLiveCounter, setPlayerLiveCounter } from "./inventory_api";
 
 const api = axios.create(
     {
@@ -72,6 +73,17 @@ export const setHungerBar = async (petId, hungerPoints) => {
     }
 };
 
+export const getIsDead = async (petId) => {
+    try{
+        const res = await api.get(`pet/${petId}/get_is_dead`);
+        return { data: res.data, status: res.status };
+    }
+    catch(err){
+        const error = err.response;
+        return { data: error.data, status: error.status };
+    }
+};
+
 export const setIsDead = async (petId, isDead) => {
     try{
         const res = await api.put(`pet/${petId}/set_is_dead/`, {
@@ -96,8 +108,8 @@ export const getPetByPlayerAndLanguage = async (playerId, language) => {
     }
 };
 
-export const increaseHunger = async (userId, petId, token) => {
-    console.log(`🔍 Checking huner for user ${userId} and pet ${petId}`);
+export const increaseHunger = async (userId, playerId, petId, token) => {
+    console.log(`🔍 Checking huner for user ${userId} with playerId, ${playerId} and petId ${petId}`);
     try {
 
         const { data, status } = await getLastLogin(userId, token);
@@ -114,12 +126,6 @@ export const increaseHunger = async (userId, petId, token) => {
             return { data: "No time has passed, hunger remains the same", status: 200 };
         }
 
-        const { data: hungerData, status: hungerStatus } = await getHungerBar(petId);
-
-        if (hungerStatus !== 200) {
-            return { data: "Could not get your pet's hunger bar", status: hungerStatus };
-        }
-
         const hungerReductionRate = 2;
         let hungerFactor = Math.floor(diffHours * hungerReductionRate);
 
@@ -128,6 +134,44 @@ export const increaseHunger = async (userId, petId, token) => {
             return { data: "Could not set your pet's hunger bar", status: hungerResponse.status };
         }
         console.log("✅ Hunger updated:", hungerResponse.data);
+
+        const { data: hungerData, status: hungerStatus } = await getHungerBar(petId);
+
+        if (hungerStatus !== 200) {
+            return { data: "Could not get your pet's hunger bar", status: hungerStatus };
+        }
+
+        if (hungerData.hunger === 0){
+            const livesResponse = await getPlayerLiveCounter(playerId);
+            
+            if (livesResponse.status !== 200) {
+                return { data: "Could not get your lives", status: livesResponse.status };
+            }
+
+            let lives = livesResponse.data.lives_counter - 1;
+            lives < 0 ? lives = 0 : lives;
+
+            const isDead = await getIsDead(petId);
+
+            if (isDead.status !== 200) {
+                return { data: "Could not get your pet's status", status: isDead.status };
+            }
+
+            console.log(`is alive: ${isDead.data.isDead}, lives: ${lives}`);
+
+            if (lives === 0 && isDead.data.isDead === false){
+                const newStatus = await setIsDead(petId, true);
+                if (newStatus.status !== 200) {
+                    return { data: "Could not set your pet's status", status: newStatus.status };
+                }
+            }
+            else{
+                const newLives = await setPlayerLiveCounter(playerId, lives);
+                if (newLives.status !== 200) {
+                    return { data: "Could not set your lives", status: newLives.status };
+                }
+            }
+        }
 
         const { data: lastLoginData, status: lastLoginStatus } = await setLastLogin(userId, token);
         if (lastLoginStatus !== 200) {
