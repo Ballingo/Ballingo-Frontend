@@ -10,6 +10,7 @@ import { useRouter } from "expo-router";
 import styles from "./ProfileIconStyles";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PetSkinImageMap } from "@/utils/imageMap";
+import { getIsDead } from "@/api/pet_api";
 
 interface ProfileIconProps {
   imageUrl?: string;
@@ -28,6 +29,7 @@ const ProfileIcon: React.FC<ProfileIconProps> = ({
     router.push("/profile");
   };
   const [actualLanguage, setActualLanguage] = useState<string>("");
+  const [isDead, setIsDead] = useState<boolean>(false);
   
 
   useEffect(() => {
@@ -40,7 +42,16 @@ const ProfileIcon: React.FC<ProfileIconProps> = ({
       setActualLanguage(storedLanguage);
     }
 
+    const fetchStatus = async () => {
+      const petId = await AsyncStorage.getItem("PetId");
+      const {data, status} = await getIsDead(petId);
+      if(status === 200) {
+        setIsDead(data.isDead);
+      }
+    };
+
     fetchLanguage();
+    fetchStatus();
   }, []);
 
   return (
@@ -53,7 +64,7 @@ const ProfileIcon: React.FC<ProfileIconProps> = ({
       >
         <Image
           source={
-            PetSkinImageMap[actualLanguage]
+            isDead === false ? PetSkinImageMap[actualLanguage] : PetSkinImageMap["ded"]
           }
           style={[
             styles.image,
