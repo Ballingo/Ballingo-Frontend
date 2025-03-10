@@ -31,6 +31,7 @@ export default function Shop() {
   useFocusEffect(
     useCallback(() => {
       console.log("Relaoding the screen...");
+      setIsObjects(true);
       setRefreshKey((prev) => prev + 1);
     }, [])
   );
