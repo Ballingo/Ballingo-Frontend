@@ -57,7 +57,7 @@ const LoadingScreen: React.FC = () => {
 
       {/* Animación de la bola */}
       <Animated.Image 
-        source={require('@/assets/pets/ar.png')} 
+        source={require('@/assets/pets/ar_eyes.png')} 
         style={[styles.ball, { transform: [{ translateY: bounceAnim }] }]}
       />
 

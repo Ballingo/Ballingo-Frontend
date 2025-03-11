@@ -10,7 +10,18 @@ export const ClothesPositionByScreenMap: Record<string, Record<string, { top: nu
       winter_hat: { top: -140, left: 30, width: 200, height: 200 },
     
       bag: { top: 130, left: 170, width: 140, height: 140 },
-      scarf: { top: 200, left: 40, width: 220, height: 220 },
+
+      funny_glasses: { top: 30, left: 60, width: 140, height: 140 },
+      funny_glasses2: { top: 30, left: 60, width: 140, height: 140 },
+      heart_glasses: { top: 40, left: 25, width: 210, height: 210 },
+      snorkel_glasses: { top: 10, left: 40, width: 180, height: 180  },
+
+      basic_orange: { top: 100, left: 30, width: 200, height: 200 },
+      basic_black: { top: 100, left: 30, width: 200, height: 200 },
+      basic_green: { top: 100, left: 30, width: 200, height: 200 },
+      basic_red: { top: 100, left: 30, width: 200, height: 200 },
+
+
     },
     inventory: {
       cap: { top: -100, left: 30, width: 170, height: 170 }, 
@@ -22,7 +33,17 @@ export const ClothesPositionByScreenMap: Record<string, Record<string, { top: nu
       instructor_hat: { top: -100, left: 10, width: 180, height: 180 },
       winter_hat: { top: -110, left: 20, width: 160, height: 160 },
 
-
       bag: { top: 110, left: 130, width: 100, height: 100 },
+
+      funny_glasses: { top: 30, left: 45, width: 110, height: 110 },
+      funny_glasses2: { top: 30, left: 45, width: 110, height: 110 },
+      heart_glasses: { top: 40, left: 25, width: 150, height: 150 },
+      snorkel_glasses: { top: 20, left: 35, width: 130, height: 130  },
+
+      basic_orange: { top: 90, left: 30, width: 150, height: 150 },
+      basic_black: { top: 90, left: 30, width: 150, height: 150 },
+      basic_green: { top: 90, left: 30, width: 150, height: 150 },
+      basic_red: { top: 90, left: 30, width: 150, height: 150 },
+
     },
   };
