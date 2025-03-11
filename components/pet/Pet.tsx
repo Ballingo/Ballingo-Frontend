@@ -26,7 +26,7 @@ interface PetProps {
   screen?: "index" | "inventory"; // Se agrega screen para determinar la posición del gorro
 }
 
-const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle, type, screen = "inventory" }) => {
+const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle, type, screen }) => {
   const rotation = useSharedValue(0);
   const [actualLanguage, setActualLanguage] = useState<string>("");
   const [selectedClothes, setSelectedClothes] = useState<string[]>([]);
@@ -72,6 +72,8 @@ const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle, type, screen = "i
 
   useEffect(() => {
 
+    if (!screen) return;
+
     const fetchClothes = async () => {
       try {
         const storedPetId = await AsyncStorage.getItem("PetId");
@@ -94,7 +96,7 @@ const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle, type, screen = "i
     };
 
     fetchClothes();
-  }, []);
+  }, [screen]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${rotation.value}deg` }],
@@ -105,15 +107,13 @@ const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle, type, screen = "i
       {/* Contenedor animado que incluye la bola y todos los accesorios */}
       <Animated.View style={[styles.petContainer, animatedStyle]}>
         {/* Renderizar cada accesorio en la posición correcta */}
-        {selectedClothes.map((accessory) => {
-          const accessoryImage = ClothesImageMap[accessory]; // Default
-          const accessoryStyle =
-            ClothesPositionByScreenMap[screen]?.[accessory];
+        {screen &&
+          selectedClothes.map((accessory) => {
+            const accessoryImage = ClothesImageMap[accessory];
+            const accessoryStyle = ClothesPositionByScreenMap[screen]?.[accessory];
 
-          return (
-            <Image key={accessory} source={accessoryImage} style={[styles.accessory, accessoryStyle]} />
-          );
-        })}
+            return <Image key={accessory} source={accessoryImage} style={[styles.accessory, accessoryStyle]} />;
+          })}
 
         {/* Imagen animada de la bola */}
         <Animated.Image

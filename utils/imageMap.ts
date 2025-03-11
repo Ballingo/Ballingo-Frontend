@@ -25,6 +25,10 @@ export const ClothesImageMap: { [key: string]: any } = {
   "fireman_hat": require("@/assets/inventory/wardrobe/hats/fireman_hat_v2.png"),
   "instructor_hat": require("@/assets/inventory/wardrobe/hats/instructor_hat.png"),
   "winter_hat": require("@/assets/inventory/wardrobe/hats/winter_hat.png"),
+  "basic_black": require("@/assets/inventory/wardrobe/shoes/basic_black.png"),
+  "basic_green": require("@/assets/inventory/wardrobe/shoes/basic_green.png"),
+  "basic_red": require("@/assets/inventory/wardrobe/shoes/basic_red.png"),
+  "basic_orange": require("@/assets/inventory/wardrobe/shoes/basic_orange.png"),
 };
 
 export const GameObjectImageMap: { [key: string]: any } = {
