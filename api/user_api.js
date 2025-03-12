@@ -85,6 +85,21 @@ export const setLastLogin = async (userId, token) => {
     }
 };
 
+export const deleteUser = async (userId, token) => {
+    try{
+        const res = await api.delete(`delete/${userId}`,
+            {
+                headers: {'Authorization': `Token ${token}`}
+            }
+        );
+        return {data: res.data, status: res.status};
+    }
+    catch(err){
+        const error = err.response
+        return {data: error.data, status: error.status};
+    }
+};
+
 export const handleErrorUserSignUp = (error) => {
     if (error.emailError && error.usernameError){
         alert("Username and Email already exists");
