@@ -213,7 +213,7 @@ export default function RegisterScreen() {
           style={styles.title}
           entering={FadeInUp.delay(800).duration(800)}
         >
-          Sign In
+          Sign Up
         </Animated.Text>
 
         <Animated.View entering={FadeInUp.delay(800).duration(800)}>

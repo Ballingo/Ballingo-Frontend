@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Button, ImageBackground } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Button,
+  ImageBackground,
+  TouchableOpacity,
+} from "react-native";
 import { useRouter } from "expo-router";
 import Pet from "@/components/pet/Pet";
 import HungerBar from "@/components/hunger-bar/HungerBar";
@@ -11,6 +18,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { deleteUser } from "../api/user_api";
+import {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 
 interface Clothes {
   id: number;
@@ -41,10 +53,17 @@ export default function ProfileScreen() {
     }, [])
   );
 
+  const scale = useSharedValue(1);
   const [hatsCount, setHatsCount] = useState(0);
   const [accessoriesCount, setAccessoriesCount] = useState(0);
   const [totalHats, setTotalHats] = useState(0);
   const [totalAccessories, setTotalAccessories] = useState(0);
+
+  const animatedButtonStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: scale.value }],
+    };
+  });
 
   useEffect(() => {
     const getUserData = async () => {
@@ -116,8 +135,7 @@ export default function ProfileScreen() {
       if (status === 204) {
         console.log("Usuario eliminado correctamente");
         router.navigate("/");
-      }
-      else {
+      } else {
         console.error("Error al eliminar el usuario:", data);
       }
     }
@@ -156,6 +174,30 @@ export default function ProfileScreen() {
           </Text>
         </View>
 
+        <View style={styles.buttonPanel}>
+          <TouchableOpacity
+            style={[styles.button, styles.deleteButton, animatedButtonStyle]}
+            onPress={() => {
+              scale.value = withSpring(0.9, { damping: 2 }, () => {
+                scale.value = withSpring(1);
+              });
+            }}
+          >
+            <Text style={styles.buttonText}>Delete account</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.button, styles.logoutButton, animatedButtonStyle]}
+            onPress={() => {
+              scale.value = withSpring(0.9, { damping: 2 }, () => {
+                scale.value = withSpring(1);
+              });
+            }}
+          >
+            <Text style={styles.buttonText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.footer}>
           <Button title="Volver a Inicio" onPress={() => router.back()} />
         </View>
@@ -189,6 +231,24 @@ const styles = StyleSheet.create({
   hungerBarContainer: {
     width: "95%",
   },
+  button: {
+    padding: 10,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  logoutButton: {
+    backgroundColor: "#5D11D4",
+  },
+  deleteButton: {
+    backgroundColor: "#FF3232",
+  },
+  buttonPanel: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "75%",
+    marginVertical: 50,
+  },
   inventory: {
     marginTop: 20,
     padding: 20,
@@ -211,4 +271,5 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     marginBottom: 50,
   },
+  buttonText: { color: "#F9F7F7", fontWeight: "bold" },
 });

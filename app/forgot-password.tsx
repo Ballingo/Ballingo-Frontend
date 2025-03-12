@@ -194,6 +194,14 @@ export default function LoginScreen() {
             <Text style={styles.buttonText}>Confirm</Text>
           </TouchableOpacity>
         </Animated.View>
+        <Animated.View entering={FadeIn.delay(2400).duration(800)}>
+          <TouchableOpacity
+            onPress={() => router.push("/login")}
+            style={styles.linkContainer}
+          >
+            <Text style={styles.linkText}>Back to login</Text>
+          </TouchableOpacity>
+        </Animated.View>
       </View>
     </ImageBackground>
   );
@@ -211,6 +219,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginHorizontal: 2,
   },
+  linkContainer: { marginTop: 10, alignItems: "center" },
+  linkText: { color: "#ba95ff", textDecorationLine: "underline" },
   container: { flex: 1, justifyContent: "center", padding: 20 },
   title: {
     fontSize: 24,
