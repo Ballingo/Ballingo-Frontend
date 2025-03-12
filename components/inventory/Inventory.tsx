@@ -82,7 +82,7 @@ const Inventory: React.FC<InventoryProps> = ({
         try {
           const storedPetId = await AsyncStorage.getItem("PetId");
           if (!storedPetId) {
-            alert("❌ No se encontró el ID de la mascota.");
+            console.error("❌ No se encontró el ID de la mascota.");
             return;
           }
 
@@ -140,7 +140,7 @@ const Inventory: React.FC<InventoryProps> = ({
     if (isClothes) {
       const storedPetId = await AsyncStorage.getItem("PetId");
       if (!storedPetId) {
-        alert("❌ No se encontró el ID de la mascota.");
+        console.error("❌ No se encontró el ID de la mascota.");
         return;
       }
 

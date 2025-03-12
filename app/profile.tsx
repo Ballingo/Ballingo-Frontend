@@ -10,6 +10,7 @@ import { getAllClothes } from "../api/clothes_api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
+import { deleteUser } from "../api/user_api";
 
 interface Clothes {
   id: number;
@@ -104,6 +105,23 @@ export default function ProfileScreen() {
 
     getUserData();
   }, []);
+
+  const handleDeleteUser = async () => {
+    const userId = await AsyncStorage.getItem("UserId");
+    const token = await AsyncStorage.getItem("Token");
+
+    if (userId && token) {
+      const { data, status } = await deleteUser(userId, token);
+
+      if (status === 204) {
+        console.log("Usuario eliminado correctamente");
+        router.navigate("/");
+      }
+      else {
+        console.error("Error al eliminar el usuario:", data);
+      }
+    }
+  };
 
   return (
     <ImageBackground

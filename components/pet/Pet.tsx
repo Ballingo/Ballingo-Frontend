@@ -78,7 +78,7 @@ const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle, type, screen }) =
       try {
         const storedPetId = await AsyncStorage.getItem("PetId");
         if (!storedPetId) {
-          alert("❌ No se encontró el ID de la mascota.");
+          console.error("❌ No se encontró el ID de la mascota.");
           return;
         }
 
