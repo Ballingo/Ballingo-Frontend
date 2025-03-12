@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -105,7 +105,7 @@ export default function RegisterScreen() {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Animación de entrada del Pet
     petPositionX.value = withTiming(0, {
       duration: 10000,
@@ -116,6 +116,15 @@ export default function RegisterScreen() {
       -1,
       true
     );
+
+    const checkForToken = async () => {
+      const token = await AsyncStorage.getItem("Token");
+      if (token) {
+        router.replace("/(tabs)");
+      }
+    };
+
+    checkForToken();
   }, []);
 
   return (

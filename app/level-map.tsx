@@ -17,6 +17,7 @@ import { getUserLevels } from "@/api/player_progress_api"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getQuestionnairesByLanguage } from "@/api/questionnaire_api";
 import LoadingScreen from "@/components/loading-screen/LoadingScreen";
+import { checkForToken } from "@/utils/functions";
 
 
 // Disposición geométrica en zig-zag (reducido a 5 niveles)
@@ -54,6 +55,8 @@ export default function LevelMap() {
     setTimeout(() => {
       scrollViewRef.current?.scrollTo({ y: levelPositions[0].y, animated: true });
     }, 1000);
+
+    checkForToken(router);
   }, []);
 
 

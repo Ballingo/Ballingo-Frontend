@@ -17,7 +17,7 @@ import { getAllClothes } from "../api/clothes_api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
-import { deleteUser } from "../api/user_api";
+import { deleteUser, logoutUser } from "../api/user_api";
 import {
   useAnimatedStyle,
   useSharedValue,
@@ -141,6 +141,22 @@ export default function ProfileScreen() {
     }
   };
 
+  const handleLogOut = async () => {
+    const token = await AsyncStorage.getItem("Token");
+
+    if (token) {
+      const { data, status } = await logoutUser(token);
+
+      if (status === 200) {
+        await AsyncStorage.clear();
+        console.log("User logged out");
+        router.navigate("/");
+      } else {
+        console.error("Error logging out:", data);
+      }
+    }
+  };
+
   return (
     <ImageBackground
       source={require("../assets/backgrounds/cyan.png")}
@@ -180,6 +196,7 @@ export default function ProfileScreen() {
             onPress={() => {
               scale.value = withSpring(0.9, { damping: 2 }, () => {
                 scale.value = withSpring(1);
+                handleDeleteUser();
               });
             }}
           >
@@ -191,6 +208,7 @@ export default function ProfileScreen() {
             onPress={() => {
               scale.value = withSpring(0.9, { damping: 2 }, () => {
                 scale.value = withSpring(1);
+                handleLogOut();
               });
             }}
           >

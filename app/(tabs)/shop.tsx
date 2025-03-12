@@ -9,6 +9,8 @@ import { getAllMoneyPacks, getAllClothesPacks, getShopItemById } from "@/api/sho
 import { setPlayerCoins, setPlayerLiveCounter, setPlayerWardrobe } from "@/api/inventory_api";
 import { GameObjectImageMap, ClothesImageMap } from "@/utils/imageMap";
 import { useFocusEffect } from "@react-navigation/native";
+import { useRouter } from "expo-router";
+import { checkForToken } from "@/utils/functions";
 
 interface Products {
   id: string;
@@ -27,6 +29,7 @@ export default function Shop() {
   const [moneyItems, setMoneyItems] = useState<Products[]>([]);
   const [gameItems, setGameItems] = useState<Products[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
+  const router = useRouter();
 
   useFocusEffect(
     useCallback(() => {
@@ -41,6 +44,7 @@ export default function Shop() {
   };
 
   useEffect(() => {
+
     const fetchMoneyItems = async () => {
       const {data, status} = await getAllMoneyPacks();
 
@@ -65,6 +69,7 @@ export default function Shop() {
 
     };
 
+    checkForToken(router);
     fetchMoneyItems();
     fetchGameItems();
 

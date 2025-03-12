@@ -35,6 +35,21 @@ export const loginUser = async (data) => {
     }
 };
 
+export const logoutUser = async (token) => {
+    try{
+        const res = await api.post('logout', {},
+            {
+                headers: {'Authorization': `Token ${token}`}
+            }
+        );
+        return {data: res.data, status: res.status};
+    }
+    catch(err){
+        const error = err.response
+        return {data: error.data, status: error.status};
+    }
+};
+
 export const getUserById = async (userId, token) => {
     try{
         const res = await api.get(`get/${userId}`, 

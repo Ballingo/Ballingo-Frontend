@@ -11,11 +11,22 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { increaseHunger } from "@/api/pet_api";
 
+interface PlayerData {
+  userId: string | null;
+  token: string | null;
+  playerId: string | null;
+  petId: string | null;
+}
+
 export default function Index() {
   const [foodList, setFoodList] = useState([]);
-  const [playerId, setPlayerId] = useState<number | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [petId, setPetId] = useState<string | null>(null);
+  const [playerData, setPlayerData] = useState<PlayerData>({
+    userId: "",
+    token: "",
+    playerId: "",
+    petId: ""
+  });
 
 
   useFocusEffect(
@@ -26,17 +37,32 @@ export default function Index() {
     }, [])
   );
 
-  const petCheckHunger = async () => {
-    const userId = await AsyncStorage.getItem("UserId");
-    const token = await AsyncStorage.getItem("Token");
-    
-    const playerId = await AsyncStorage.getItem("PlayerId");
+  useEffect(() => {
+    const fetchPlayerData = async () => {
+      const uId = await AsyncStorage.getItem("UserId");
+      const token = await AsyncStorage.getItem("Token");
+      const pId = await AsyncStorage.getItem("PlayerId");
+      const petId = await AsyncStorage.getItem("PetId");
 
-    const storedPetId = await AsyncStorage.getItem("PetId");
-    setPetId(storedPetId === "undefined" ? null : storedPetId);
-      
-    if (userId && playerId && token && storedPetId) {
-      const response = await increaseHunger(parseInt(userId), parseInt(playerId), parseInt(storedPetId), token);
+      if (uId && token && pId) {
+        setPlayerData({
+          userId: uId,
+          token: token,
+          playerId: pId,
+          petId: petId
+        });
+      }
+      else{
+        console.error("❌ Error getting player data from AsyncStorage");
+      }
+    };
+
+    fetchPlayerData();
+  }, []);
+
+  const petCheckHunger = async () => {
+    if (playerData.userId && playerData.playerId && playerData.token && playerData.petId) {
+      const response = await increaseHunger(parseInt(playerData.userId), parseInt(playerData.playerId), parseInt(playerData.petId), playerData.token);
       if (response.status === 200) {
         console.log("Hunger increased");
         setRefreshKey((prev) => prev + 1);
@@ -47,11 +73,8 @@ export default function Index() {
   useEffect(() => {
     const fetchPlayerIdAndFood = async () => {
       try {
-        const storedPlayerId = await AsyncStorage.getItem("PlayerId");
-
-        if (storedPlayerId) {
-          const parsedPlayerId = parseInt(storedPlayerId);
-          setPlayerId(parsedPlayerId);
+        if (playerData.playerId) {
+          const parsedPlayerId = parseInt(playerData.playerId);
           console.log("✅ Player ID obtenido:", parsedPlayerId);
 
           fetchFoodList(parsedPlayerId);
@@ -64,7 +87,7 @@ export default function Index() {
     };
 
     fetchPlayerIdAndFood();
-  }, []);
+  }, [playerData]);
 
   const fetchFoodList = async (id: number) => {
     try {
@@ -83,8 +106,8 @@ export default function Index() {
   };
 
   const refreshFoodList = () => {
-    if (playerId) {
-      fetchFoodList(playerId);
+    if (playerData.playerId) {
+      fetchFoodList(parseInt(playerData.playerId));
       setRefreshKey((prev) => prev + 1);
     }
   };
@@ -104,7 +127,7 @@ export default function Index() {
       <View style={{ alignItems: "center", flex: 1, justifyContent: "center" }}>
         <Pet screen="index"/>
         
-        {petId && petId !== "undefined" && <HungerBar width={60} />}
+        {playerData.petId && playerData.petId !== "undefined" && <HungerBar width={60} />}
 
       </View>
 

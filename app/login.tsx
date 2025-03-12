@@ -63,7 +63,6 @@ export default function LoginScreen() {
 
       if (status === 200) {
         alert(`Bienvenido de nuevo, ${username}`);
-        router.replace("/(tabs)");
 
         await AsyncStorage.setItem("Token", data.token);
         await AsyncStorage.setItem("UserId", data.user_id);
@@ -83,6 +82,7 @@ export default function LoginScreen() {
           );
 
           console.log("✅ Player data:", response.data);
+          router.replace("/(tabs)");
         } else {
           console.error("❌ Error obteniendo el jugador:", response.data);
         }

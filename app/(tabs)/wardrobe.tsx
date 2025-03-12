@@ -8,6 +8,8 @@ import Pet from "@/components/pet/Pet";
 import Inventory from "@/components/inventory/Inventory";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
+import { useRouter } from "expo-router";
+import { checkForToken } from "@/utils/functions";
 
 interface InventoryItem {
   id: string;
@@ -18,6 +20,7 @@ interface InventoryItem {
 export default function Wardrobe() {
   const [clothes, setClothes] = useState<InventoryItem[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
+  const router = useRouter();
 
   useFocusEffect(
     useCallback(() => {
@@ -60,6 +63,7 @@ export default function Wardrobe() {
       }
     }
 
+    checkForToken(router);
     loadWardrobe();
   }, []);
 
