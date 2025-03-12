@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Button,
   Image,
@@ -21,6 +21,7 @@ import { updatePlayerLanguage } from "@/api/player_api";
 import { setLastLogin } from "@/api/user_api";
 import { setPlayerProgress, getPlayerProgress } from "@/api/player_progress_api";
 import { playerHasPet } from "@/api/pet_api";
+import { checkForToken } from "@/utils/functions";
 
 const { width } = Dimensions.get("window");
 
@@ -48,6 +49,10 @@ export default function Languages() {
       setRefreshKey((prev) => prev + 1);
     }, [])
   );
+
+  useEffect(() => {
+    checkForToken(router);
+  }, []);
 
   const handleSelectLanguage = (index: number) => {
     setCurrentIndex(index);

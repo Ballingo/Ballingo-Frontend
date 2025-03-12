@@ -9,6 +9,8 @@ import { getFoodListByPlayer } from "@/api/foodList_api";
 import { getAllFood } from "@/api/food_api";
 import { FoodImageMap } from "@/utils/imageMap";
 import { useFocusEffect } from "@react-navigation/native";
+import { checkForToken } from "@/utils/functions";
+import { useRouter } from "expo-router";
 
 interface InventoryItem {
   id: string;
@@ -21,6 +23,7 @@ export default function Trade() {
   const [allFood, setAllFood] = useState<InventoryItem[]>([]);
   const [playerId, setPlayerId] = useState<number | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const router = useRouter();
 
   useFocusEffect(
     useCallback(() => {
@@ -49,6 +52,7 @@ export default function Trade() {
       }
     };
 
+    checkForToken(router);
     fetchPlayerIdAndFood();
   }, []);
 
