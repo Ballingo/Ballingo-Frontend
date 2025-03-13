@@ -29,6 +29,10 @@ export default function Wardrobe() {
     }, [])
   );
 
+  const handleRefresh = () => {
+    setRefreshKey((prev) => prev + 1);
+  };
+
   useEffect(() => {
     async function loadWardrobe() {
       try {
@@ -126,6 +130,7 @@ export default function Wardrobe() {
             ]}
             items={clothes}
             isClothes={true}
+            onClothesChange={handleRefresh}
           />
         ) : (
           <Text>Cargando ropa...</Text>

@@ -45,6 +45,7 @@ interface InventoryProps {
   items: InventoryItem[];
   allItems?: InventoryItem[];
   isClothes?: boolean;
+  onClothesChange?: () => void;
 }
 
 const Inventory: React.FC<InventoryProps> = ({
@@ -52,6 +53,7 @@ const Inventory: React.FC<InventoryProps> = ({
   items,
   allItems,
   isClothes = false,
+  onClothesChange,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>(
     categories[0].name
@@ -135,7 +137,7 @@ const Inventory: React.FC<InventoryProps> = ({
   };
 
   // Manejar la selección de ítems
-  const handleSelectItem = async (item: InventoryItem) => {
+const handleSelectItem = async (item: InventoryItem) => {
     setSelectedItem(item);
     if (isClothes) {
       const storedPetId = await AsyncStorage.getItem("PetId");
@@ -159,11 +161,19 @@ const Inventory: React.FC<InventoryProps> = ({
             return updatedSelection;
           });
 
-          //alert("✅ Clothes added to pet.");
+          // Llamar al padre para refrescar la pantalla 🔹
+          if (onClothesChange) {
+            onClothesChange();
+          }
         } else {
           console.log("✅ All clothes removed: ", data);
           alert("✅ Removed all clothes from your pet.");
           setSelectedClothes([]);
+
+          // Llamar al padre para refrescar la pantalla 🔹
+          if (onClothesChange) {
+            onClothesChange();
+          }
         }
       } else {
         console.error("❌ Error:", data);

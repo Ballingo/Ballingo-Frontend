@@ -133,6 +133,7 @@ export default function ProfileScreen() {
       const { data, status } = await deleteUser(userId, token);
 
       if (status === 204) {
+        await AsyncStorage.clear();
         console.log("Usuario eliminado correctamente");
         router.navigate("/");
       } else {
