@@ -115,6 +115,52 @@ export const deleteUser = async (userId, token) => {
     }
 };
 
+export const getRecovCode = async (email) => {
+    try{
+        const res = await api.post(`get-recovery-code`, 
+            {
+                email: email
+            }
+        );
+        return {data: res.data, status: res.status};
+    }
+    catch(err){
+        const error = err.response
+        return {data: error.data, status: error.status};
+    }
+};
+
+export const resetPasswordRequest = async (email) => {
+    try{
+        const res = await api.post('reset-password/request',
+            {
+                email: email
+            }
+        );
+        return {data: res.data, status: res.status};
+    }
+    catch(err){
+        const error = err.response
+        return {data: error.data, status: error.status};
+    }
+};
+
+export const resetPassword = async (email, newPass) => {
+    try{
+        const res = await api.put('confirm-new-password',
+            {
+                email: email,
+                new_password: newPass
+            }
+        );
+        return {data: res.data, status: res.status};
+    }
+    catch(err){
+        const error = err.response
+        return {data: error.data, status: error.status};
+    }
+};
+
 export const handleErrorUserSignUp = (error) => {
     if (error.emailError && error.usernameError){
         alert("Username and Email already exists");
