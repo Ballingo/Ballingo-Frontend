@@ -7,6 +7,7 @@ import {
   StyleSheet,
 } from "react-native";
 import React, { useRef, useEffect } from "react";
+import Toast from "react-native-toast-message";
 
 const icons = {
   shop: require("../../assets/icons/shop.png"),
@@ -73,23 +74,30 @@ const TabsLayout = () => {
   ];
 
   return (
-    <Tabs
-      screenOptions={{ tabBarShowLabel: false, tabBarStyle: styles.navbar }}
-    >
-      {tabData.map((tab, i) => (
-        <Tabs.Screen
-          key={tab.name}
-          name={tab.name}
-          options={{
-            title: tab.name.charAt(0).toUpperCase() + tab.name.slice(1),
-            headerShown: false,
-            tabBarIcon: ({ focused }) => (
-              <TabIcon focused={focused} icon={tab.icon} index={i} />
-            ),
-          }}
-        />
-      ))}
-    </Tabs>
+    <>
+      <Tabs
+        screenOptions={{ tabBarShowLabel: false, tabBarStyle: styles.navbar }}
+      >
+        {tabData.map((tab, i) => (
+          <Tabs.Screen
+            key={tab.name}
+            name={tab.name}
+            options={{
+              title: tab.name.charAt(0).toUpperCase() + tab.name.slice(1),
+              headerShown: false,
+              tabBarIcon: ({ focused }) => (
+                <TabIcon focused={focused} icon={tab.icon} index={i} />
+              ),
+            }}
+          />
+        ))}
+      </Tabs>
+      <Toast 
+        position="bottom"
+        bottomOffset={20}
+        onPress={() => Toast.hide()}
+      />
+    </>
   );
 };
 

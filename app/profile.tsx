@@ -6,6 +6,7 @@ import {
   Button,
   ImageBackground,
   TouchableOpacity,
+  Modal,
 } from "react-native";
 import { useRouter } from "expo-router";
 import Pet from "@/components/pet/Pet";
@@ -23,6 +24,8 @@ import {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
+import Toast from "react-native-toast-message";
+import { checkForToken } from "@/utils/functions";
 
 interface Clothes {
   id: number;
@@ -43,7 +46,7 @@ interface Wardrobe {
 export default function ProfileScreen() {
   const router = useRouter();
   const [username, setUsername] = useState("");
-
+  const [modalVisible, setModalVisible] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
   useFocusEffect(
@@ -152,6 +155,7 @@ export default function ProfileScreen() {
       }
     };
 
+    checkForToken(router);
     getUserData();
   }, []);
 
@@ -161,15 +165,26 @@ export default function ProfileScreen() {
 
     if (userId && token) {
       const { data, status } = await deleteUser(userId, token);
-
       if (status === 204) {
         await AsyncStorage.clear();
-        console.log("Usuario eliminado correctamente");
+        Toast.show({
+          type: "success",
+          text1: `Account deleted`,
+          text2: `We're sorry to see you go 😭`,
+        });
         router.navigate("/");
       } else {
-        console.error("Error al eliminar el usuario:", data);
+        Toast.show({
+          type: "error",
+          text1: `Error deleting account`,
+        });
       }
     }
+  };
+
+  const handleConfirmDelete = async () => {
+    await handleDeleteUser();
+    setModalVisible(false);
   };
 
   const handleLogOut = async () => {
@@ -270,7 +285,7 @@ export default function ProfileScreen() {
             onPress={() => {
               scale.value = withSpring(0.9, { damping: 2 }, () => {
                 scale.value = withSpring(1);
-                handleDeleteUser();
+                setModalVisible(true);
               });
             }}
           >
@@ -289,6 +304,40 @@ export default function ProfileScreen() {
         >
           <Text style={styles.backButtonText}>⬅ Back</Text>
         </TouchableOpacity>
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>Confirm Delete</Text>
+              <Text style={styles.modalMessage}>
+                Are you sure you want to delete your account?
+              </Text>
+              <Text style={styles.modalMessage}>
+                All of your progress will be lost.
+              </Text>
+              <View style={styles.modalButtons}>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.cancelButton]}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text style={styles.modalButtonText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.confirmButton]}
+                  onPress={handleConfirmDelete}
+                >
+                  <Text style={styles.modalButtonText}>Confirm</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
       </View>
     </ImageBackground>
   );
@@ -434,5 +483,51 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     marginBottom: 50,
+  },
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    width: "80%",
+    backgroundColor: "#FFF",
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  modalMessage: {
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  modalButton: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    marginHorizontal: 5,
+  },
+  cancelButton: {
+    backgroundColor: "#4A90E2",
+  },
+  confirmButton: {
+    backgroundColor: "#D0021B",
+  },
+  modalButtonText: {
+    color: "#FFF",
+    fontWeight: "bold",
   },
 });
