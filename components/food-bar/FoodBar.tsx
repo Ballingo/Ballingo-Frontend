@@ -39,7 +39,6 @@ const FoodBar: React.FC<FoodBarProps> = ({ foodList, refreshFoodList  }) => {
   };
 
   const handleReduceQuantity = async (foodItemId: number, item: any) => {
-    console.log("🔹 Reduciendo cantidad de alimento:", foodItemId);
     const response = await reduceFoodQuantity(foodItemId);
   
     if (response.status === 200) {
@@ -69,15 +68,24 @@ const FoodBar: React.FC<FoodBarProps> = ({ foodList, refreshFoodList  }) => {
   const FeedPet = async (foodId: number) => {
     const petId = await AsyncStorage.getItem("PetId");
     const {data, status} = await getFoodById(foodId);
+    const actualLanguage = await AsyncStorage.getItem("ActualLanguage");
 
     if (status === 200){
       if (petId){
-        let isFed = await upDateFoodBar(petId, data.hunger_points);
-        if (isFed){
+        if (actualLanguage === data.language){
+          console.log("🔹 Alimentando a tu mascota con: ", data);
+          let isFed = await upDateFoodBar(petId, data.hunger_points * 3);
+          if (!isFed){
+            return false;
+          }
           return true;
         }
         else{
-          return false;
+          let isFed = await upDateFoodBar(petId, data.hunger_points);
+          if (!isFed){
+            return false;
+          }
+          return true;
         }
       }
       else{

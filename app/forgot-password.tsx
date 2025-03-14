@@ -16,6 +16,7 @@ import Animated, {
 } from "react-native-reanimated";
 import Pet from "@/components/pet/Pet";
 import { resetPasswordRequest, getRecovCode, resetPassword } from "../api/user_api";
+import Toast from "react-native-toast-message";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -43,13 +44,18 @@ export default function LoginScreen() {
     const { data, status } = await resetPasswordRequest(email);
 
     if (status === 200) {
-      console.log("Email sent successfully");
-      console.log("Generated verification code:", data.verificationCode);
+      Toast.show({
+        type: "success",
+        text1: `Email sent`,
+        text2: `Check your inbox for the verification code`,
+      });
       setIsEmailSent(true);
     } else {
-      alert("Email not found");
-      console.error("Error sending email");
-      console.error(data);
+      Toast.show({
+        type: "error",
+        text1: `Error sending email`,
+        text2: `${data.detail}`,
+      });
     }
   };
 
@@ -64,36 +70,64 @@ export default function LoginScreen() {
     if (status === 200) {
       if (verificationCode === data.recovery_code) {
         setIsCodeCorrect(true);
-        console.log("Verification code is correct");
-      } else {
-        alert("Verification code is incorrect");
+        Toast.show({
+          type: "success",
+          text1: `Code verified`,
+          text2: `You can now reset your password`,
+        });
       }
-    } else {
-      alert("Verification code is incorrect");
+      else {
+        Toast.show({
+          type: "error",
+          text1: `Incorrect code`,
+          text2: `Please try again`,
+        });
+      }
+    }
+    else {
+      Toast.show({
+        type: "error",
+        text1: `Error verifying code`,
+        text2: `${data.detail}`,
+      });
     }
   };
 
   const handlePasswordReset = async () => {
     if (!newPassword || !confirmPassword) {
-      alert("Please enter both password fields");
+      Toast.show({
+        type: "error",
+        text1: `Empty fields`,
+        text2: `Please fill in all fields`,
+      });
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      alert("Passwords do not match");
+      Toast.show({
+        type: "error",
+        text1: `Passwords do not match`,
+        text2: `Please enter matching passwords`,
+      });
       return;
     }
 
     const { data, status } = await resetPassword(email, newPassword);
 
     if (status !== 200) {
-      alert("Error resetting password");
-      console.error(data);
+      Toast.show({
+        type: "error",
+        text1: `Error resetting password`,
+        text2: "Could not reset password",
+      });
       return
     }
 
-    console.log("Password reset successfully");
-    alert("Your password has been reset");
+    Toast.show({
+      type: "success",
+      text1: `Password reset`,
+      text2: `You can now login with your new password`,
+    });
 
     router.push("/login");
   };

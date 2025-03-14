@@ -11,6 +11,7 @@ import { GameObjectImageMap, ClothesImageMap } from "@/utils/imageMap";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { checkForToken } from "@/utils/functions";
+import Toast from "react-native-toast-message";
 
 interface Products {
   id: string;
@@ -52,7 +53,10 @@ export default function Shop() {
         setMoneyItems(data);
       }
       else{
-        console.error(`${status} - ${data}`);
+        Toast.show({
+          type: "Error",
+          text1: `Fetching money offerts`,
+        });
       }
 
     };
@@ -64,7 +68,10 @@ export default function Shop() {
         setGameItems(data);
       }
       else{
-        console.error(`${status} - ${data}`);
+        Toast.show({
+          type: "Error",
+          text1: `Fetching clothes offerts`,
+        });
       }
 
     };
@@ -92,7 +99,10 @@ export default function Shop() {
           }
         }
         else{
-          console.error(`${status} - ${data}`);
+          Toast.show({
+            type: "Error",
+            text1: `Error fetching item: ${id}`,
+          });
         }
       }
   
@@ -100,11 +110,17 @@ export default function Shop() {
         const { data, status } = await setPlayerCoins(playerId, coinAmount);
   
         if (status === 200){
-          alert(`You bought ${coinAmount} coins`);
+          Toast.show({
+            type: "success",
+            text1: `You bought ${coinAmount} coins`,
+          });
           setRefreshKey((prev) => prev + 1);
         }
         else {
-          console.error(`${status} - ${data}`);
+          Toast.show({
+            type: "Error",
+            text1: `Error buying coins`,
+          });
         }
       }
 
@@ -112,11 +128,17 @@ export default function Shop() {
         const { data, status } = await setPlayerLiveCounter(playerId, livesAmount);
         
         if (status === 200){
-          alert(`You bought ${livesAmount} lives`);
+          Toast.show({
+            type: "success",
+            text1: `You bought ${livesAmount} lives`,
+          });
           setRefreshKey((prev) => prev + 1);
         }
         else {
-          console.error(`${status} - ${data}`);
+          Toast.show({
+            type: "Error",
+            text1: `Error buying lives`,
+          });
         }
       }
 
@@ -129,13 +151,20 @@ export default function Shop() {
           if (transaction){
             updatePlayerWardrobe(playerId, data.clothes.id, name);
             setRefreshKey((prev) => prev + 1);
+            setIsObjects(true);
           }
           else{
-            alert("You don't have enough coins");
+            Toast.show({
+              type: "Error",
+              text1: `Not enough coins`,
+            });
           }
         }
         else{
-          console.error("PlayerId is missing");
+          Toast.show({
+            type: "Error",
+            text1: `Error buying clothes`,
+          });
         }
       }
     }
@@ -145,10 +174,16 @@ export default function Shop() {
     const { data, status } = await setPlayerWardrobe(playerId, clothesId);
 
     if (status === 200){
-      alert(`You bought ${name}`);
+      Toast.show({
+        type: "success",
+        text1: `You bought ${name}`,
+      });
     }
     else {
-      console.error(`${status} - ${data}`);
+      Toast.show({
+        type: "Error",
+        text1: `Error transfering clothes to wardrobe`,
+      });
     }
 
   };
@@ -161,7 +196,6 @@ export default function Shop() {
       return true;
     }
     else {
-      console.error(`${status} - ${data}`);
       return false;
     }
   };
