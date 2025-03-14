@@ -117,9 +117,16 @@ const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle, type, screen }) =
 
         {/* Imagen animada de la bola */}
         <Animated.Image
-          source={ isDead === false ? PetSkinImageMap[actualLanguage] : PetSkinImageMap["ded"] }
+          source={ 
+            isDead 
+              ? PetSkinImageMap["ded"] 
+              : (!screen || selectedClothes.length === 0) // Si no hay screen o no hay accesorios, usa la variante _eyes
+                ? PetSkinImageMap[`${actualLanguage}_eyes`] || PetSkinImageMap[""] // Usa el fallback si no existe
+                : PetSkinImageMap[actualLanguage] 
+          }
           style={[styles.image, animatedStyle, imageStyle]}
         />
+
       </Animated.View>
 
     </View>

@@ -29,6 +29,9 @@ export const ClothesImageMap: { [key: string]: any } = {
   "basic_green": require("@/assets/inventory/wardrobe/shoes/basic_green.png"),
   "basic_red": require("@/assets/inventory/wardrobe/shoes/basic_red.png"),
   "basic_orange": require("@/assets/inventory/wardrobe/shoes/basic_orange.png"),
+  "general_eyes": require("@/assets/inventory/wardrobe/eyes/general_eyes.png"),
+  "ja_eyes": require("@/assets/inventory/wardrobe/eyes/ja_eyes.png"),
+  "ar_eyes": require("@/assets/inventory/wardrobe/eyes/ar_eyes.png"),
 };
 
 export const GameObjectImageMap: { [key: string]: any } = {
@@ -49,5 +52,10 @@ export const PetSkinImageMap: { [key: string]: any } = {
   "ar": require("@/assets/pets/ar.png"),
   "ded": require("@/assets/pets/ded.png"),
   "" : require("@/assets/pets/NA.png"),
+  "en_eyes": require("@/assets/pets/en_eyes.png"),
+  "es_eyes": require("@/assets/pets/es_eyes.png"),
+  "de_eyes": require("@/assets/pets/de_eyes.png"),
+  "ja_eyes": require("@/assets/pets/ja_eyes.png"),
+  "ar_eyes": require("@/assets/pets/ar_eyes.png"),
 };  
 

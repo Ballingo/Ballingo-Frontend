@@ -58,6 +58,10 @@ export default function ProfileScreen() {
   const [accessoriesCount, setAccessoriesCount] = useState(0);
   const [totalHats, setTotalHats] = useState(0);
   const [totalAccessories, setTotalAccessories] = useState(0);
+  const [totalEyes, setTotalEyes] = useState(0);
+  const [totalShoes, setTotalShoes] = useState(0);
+  const [eyesCount, setEyesCount] = useState(0);
+  const [shoesCount, setShoesCount] = useState(0);
 
   const animatedButtonStyle = useAnimatedStyle(() => {
     return {
@@ -98,6 +102,14 @@ export default function ProfileScreen() {
             (item) => item.type === "accesories"
           ).length;
 
+          const totalEyesCount = allClothes.filter(
+            (item) => item.type === "eyes"
+          ).length;
+
+          const totalShoesCount = allClothes.filter(
+            (item) => item.type === "shoes"
+          ).length;
+
           const userHatsCount = wardrobeItems.filter((item) => {
             const clothesItem = allClothes.find(
               (clothes) => clothes.id === item.id
@@ -112,10 +124,28 @@ export default function ProfileScreen() {
             return clothesItem?.type === "accesories";
           }).length;
 
+          const userEyesCount = wardrobeItems.filter((item) => {
+            const clothesItem = allClothes.find(
+              (clothes) => clothes.id === item.id
+            );
+            return clothesItem?.type === "eyes";
+          }).length;
+
+          const userShoesCount = wardrobeItems.filter((item) => {
+            const clothesItem = allClothes.find(
+              (clothes) => clothes.id === item.id
+            );
+            return clothesItem?.type === "shoes";
+          }).length;
+
           setTotalHats(totalHatsCount);
           setTotalAccessories(totalAccessoriesCount);
           setHatsCount(userHatsCount);
           setAccessoriesCount(userAccessoriesCount);
+          setTotalEyes(totalEyesCount);
+          setEyesCount(userEyesCount);
+          setTotalShoes(totalShoesCount);
+          setShoesCount(userShoesCount);
         }
       } else {
         console.error("Error al obtener el armario:", wardrobeResponse);
@@ -183,27 +213,46 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.inventory}>
-          <Text style={styles.inventoryText}>
-            Hats: {hatsCount}/{totalHats}
-          </Text>
-          <Text style={styles.inventoryText}>
-            Accessories: {accessoriesCount}/{totalAccessories}
-          </Text>
+          <Text style={styles.inventoryTitle}>🎽 Your Wardrobe</Text>
+
+          <View style={styles.inventoryRow}>
+            <View style={styles.inventoryItem}>
+              <Text style={styles.inventoryIcon}>🎩</Text>
+              <Text style={styles.inventoryText}>
+                {hatsCount}/{totalHats}
+              </Text>
+              <Text style={styles.inventoryLabel}>Hats</Text>
+            </View>
+
+            <View style={styles.inventoryItem}>
+              <Text style={styles.inventoryIcon}>👀</Text>
+              <Text style={styles.inventoryText}>
+                {eyesCount}/{totalEyes}
+              </Text>
+              <Text style={styles.inventoryLabel}>Eyes</Text>
+            </View>
+          </View>
+
+          <View style={styles.inventoryRow}>
+            <View style={styles.inventoryItem}>
+              <Text style={styles.inventoryIcon}>👟</Text>
+              <Text style={styles.inventoryText}>
+                {shoesCount}/{totalShoes}
+              </Text>
+              <Text style={styles.inventoryLabel}>Shoes</Text>
+            </View>
+
+            <View style={styles.inventoryItem}>
+              <Text style={styles.inventoryIcon}>🕶</Text>
+              <Text style={styles.inventoryText}>
+                {accessoriesCount}/{totalAccessories}
+              </Text>
+              <Text style={styles.inventoryLabel}>Accessories</Text>
+            </View>
+          </View>
         </View>
 
-        <View style={styles.buttonPanel}>
-          <TouchableOpacity
-            style={[styles.button, styles.deleteButton, animatedButtonStyle]}
-            onPress={() => {
-              scale.value = withSpring(0.9, { damping: 2 }, () => {
-                scale.value = withSpring(1);
-                handleDeleteUser();
-              });
-            }}
-          >
-            <Text style={styles.buttonText}>Delete account</Text>
-          </TouchableOpacity>
-
+        <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[styles.button, styles.logoutButton, animatedButtonStyle]}
             onPress={() => {
@@ -213,13 +262,33 @@ export default function ProfileScreen() {
               });
             }}
           >
-            <Text style={styles.buttonText}>Logout</Text>
+            <Text style={styles.buttonText}>🚪 Logout</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.button, styles.deleteButton, animatedButtonStyle]}
+            onPress={() => {
+              scale.value = withSpring(0.9, { damping: 2 }, () => {
+                scale.value = withSpring(1);
+                handleDeleteUser();
+              });
+            }}
+          >
+            <Text style={styles.buttonText}>🗑 Delete Account</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.footer}>
-          <Button title="Volver a Inicio" onPress={() => router.back()} />
-        </View>
+        <TouchableOpacity
+          style={[styles.backButton, animatedButtonStyle]}
+          onPress={() => {
+            scale.value = withSpring(0.9, { damping: 2 }, () => {
+              scale.value = withSpring(1);
+              router.back();
+            });
+          }}
+        >
+          <Text style={styles.backButtonText}>⬅ Back</Text>
+        </TouchableOpacity>
       </View>
     </ImageBackground>
   );
@@ -250,45 +319,120 @@ const styles = StyleSheet.create({
   hungerBarContainer: {
     width: "95%",
   },
-  button: {
-    padding: 10,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  logoutButton: {
-    backgroundColor: "#5D11D4",
-  },
-  deleteButton: {
-    backgroundColor: "#FF3232",
-  },
-  buttonPanel: {
+
+
+
+  buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    width: "75%",
-    marginVertical: 50,
+    width: "85%",
+    marginTop: 30,
   },
+  button: {
+    flex: 1,
+    paddingVertical: 12,
+    marginHorizontal: 5,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+  },
+  logoutButton: {
+    backgroundColor: "#4A90E2", // Azul brillante
+  },
+  deleteButton: {
+    backgroundColor: "#D0021B", // Rojo intenso
+  },
+  buttonText: {
+    color: "#FFF",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+
+
+  backButton: {
+    marginTop: 30,
+    paddingVertical: 14,
+    width: "84%", // 🔹 Ahora es más ancho
+    backgroundColor: "rgba(0, 174, 255, 0.9)", // 🔹 Más sólido, menos transparente
+    borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2, // 🔹 Borde más grueso para resaltar
+    borderColor: "#00D4FF", // 🔹 Azul brillante
+    shadowColor: "#000",
+    shadowOffset: { width: 2, height: 3 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+  },
+  backButtonText: {
+    color: "#FFF",
+    fontWeight: "bold",
+    fontSize: 16, // 🔹 Texto más grande
+    textTransform: "uppercase",
+    letterSpacing: 1.2, // 🔹 Mejor separación de letras
+  },
+  
+
+
   inventory: {
     marginTop: 20,
     padding: 20,
-    backgroundColor: "#7DEFFF",
+    backgroundColor: "rgba(0, 174, 255, 0.85)", // Azul semi-transparente
     borderRadius: 15,
-    width: "80%",
+    width: "85%",
     alignItems: "center",
-    borderWidth: 2,
-    borderColor: "#7DB4FF",
+    borderWidth: 1,
+    borderColor: "#FFF",
     elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+  },
+  inventoryTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#FFF",
+    marginBottom: 10,
+    textAlign: "center",
+    textTransform: "uppercase",
+  },
+  inventoryRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginVertical: 5,
+  },
+  inventoryItem: {
+    flex: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.2)", // Fondo semi-transparente
+    borderRadius: 10,
+    paddingVertical: 12,
+    alignItems: "center",
+    marginHorizontal: 5,
+  },
+  inventoryIcon: {
+    fontSize: 30, // Tamaño más grande para el ícono
+    marginBottom: 5,
   },
   inventoryText: {
     fontSize: 18,
+    fontWeight: "bold",
     color: "#FFF",
-    fontWeight: "600",
-    marginVertical: 5,
+  },
+  inventoryLabel: {
+    fontSize: 14,
+    color: "#D0F0FF",
+    marginTop: 5,
   },
   footer: {
     flex: 1,
     justifyContent: "flex-end",
     marginBottom: 50,
   },
-  buttonText: { color: "#F9F7F7", fontWeight: "bold" },
 });
