@@ -64,7 +64,7 @@ const ProfileIcon: React.FC<ProfileIconProps> = ({
       >
         <Image
           source={
-            isDead === false ? PetSkinImageMap[actualLanguage] : PetSkinImageMap["ded"]
+            isDead === false ? PetSkinImageMap[`${actualLanguage}_eyes`] : PetSkinImageMap["ded"]
           }
           style={[
             styles.image,

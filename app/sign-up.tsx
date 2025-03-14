@@ -26,6 +26,7 @@ import Animated, {
   interpolate,
 } from "react-native-reanimated";
 import { useFocusEffect } from "@react-navigation/native";
+import { setPlayerWardrobe } from "@/api/inventory_api";
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -90,8 +91,21 @@ export default function RegisterScreen() {
         const response = await getPlayerByUserId(data.user_id);
 
         if (response.status === 200) {
-          await AsyncStorage.setItem("PlayerId", response.data.id);
+          const playerId = response.data.id;
+          await AsyncStorage.setItem("PlayerId", playerId);
           console.log("✅ Player data:", response.data);
+
+          const clothesIds = [33, 34, 35];
+
+          for (const clothesId of clothesIds) {
+            const wardrobeResponse = await setPlayerWardrobe(playerId, clothesId);
+            if (wardrobeResponse.status === 200) {
+              console.log(`✅ Ropa con ID ${clothesId} asignada correctamente.`);
+            } else {
+              console.error(`❌ Error al asignar ropa con ID ${clothesId}:`, wardrobeResponse.data);
+            }
+          }
+
         } else {
           console.error("❌ Error obteniendo el jugador:", response.data);
         }

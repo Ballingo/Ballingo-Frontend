@@ -292,7 +292,7 @@ const handleSelectItem = async (item: InventoryItem) => {
           id: trade.id.toString(),
           itemName: trade.in_food.name,
           status: trade.isActive ? "Pendiente" : "Completado",
-          userProfile: PetSkinImageMap[trade.player.actualLanguage],
+          userProfile: PetSkinImageMap[`${trade.player.actualLanguage}_eyes`],
           requestedImage: FoodImageMap[trade.out_food.image_path],
           offeredImage: FoodImageMap[trade.in_food.image_path],
         }));

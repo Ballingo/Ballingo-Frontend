@@ -15,6 +15,9 @@ export const ClothesPositionByScreenMap: Record<string, Record<string, { top: nu
       funny_glasses2: { top: 30, left: 60, width: 140, height: 140 },
       heart_glasses: { top: 40, left: 25, width: 210, height: 210 },
       snorkel_glasses: { top: 10, left: 40, width: 180, height: 180  },
+      general_eyes: { top: 30, left: 60, width: 140, height: 140 },
+      ja_eyes: { top: 10, left: 60, width: 140, height: 140 },
+      ar_eyes: { top: 20, left: 60, width: 140, height: 140 },
 
       basic_orange: { top: 100, left: 30, width: 200, height: 200 },
       basic_black: { top: 100, left: 30, width: 200, height: 200 },
@@ -39,11 +42,15 @@ export const ClothesPositionByScreenMap: Record<string, Record<string, { top: nu
       funny_glasses2: { top: 30, left: 45, width: 110, height: 110 },
       heart_glasses: { top: 40, left: 25, width: 150, height: 150 },
       snorkel_glasses: { top: 20, left: 35, width: 130, height: 130  },
+      general_eyes: { top: 30, left: 45, width: 110, height: 110 },
+      ja_eyes: { top: 0, left: 45, width: 110, height: 110 },
+      ar_eyes: { top: 20, left: 45, width: 110, height: 110 },
 
       basic_orange: { top: 90, left: 30, width: 150, height: 150 },
       basic_black: { top: 90, left: 30, width: 150, height: 150 },
       basic_green: { top: 90, left: 30, width: 150, height: 150 },
       basic_red: { top: 90, left: 30, width: 150, height: 150 },
+
 
     },
   };
