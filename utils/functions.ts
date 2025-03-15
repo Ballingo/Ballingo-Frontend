@@ -31,7 +31,7 @@ export const getRandomFoodId = async (): Promise<any> => {
 export const checkForToken = async (router: Router) => {
     const token = await AsyncStorage.getItem("Token");
 
-    if (!token) {
+    if (!token || token === "") {
       router.replace("/sign-up");
     }
   };

@@ -8,63 +8,50 @@ import {
   ImageBackground,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { createUser, handleErrorUserSignUp } from "../api/user_api";
-import { getPlayerByUserId } from "../api/player_api";
+import { createUser, confirmUser } from "../api/user_api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Pet from "@/components/pet/Pet";
 import Animated, {
-  withDelay,
-  FadeIn,
   FadeInUp,
   useSharedValue,
   withSpring,
   useAnimatedStyle,
-  withRepeat,
-  withTiming,
-  FadeInDown,
-  Easing,
-  interpolate,
 } from "react-native-reanimated";
 import { useFocusEffect } from "@react-navigation/native";
+import { getPlayerByUserId } from "@/api/player_api";
 import { setPlayerWardrobe } from "@/api/inventory_api";
+import Toast from "react-native-toast-message";
 
 export default function RegisterScreen() {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [verificationCode, setVerificationCode] = useState("");
   const [isEmailValid, setIsEmailValid] = useState(true);
+  const [isCodeSent, setIsCodeSent] = useState(false); // 🔹 Estado para cambiar la UI
+
+  const scale = useSharedValue(1);
+
+  const animatedButtonStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
   useFocusEffect(
     useCallback(() => {
       console.log("Reloading the screen...");
-      setRefreshKey((prev) => prev + 1);
     }, [])
   );
 
-  const scale = useSharedValue(1);
-  const petPositionX = useSharedValue(-100); // Inicia fuera de la pantalla a la izquierda
-  const petPositionY = useSharedValue(0);
-
-  const letters = "BALLINGO".split("");
-
-  const letterColorValues = letters.map(() => useSharedValue(0));
-
-  const animatedButtonStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ scale: scale.value }],
+  useEffect(() => {
+    const checkForToken = async () => {
+      const token = await AsyncStorage.getItem("Token");
+      if (token) {
+        router.replace("/(tabs)");
+      }
     };
-  });
-
-  const petAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { translateX: petPositionX.value },
-        { translateY: petPositionY.value },
-      ],
-    };
-  });
+    checkForToken();
+  }, []);
 
   const validateEmail = (email: string) => {
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -72,236 +59,187 @@ export default function RegisterScreen() {
   };
 
   const handleRegister = async () => {
-    if (username && email && password) {
-      if (!validateEmail(email)) {
-        setIsEmailValid(false);
-        return;
-      } else {
-        setIsEmailValid(true);
-      }
+    if (!username || !email || !password) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Please fill all the fields.",
+      });
+      return;
+    }
 
-      const newUser = { username, email, password };
-      const { data, status } = await createUser(newUser);
+    if (!validateEmail(email)) {
+      setIsEmailValid(false);
+      return;
+    }
 
-      if (status === 201) {
-        alert(`Usuario ${username} registrado con éxito`);
-        await AsyncStorage.setItem("Token", data.token);
-        await AsyncStorage.setItem("UserId", data.user_id);
+    setIsEmailValid(true);
 
-        const response = await getPlayerByUserId(data.user_id);
+    const newUser = { username, email, password };
+    const { data, status } = await createUser(newUser);
 
-        if (response.status === 200) {
-          const playerId = response.data.id;
-          await AsyncStorage.setItem("PlayerId", playerId);
-          console.log("✅ Player data:", response.data);
-
-          const clothesIds = [33, 34, 35];
-
-          for (const clothesId of clothesIds) {
-            const wardrobeResponse = await setPlayerWardrobe(playerId, clothesId);
-            if (wardrobeResponse.status === 200) {
-              console.log(`✅ Ropa con ID ${clothesId} asignada correctamente.`);
-            } else {
-              console.error(`❌ Error al asignar ropa con ID ${clothesId}:`, wardrobeResponse.data);
-            }
-          }
-
-        } else {
-          console.error("❌ Error obteniendo el jugador:", response.data);
-        }
-
-        router.replace("/(tabs)");
-      } else {
-        handleErrorUserSignUp(data);
-      }
-    } else {
-      alert("Por favor, complete todos los campos.");
+    if (status === 201) {
+      Toast.show({
+        type: "success",
+        text1: "Vrification code sent",
+        text2: `Verification code sent to ${email}.`,
+      });
+      setIsCodeSent(true);
+    }
+    else {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Something went wrong. Please try again later.",
+      });
     }
   };
 
-  useEffect(() => {
-    // Animación de entrada del Pet
-    petPositionX.value = withTiming(0, {
-      duration: 10000,
-      easing: Easing.out(Easing.exp),
-    });
-    petPositionY.value = withRepeat(
-      withSpring(-20, { damping: 2, stiffness: 50 }),
-      -1,
-      true
-    );
+  const handleConfirmUser = async () => {
+    if (!verificationCode) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Please enter the verification code.",
+      });
+      return;
+    }
 
-    const checkForToken = async () => {
-      const token = await AsyncStorage.getItem("Token");
-      if (token) {
-        router.replace("/(tabs)");
+    const { data, status } = await confirmUser(email, verificationCode);
+
+    if (status === 201) {
+      Toast.show({
+        type: "success",
+        text1: "Account created",
+        text2: "Account created successfully.",
+      });
+
+      await AsyncStorage.setItem("Token", data.token);
+      await AsyncStorage.setItem("UserId", data.user_id);
+
+      const response = await getPlayerByUserId(data.user_id);
+      if (response.status === 200) {
+        const playerId = response.data.id;
+        await AsyncStorage.setItem("PlayerId", playerId.toString());
+
+        console.log("✅ Player data:", response.data);
+
+        const clothesIds = [33, 34, 35];
+        for (const clothesId of clothesIds) {
+          const wardrobeResponse = await setPlayerWardrobe(playerId, clothesId);
+          if (wardrobeResponse.status === 200) {
+            console.log(`✅ Ropa con ID ${clothesId} asignada correctamente.`);
+          } else {
+            console.error(`❌ Error al asignar ropa con ID ${clothesId}:`, wardrobeResponse.data);
+          }
+        }
+      } else {
+        console.error("❌ Error obteniendo el jugador:", response.data);
       }
-    };
 
-    checkForToken();
-  }, []);
+      router.replace("/(tabs)");
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Invalid verification code.",
+      });
+      console.error("❌ Error:", data);
+    }
+  };
 
   return (
     <ImageBackground
       source={require("../assets/backgrounds/space.png")}
       style={{ flex: 1, width: "100%", height: "100%" }}
       resizeMode="cover"
-      key={refreshKey}
     >
-      <View style={styles.ballingoContainer}>
-        {letters.map((letter, index) => {
-          const offset = useSharedValue(0);
-
-          offset.value = withRepeat(
-            withTiming(1, {
-              duration: 2000,
-              easing: Easing.inOut(Easing.ease),
-            }),
-            -1,
-            true
-          );
-
-          letterColorValues[index].value = withDelay(
-            index * 400,
-            withRepeat(
-              withTiming(1, { duration: 6000, easing: Easing.linear }),
-              -1,
-              true
-            )
-          );
-
-          const letterStyle = useAnimatedStyle(() => {
-            const translateY = interpolate(offset.value, [0, 0], [0, -20], {
-              extrapolateLeft: "clamp",
-              extrapolateRight: "clamp",
-            });
-
-            const colorProgress = letterColorValues[index].value;
-
-            const goldColors = [
-              { r: 255, g: 225, b: 105 }, // Oro claro
-              { r: 255, g: 195, b: 0 }, // Oro medio
-              { r: 201, g: 152, b: 11 }, // Oro oscuro
-              { r: 255, g: 225, b: 105 }, // Oro claro (para cerrar el ciclo)
-            ];
-
-            const colorIndex = Math.floor(
-              colorProgress * (goldColors.length - 1)
-            );
-            const nextColorIndex = (colorIndex + 1) % goldColors.length;
-            const blend = colorProgress * (goldColors.length - 1) - colorIndex;
-
-            const r = Math.round(
-              goldColors[colorIndex].r +
-                blend *
-                  (goldColors[nextColorIndex].r - goldColors[colorIndex].r)
-            );
-            const g = Math.round(
-              goldColors[colorIndex].g +
-                blend *
-                  (goldColors[nextColorIndex].g - goldColors[colorIndex].g)
-            );
-            const b = Math.round(
-              goldColors[colorIndex].b +
-                blend *
-                  (goldColors[nextColorIndex].b - goldColors[colorIndex].b)
-            );
-
-            return {
-              transform: [{ translateY }],
-              color: `rgb(${r}, ${g}, ${b})`,
-              textShadowColor: `rgb(${r}, ${g}, ${b})`,
-              textShadowOffset: { width: 2, height: 2 },
-              textShadowRadius: 10,
-            };
-          });
-
-          return (
-            <Animated.Text
-              key={index}
-              style={[styles.ballingoLetter, letterStyle]}
-              entering={FadeInDown.delay(300 + index * 200).duration(1000)}
-            >
-              {letter}
-            </Animated.Text>
-          );
-        })}
-      </View>
       <View style={styles.container}>
-        <Animated.View style={petAnimatedStyle}>
+        <Animated.View entering={FadeInUp.delay(800).duration(800)}>
           <Pet imageStyle={{ width: 175, height: 175 }} type={""} />
         </Animated.View>
 
         <Animated.Text
           style={styles.title}
-          entering={FadeInUp.delay(800).duration(800)}
+          entering={FadeInUp.delay(1000).duration(800)}
         >
-          Sign Up
+          {isCodeSent ? "Enter Verification Code" : "Sign Up"}
         </Animated.Text>
 
-        <Animated.View entering={FadeInUp.delay(800).duration(800)}>
-          <TextInput
-            style={styles.input}
-            placeholder="Username"
-            value={username}
-            onChangeText={setUsername}
-          />
-        </Animated.View>
+        {!isCodeSent ? (
+          <>
+            <Animated.View entering={FadeInUp.delay(1200).duration(800)}>
+              <TextInput
+                style={styles.input}
+                placeholder="Username"
+                value={username}
+                onChangeText={setUsername}
+              />
+            </Animated.View>
 
-        <Animated.View entering={FadeInUp.delay(1000).duration(800)}>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                borderColor:
-                  email === ""
-                    ? "#9f6cff"
-                    : isEmailValid
-                    ? "#6cff86"
-                    : "#ff6c6c",
-              },
-            ]}
-            placeholder="Email"
-            value={email}
-            onChangeText={(text) => {
-              setEmail(text);
-              setIsEmailValid(validateEmail(text));
-            }}
-          />
-        </Animated.View>
+            <Animated.View entering={FadeInUp.delay(1400).duration(800)}>
+              <TextInput
+                style={[
+                  styles.input,
+                  { borderColor: email === "" ? "#9f6cff" : isEmailValid ? "#6cff86" : "#ff6c6c" },
+                ]}
+                placeholder="Email"
+                value={email}
+                onChangeText={(text) => {
+                  setEmail(text);
+                  setIsEmailValid(validateEmail(text));
+                }}
+              />
+            </Animated.View>
 
-        <Animated.View entering={FadeInUp.delay(1200).duration(800)}>
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-        </Animated.View>
+            <Animated.View entering={FadeInUp.delay(1600).duration(800)}>
+              <TextInput
+                style={styles.input}
+                placeholder="Password"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+              />
+            </Animated.View>
 
-        <Animated.View entering={FadeInUp.delay(1400).duration(800)}>
-          <TouchableOpacity
-            style={[styles.button, animatedButtonStyle]}
-            onPress={() => {
-              scale.value = withSpring(0.9, { damping: 2 }, () => {
-                scale.value = withSpring(1);
-              });
-              handleRegister();
-            }}
-          >
-            <Text style={styles.buttonText}>Create Account</Text>
-          </TouchableOpacity>
-        </Animated.View>
+            <Animated.View entering={FadeInUp.delay(1800).duration(800)}>
+              <TouchableOpacity
+                style={[styles.button, animatedButtonStyle]}
+                onPress={handleRegister}
+              >
+                <Text style={styles.buttonText}>Create Account</Text>
+              </TouchableOpacity>
+            </Animated.View>
+          </>
+        ) : (
+          <>
+            <Animated.View entering={FadeInUp.delay(1200).duration(800)}>
+              <TextInput
+                style={styles.input}
+                placeholder="Verification Code"
+                value={verificationCode}
+                onChangeText={setVerificationCode}
+                keyboardType="numeric"
+              />
+            </Animated.View>
 
-        <Animated.View entering={FadeIn.delay(2200).duration(800)}>
+            <Animated.View entering={FadeInUp.delay(1400).duration(800)}>
+              <TouchableOpacity
+                style={[styles.button, animatedButtonStyle]}
+                onPress={handleConfirmUser}
+              >
+                <Text style={styles.buttonText}>Verify</Text>
+              </TouchableOpacity>
+            </Animated.View>
+          </>
+        )}
+
+        <Animated.View entering={FadeInUp.delay(2000).duration(800)}>
           <TouchableOpacity
             onPress={() => router.push("/login")}
             style={styles.linkContainer}
           >
-            <Text style={styles.linkText}>
-              Already have an account? Log In here!
-            </Text>
+            <Text style={styles.linkText}>Already have an account? Log In here!</Text>
           </TouchableOpacity>
         </Animated.View>
       </View>
@@ -310,17 +248,6 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  ballingoContainer: {
-    alignSelf: "center",
-    position: "absolute",
-    flexDirection: "row",
-    marginTop: 120,
-  },
-  ballingoLetter: {
-    fontSize: 56,
-    fontWeight: "bold",
-    marginHorizontal: 2,
-  },
   container: { flex: 1, justifyContent: "center", padding: 20 },
   title: {
     fontSize: 24,
@@ -339,8 +266,6 @@ const styles = StyleSheet.create({
     color: "#000",
     backgroundColor: "#F9F7F7",
   },
-  linkContainer: { marginTop: 10, alignItems: "center" },
-  linkText: { color: "#ba95ff", textDecorationLine: "underline" },
   button: {
     padding: 10,
     backgroundColor: "#4e00dd",
@@ -349,4 +274,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   buttonText: { color: "#F9F7F7", fontWeight: "bold" },
+  linkContainer: { marginTop: 10, alignItems: "center" },
+  linkText: { color: "#ba95ff", textDecorationLine: "underline" },
 });

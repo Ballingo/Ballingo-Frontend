@@ -7,9 +7,15 @@ const api = axios.create(
     }
 );
 
+const pending = axios.create(
+    {
+        baseURL: 'http://localhost:8000/api/pending/'
+    }
+);
+
 export const createUser = async (data) => {
     try{
-        const res = await api.post('signup', data);
+        const res = await pending.post('registration', data);
         return {data: res.data, status: res.status};
     }
     catch(err){
@@ -21,6 +27,22 @@ export const createUser = async (data) => {
             },
             status: error.status
         };
+    }
+};
+
+export const confirmUser = async (email, code) => {
+    try{
+        const res = await pending.post('confirm-registration',
+            {
+                email: email,
+                confirmation_code: code
+            }
+        );
+        return {data: res.data, status: res.status};
+    }
+    catch(err){
+        const error = err.response
+        return {data: error.data, status: error.status};
     }
 };
 
