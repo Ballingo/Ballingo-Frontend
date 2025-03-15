@@ -2,6 +2,7 @@ import axios from "axios";
 import { DateTime } from "luxon";
 import { getLastLogin, setLastLogin } from "./user_api"; 
 import { getPlayerLiveCounter, changeLivesAfterDeath } from "./inventory_api";
+import Toast from "react-native-toast-message";
 
 const api = axios.create(
     {
@@ -175,6 +176,11 @@ export const increaseHunger = async (userId, playerId, petId, token) => {
                 if (newStatus.status !== 200) {
                     return { data: "Could not set your pet's status", status: newStatus.status };
                 }
+                Toast.show({
+                    type: 'info',
+                    text1: 'Your pet died! 💀',
+                    text2: 'You can buy more lives in the shop',
+                });
             }
             const newLives = await changeLivesAfterDeath(playerId, lives);
             if (newLives.status !== 200) {
@@ -182,6 +188,11 @@ export const increaseHunger = async (userId, playerId, petId, token) => {
             }
 
             if (lives !== 0){
+                Toast.show({
+                    type: 'info',
+                    text1: 'Your pet lost a life! 💔',
+                    text2: 'You have ' + lives + ' lives left',
+                });
                 const newLifeHubger = await setHungerBar(petId, 100);
                 if (newLifeHubger.status !== 200) {
                     return { data: "Could not set your pet's hunger bar", status: newLifeHubger.status };

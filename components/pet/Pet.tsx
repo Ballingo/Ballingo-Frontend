@@ -104,31 +104,34 @@ const Pet: React.FC<PetProps> = ({ containerStyle, imageStyle, type, screen }) =
 
   return (
     <View style={[styles.container, containerStyle]}>
-      {/* Contenedor animado que incluye la bola y todos los accesorios */}
       <Animated.View style={[styles.petContainer, animatedStyle]}>
-        {/* Renderizar cada accesorio en la posición correcta */}
-        {screen &&
+        {!isDead && screen &&
           selectedClothes.map((accessory) => {
             const accessoryImage = ClothesImageMap[accessory];
             const accessoryStyle = ClothesPositionByScreenMap[screen]?.[accessory];
 
-            return <Image key={accessory} source={accessoryImage} style={[styles.accessory, accessoryStyle]} />;
-          })}
+            return (
+              <Image
+                key={accessory}
+                source={accessoryImage}
+                style={[styles.accessory, accessoryStyle]}
+              />
+            );
+          })
+        }
 
-        {/* Imagen animada de la bola */}
+        {/* Imagen animada del pet o lápida */}
         <Animated.Image
-          source={ 
-            isDead 
-              ? PetSkinImageMap["ded"] 
-              : (!screen || selectedClothes.length === 0) // Si no hay screen o no hay accesorios, usa la variante _eyes
-                ? PetSkinImageMap[`${actualLanguage}_eyes`] || PetSkinImageMap[""] // Usa el fallback si no existe
-                : PetSkinImageMap[actualLanguage] 
+          source={
+            isDead
+              ? PetSkinImageMap["ded"]
+              : (!screen || selectedClothes.length === 0)
+                ? PetSkinImageMap[`${actualLanguage}_eyes`] || PetSkinImageMap[""]
+                : PetSkinImageMap[actualLanguage]
           }
           style={[styles.image, animatedStyle, imageStyle]}
         />
-
       </Animated.View>
-
     </View>
   );
 };
