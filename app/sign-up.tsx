@@ -243,6 +243,11 @@ export default function RegisterScreen() {
           </TouchableOpacity>
         </Animated.View>
       </View>
+      <Toast 
+        position="bottom"
+        bottomOffset={20}
+        onPress={() => Toast.hide()}
+      />
     </ImageBackground>
   );
 }
