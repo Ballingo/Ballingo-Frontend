@@ -278,6 +278,10 @@ const handleSelectItem = async (item: InventoryItem) => {
 
   const fetchActiveTrades = async (itemId?: string) => {
     try {
+
+      const storedPlayerId = await AsyncStorage.getItem("PlayerId");
+      const playerId = storedPlayerId ? parseInt(storedPlayerId, 10) : null;
+      
       console.log("🔹 Buscando trades activos...");
       const response = await getActiveTrades();
 
@@ -285,9 +289,11 @@ const handleSelectItem = async (item: InventoryItem) => {
         console.log("✅ Trades activos obtenidos:", response.data);
 
         const filteredTrades = response.data.filter(
-          (trade: any) => trade.in_food.id.toString() === itemId
+          (trade: any) => 
+            trade.in_food.id.toString() === itemId && trade.player.id !== playerId
         );
 
+        console.log("🔹 Trades filtrados:", response.data);
         const formattedTrades = filteredTrades.map((trade: any) => ({
           id: trade.id.toString(),
           itemName: trade.in_food.name,
@@ -298,6 +304,7 @@ const handleSelectItem = async (item: InventoryItem) => {
         }));
 
         setActiveTrades(formattedTrades);
+        
       } else {
         console.error("❌ Error obteniendo trades activos:", response.data);
       }
