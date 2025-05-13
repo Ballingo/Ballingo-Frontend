@@ -141,7 +141,7 @@ const QuizScreen: React.FC = () => {
   if (!questions || questions.length === 0) {
     return (
       <View style={styles.container}>
-        <Text>Cargando preguntas...</Text>
+        <Text>Loading questions...</Text>
       </View>
     );
   }
@@ -182,7 +182,7 @@ const QuizScreen: React.FC = () => {
       {showResult && currentQuestionIndex < questions.length && (
         <TouchableOpacity style={styles.nextButton} onPress={handleNextQuestion}>
           <Text style={styles.nextButtonText}>
-            {currentQuestionIndex < questions.length - 1 ? "Siguiente" : "Finalizar"}
+            {currentQuestionIndex < questions.length - 1 ? "Next" : "Finish"}
           </Text>
         </TouchableOpacity>
       )}

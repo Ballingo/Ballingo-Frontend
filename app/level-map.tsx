@@ -124,7 +124,7 @@ export default function LevelMap() {
             onPress={() => router.push("/languages")}
           >
             <Ionicons name="arrow-back" size={20} color="#FFF" />
-            <Text style={styles.backButtonText}>Volver a Languages</Text>
+            <Text style={styles.backButtonText}>Go back</Text>
           </TouchableOpacity>
 
           <ScrollView

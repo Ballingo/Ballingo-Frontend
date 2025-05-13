@@ -22,21 +22,21 @@ const LevelPopup: React.FC<LevelPopupProps> = ({ visible, onClose, levelObject})
     <Modal transparent visible={visible} animationType="fade">
       <View style={styles.modalBackground}>
         <View style={styles.popupContainer}>
-          <Text style={styles.title}>Nivel {levelObject.level}</Text>
+          <Text style={styles.title}>Level {levelObject.level}</Text>
           <Text style={styles.description}>
             {levelObject.unlocked
-              ? "Este nivel está desbloqueado. ¿Quieres jugarlo?"
-              : "Este nivel está bloqueado. Completa el anterior para desbloquearlo."}
+              ? "This level is unlocked. Wanna play it?"
+              : "This level is locked. Complete the previous levels to unlock it."}
           </Text>
 
           <View style={styles.buttonContainer}>
             {levelObject.unlocked && (
               <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-                <Text style={styles.closeButtonText}>Cerrar</Text>
+                <Text style={styles.closeButtonText}>Close</Text>
               </TouchableOpacity>
             )}
             <TouchableOpacity style={styles.playButton} onPress={handlePlay}>
-              <Text style={styles.playButtonText}>Jugar</Text>
+              <Text style={styles.playButtonText}>Play</Text>
             </TouchableOpacity>
           </View>
         </View>
