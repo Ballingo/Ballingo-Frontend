@@ -62,8 +62,6 @@ export default function LoginScreen() {
       const { data, status } = await loginUser(credentials);
 
       if (status === 200) {
-        alert(`Bienvenido de nuevo, ${username}`);
-
         await AsyncStorage.setItem("Token", data.token);
         await AsyncStorage.setItem("UserId", data.user_id);
 
@@ -90,7 +88,7 @@ export default function LoginScreen() {
         handleErrorUserLogin(data);
       }
     } else {
-      alert("Por favor, ingresa tu usuario y contraseña.");
+      alert("Please fill in all the fields");
     }
   };
 

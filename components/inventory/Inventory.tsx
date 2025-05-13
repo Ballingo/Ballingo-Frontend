@@ -378,7 +378,7 @@ const handleSelectItem = async (item: InventoryItem) => {
             style={styles.acceptButton}
             onPress={() => handleAcceptTrade(item.id)}
           >
-            <Text style={styles.acceptButtonText}>Aceptar</Text>
+            <Text style={styles.acceptButtonText}>Accept</Text>
           </TouchableOpacity>
         )}
       </TouchableOpacity>
@@ -457,7 +457,7 @@ const handleSelectItem = async (item: InventoryItem) => {
         />
       ) : (
         <>
-          <Text style={styles.tradeTitle}>Trades Activos</Text>
+          <Text style={styles.tradeTitle}>Active Trades</Text>
           <FlatList
             data={activeTrades}
             keyExtractor={(item) => item.id}
@@ -474,7 +474,7 @@ const handleSelectItem = async (item: InventoryItem) => {
               color="#fff"
               style={styles.iconStyle}
             />
-            <Text style={styles.buttonText}>Volver al Inventario</Text>
+            <Text style={styles.buttonText}>Return to the inventory</Text>
           </TouchableOpacity>
         </>
       )}
