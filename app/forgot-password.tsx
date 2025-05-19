@@ -37,7 +37,11 @@ export default function LoginScreen() {
 
   const handleResetPassRequest = async () => {
     if (!email) {
-      alert("Please enter your email");
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Please enter your email.",
+      });
       return;
     }
 
@@ -61,7 +65,11 @@ export default function LoginScreen() {
 
   const handleRecovCode = async () => {
     if (!verificationCode) {
-      alert("Please enter the verification code");
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Please enter the verification code.",
+      });
       return;
     }
 
@@ -122,12 +130,6 @@ export default function LoginScreen() {
       });
       return
     }
-
-    Toast.show({
-      type: "success",
-      text1: `Password reset`,
-      text2: `You can now login with your new password`,
-    });
 
     router.push("/login");
   };
@@ -255,6 +257,11 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </Animated.View>
       </View>
+      <Toast 
+        position="bottom"
+        bottomOffset={20}
+        onPress={() => Toast.hide()}
+      />
     </ImageBackground>
   );
 }

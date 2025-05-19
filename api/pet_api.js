@@ -133,8 +133,9 @@ export const increaseHunger = async (userId, playerId, petId, token) => {
 
         const lastLogin = DateTime.fromISO(data.last_login, { zone: 'utc' });
         const diffHours = now.diff(lastLogin, 'hours').hours;
+        console.log(diffHours);
 
-        if (diffHours <= 0) {
+        if (diffHours <= 1) {
             return { data: "No time has passed, hunger remains the same", status: 200 };
         }
 

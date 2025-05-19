@@ -44,7 +44,7 @@ export default function Index() {
       const pId = await AsyncStorage.getItem("PlayerId");
       const petId = await AsyncStorage.getItem("PetId");
 
-      if (uId && token && pId) {
+      if (uId && token && pId && petId) {
         setPlayerData({
           userId: uId,
           token: token,

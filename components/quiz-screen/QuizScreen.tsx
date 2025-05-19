@@ -87,7 +87,7 @@ const QuizScreen: React.FC = () => {
           }
   
           const {data, status} = await getisCompleted(parsedLevelData?.id);
-          console.log("🔍 Comprobando si el nivel ya está completado:", data, status);
+          console.log("🔍 Comprobando si el nivel ya está completado:", status);
 
           // 🚨 Si el nivel ya está completado, no damos recompensas y salimos
           if (status === 200 && data.completed === true) {

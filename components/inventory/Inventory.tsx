@@ -19,6 +19,7 @@ import { useCallback } from "react";
 import { addClothesToPet, getPetClothes } from "@/api/pet_api";
 import { PetSkinImageMap } from "@/utils/imageMap";
 import LoadingScreen from "@/components/loading-screen/LoadingScreen";
+import Toast from "react-native-toast-message";
 
 interface InventoryItem {
   id: string;
@@ -167,7 +168,11 @@ const handleSelectItem = async (item: InventoryItem) => {
           }
         } else {
           console.log("✅ All clothes removed: ", data);
-          alert("✅ Removed all clothes from your pet.");
+          Toast.show({
+            type: "success",
+            text1: `All clothes removed`,
+            text2: "All clothes removed from your pet.",
+          });
           setSelectedClothes([]);
 
           // Llamar al padre para refrescar la pantalla 🔹
@@ -177,7 +182,11 @@ const handleSelectItem = async (item: InventoryItem) => {
         }
       } else {
         console.error("❌ Error:", data);
-        alert("❌ Could not add clothes to your pet.");
+        Toast.show({
+          type: "error",
+          text1: `Error`,
+          text2: "Could not add clothes to your pet.",
+        });
       }
     } else {
       setModalVisible(true);
@@ -215,7 +224,11 @@ const handleSelectItem = async (item: InventoryItem) => {
   // Mostrar trades activos
   const handleShowTrades = async () => {
     if (!selectedItem) {
-      alert("❌ Debes seleccionar un ítem primero.");
+      Toast.show({
+        type: "error",
+        text1: `Error`,
+        text2: "You must select an item first.",
+      });
       return;
     }
 
@@ -228,7 +241,11 @@ const handleSelectItem = async (item: InventoryItem) => {
   // Confirmar Trade y enviarlo a la API
   const handleConfirmTrade = async () => {
     if (!previousItem || !selectedItem) {
-      alert("❌ Debes seleccionar dos ítems para intercambiar.");
+      Toast.show({
+        type: "error",
+        text1: `Error`,
+        text2: "You must select two items to trade.",
+      });
       return;
     }
 
@@ -237,7 +254,11 @@ const handleSelectItem = async (item: InventoryItem) => {
 
       const storedPlayerId = await AsyncStorage.getItem("PlayerId");
       if (!storedPlayerId) {
-        alert("❌ No se encontró el ID del jugador.");
+        Toast.show({
+          type: "error",
+          text1: `Error`,
+          text2: "Player ID not found.",
+        });
         return;
       }
 
@@ -257,11 +278,19 @@ const handleSelectItem = async (item: InventoryItem) => {
       const response = await createTrade(tradeData);
 
       if (response.status === 201) {
-        alert("✅ Trade creado con éxito.");
+        Toast.show({
+          type: "success",
+          text1: `Trade created`,
+          text2: "Trade created successfully.",
+        });
         handleCloseModal();
       } else {
         console.error("❌ Error creando trade:", response.data);
-        alert("❌ Hubo un error al crear el trade.");
+        Toast.show({
+          type: "error",
+          text1: `Error`,
+          text2: "Something went wrong.",
+        });
       }
     } catch (error: any) {
       // 🔹 Forzamos `error` a tipo `any`
@@ -269,9 +298,17 @@ const handleSelectItem = async (item: InventoryItem) => {
 
       if (error.response) {
         console.log("🔍 Respuesta del servidor:", error.response.data);
-        alert("❌ Error del servidor: " + JSON.stringify(error.response.data));
+        Toast.show({
+          type: "error",
+          text1: `Error`,
+          text2: "Something went wrong.",
+        });
       } else {
-        alert("❌ Error de conexión.");
+        Toast.show({
+          type: "error",
+          text1: `Error`,
+          text2: "Something went wrong.",
+        });
       }
     }
   };
@@ -320,7 +357,11 @@ const handleSelectItem = async (item: InventoryItem) => {
       // Obtener el ID del jugador desde AsyncStorage
       const storedPlayerId = await AsyncStorage.getItem("PlayerId");
       if (!storedPlayerId) {
-        alert("❌ No se encontró el ID del jugador.");
+        Toast.show({
+          type: "error",
+          text1: `Error`,
+          text2: "Player ID not found.",
+        });
         return;
       }
 
@@ -330,15 +371,27 @@ const handleSelectItem = async (item: InventoryItem) => {
       const response = await acceptTrade(tradeId, playerId);
 
       if (response.status === 200) {
-        alert("✅ Trade aceptado con éxito.");
+        Toast.show({
+          type: "success",
+          text1: `Trade accepted`,
+          text2: "Trade accepted successfully.",
+        });
         await fetchActiveTrades(); // Recargar trades después de aceptar uno
       } else {
         console.error("❌ Error aceptando trade:", response.data);
-        alert(`❌ Hubo un error al aceptar el trade: ${response.data.error}`);
+        Toast.show({
+          type: "error",
+          text1: `Error`,
+          text2: "Something went wrong.",
+        });
       }
     } catch (error) {
       console.error("❌ Error en la solicitud de aceptación:", error);
-      alert("❌ Error de conexión.");
+      Toast.show({
+        type: "error",
+        text1: `Error`,
+        text2: "Something went wrong.",
+      });
     }
   };
 
@@ -474,7 +527,7 @@ const handleSelectItem = async (item: InventoryItem) => {
               color="#fff"
               style={styles.iconStyle}
             />
-            <Text style={styles.buttonText}>Return to the inventory</Text>
+            <Text style={styles.buttonText}>Return to Trades</Text>
           </TouchableOpacity>
         </>
       )}
@@ -575,7 +628,7 @@ const handleSelectItem = async (item: InventoryItem) => {
                           color="#fff"
                           style={styles.iconStyle}
                         />
-                        <Text style={styles.buttonText}>Confirmar Trade</Text>
+                        <Text style={styles.buttonText}>Confirm Trade</Text>
                       </TouchableOpacity>
                     </>
                   )}

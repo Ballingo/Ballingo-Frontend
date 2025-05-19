@@ -112,7 +112,7 @@ export default function Shop() {
         if (status === 200){
           Toast.show({
             type: "success",
-            text1: `You bought ${coinAmount} coins`,
+            text1: `You bought: ${coinAmount} coins`,
           });
           setRefreshKey((prev) => prev + 1);
         }
@@ -176,7 +176,7 @@ export default function Shop() {
     if (status === 200){
       Toast.show({
         type: "success",
-        text1: `You bought ${name}`,
+        text1: `You bought: ${name}`,
       });
     }
     else {

@@ -26,6 +26,7 @@ import Animated, {
   interpolate,
 } from "react-native-reanimated";
 import Pet from "@/components/pet/Pet";
+import Toast from "react-native-toast-message";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -64,6 +65,11 @@ export default function LoginScreen() {
       if (status === 200) {
         await AsyncStorage.setItem("Token", data.token);
         await AsyncStorage.setItem("UserId", data.user_id);
+        Toast.show({
+          type: "success",
+          text1: "Logged in",
+          text2: "Welcome back! 👏",
+        });
 
         const response = await getPlayerByUserId(data.user_id);
 
@@ -88,7 +94,11 @@ export default function LoginScreen() {
         handleErrorUserLogin(data);
       }
     } else {
-      alert("Please fill in all the fields");
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Please fill all the fields.",
+      });
     }
   };
 
@@ -253,6 +263,11 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </Animated.View>
       </View>
+      <Toast 
+        position="bottom"
+        bottomOffset={20}
+        onPress={() => Toast.hide()}
+      />
     </ImageBackground>
   );
 }
