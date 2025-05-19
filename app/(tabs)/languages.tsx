@@ -22,6 +22,7 @@ import { setLastLogin } from "@/api/user_api";
 import { setPlayerProgress, getPlayerProgress } from "@/api/player_progress_api";
 import { playerHasPet } from "@/api/pet_api";
 import { checkForToken } from "@/utils/functions";
+import Toast from "react-native-toast-message";
 
 const { width } = Dimensions.get("window");
 
@@ -107,11 +108,6 @@ export default function Languages() {
             console.error("Error creating player progress");
             return;
           }
-
-          await updatePlayerLanguage(playerId, selectedLanguage.flag);
-          await AsyncStorage.setItem("ActualLanguage", selectedLanguage.flag);
-          await setLastLogin(userId, token);
-
         }
 
       } else {
@@ -121,19 +117,21 @@ export default function Languages() {
 
         await AsyncStorage.setItem("PetId", data.id);
         await setPlayerProgress(playerId, selectedLanguage.flag, 1);
-        
       }
 
       await updatePlayerLanguage(playerId, selectedLanguage.flag);
       await AsyncStorage.setItem("ActualLanguage", selectedLanguage.flag);
       await setLastLogin(userId, token);
-
       
       router.push("../level-map");  // Lleva a la pantalla de niveles
 
 
     } else {
-      alert("Please select a language first.");
+      Toast.show({
+        type: "error",
+        text1: `Error`,
+        text2: "You have to select a language",
+      });
     }
   };
 

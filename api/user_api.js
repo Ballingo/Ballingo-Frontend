@@ -104,6 +104,7 @@ export const getLastLogin = async (userId, token) => {
 
 export const setLastLogin = async (userId, token) => {
     try{
+        console.log("Setting last login for user: ", userId);
         const newLastLogin = DateTime.utc().toFormat("yyyy-MM-dd HH:mm:ss.SSSSSSZ");
 
         const res = await api.put(`set/last-login/${userId}`,

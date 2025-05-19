@@ -155,7 +155,7 @@ export default function Trade() {
             isClothes={false}
           />
         ) : (
-          <Text>Cargando comida...</Text>
+          <Text>Loading...</Text>
         )}
       </View>
 
